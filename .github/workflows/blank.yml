@@ -30,4 +30,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: COM3D2.VoiceShortcutManager.Plugin
-          path: COM3D2.VoiceShortcutManager.Plugin/bin/Release/COM3D2.VoiceShortcutManager.Plugin.dll
+          path: bin/Release/COM3D2.VoiceShortcutManager.Plugin.dll
