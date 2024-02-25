@@ -2,9 +2,9 @@ name: Build
 
 on:
   push:
-    branches: [ "master","ankokusamochi" ]
+    branches: [ "master","ankokusamochi", "main" ]
   pull_request:
-    branches: [ "master","ankokusamochi" ]
+    branches: [ "master","ankokusamochi", "main" ]
 
 
 jobs:
