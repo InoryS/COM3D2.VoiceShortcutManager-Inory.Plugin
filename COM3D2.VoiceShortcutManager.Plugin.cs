@@ -1024,12 +1024,15 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 					if (undressManager != null) {
 						undressManager.SetMaskMode(UndressingManager.UnitType.トップス, UndressingManager.MaskStatus.On); //Onが非表示
 						undressManager.SetMaskMode(UndressingManager.UnitType.ボトムス, UndressingManager.MaskStatus.On); //Onが非表示
-						undressManager.SetMaskMode(UndressingManager.UnitType.シューズ, UndressingManager.MaskStatus.On); //Onが非表示
+						undressManager.SetMaskMode(UndressingManager.UnitType.ブラジャー, UndressingManager.MaskStatus.On); //Onが非表示
+						undressManager.SetMaskMode(UndressingManager.UnitType.パンツ, UndressingManager.MaskStatus.On); //Onが非表示
 					} else {
 						maid.body0.SetMask(TBody.SlotID.wear, false);
 						maid.body0.SetMask(TBody.SlotID.onepiece, false);
 						maid.body0.SetMask(TBody.SlotID.skirt, false);
-						maid.body0.SetMask(TBody.SlotID.shoes, false);
+      						maid.body0.SetMask(TBody.SlotID.mizugi, false);
+						maid.body0.SetMask(TBody.SlotID.bra, false);
+						maid.body0.SetMask(TBody.SlotID.panz, false);
 					}
 				}
 			}
