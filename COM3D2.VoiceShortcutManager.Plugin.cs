@@ -1757,14 +1757,23 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		{
 			UndressingManager undressManager = getUndressingManager();
 			//すべてのメイド（仮）
-			foreach (Maid maid in GameMain.Instance.CharacterMgr.GetStockMaidList()) {
-				if (maid.Visible) {
-					if (undressManager != null) {
-						undressManager.SetMaskMode(UndressingManager.UnitType.トップス, UndressingManager.MaskStatus.On); //Onが非表示
-						undressManager.SetMaskMode(UndressingManager.UnitType.ボトムス, UndressingManager.MaskStatus.On); //Onが非表示
-						undressManager.SetMaskMode(UndressingManager.UnitType.ブラジャー, UndressingManager.MaskStatus.On); //Onが非表示
-						undressManager.SetMaskMode(UndressingManager.UnitType.パンツ, UndressingManager.MaskStatus.On); //Onが非表示
-					} else {
+			foreach (Maid maid in GameMain.Instance.CharacterMgr.GetStockMaidList())
+			{
+				if (maid.Visible)
+				{
+					if (undressManager != null)
+					{
+						undressManager.SetMaskMode(UndressingManager.UnitType.トップス,
+							UndressingManager.MaskStatus.On); //Onが非表示
+						undressManager.SetMaskMode(UndressingManager.UnitType.ボトムス,
+							UndressingManager.MaskStatus.On); //Onが非表示
+						undressManager.SetMaskMode(UndressingManager.UnitType.ブラジャー,
+							UndressingManager.MaskStatus.On); //Onが非表示
+						undressManager.SetMaskMode(UndressingManager.UnitType.パンツ,
+							UndressingManager.MaskStatus.On); //Onが非表示
+					}
+					else
+					{
 						maid.body0.SetMask(TBody.SlotID.wear, false);
 						maid.body0.SetMask(TBody.SlotID.onepiece, false);
 						maid.body0.SetMask(TBody.SlotID.skirt, false);
@@ -1774,6 +1783,8 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 					}
 				}
 			}
+		}
+
 		//服の上だけ着せる
 		public void dressTop()
 		{
