@@ -25,7 +25,7 @@
     <vymUnzipEnabled>true</vymUnzipEnabled>
     <vymFaceMotionEnabled>true</vymFaceMotionEnabled>
     <vymEyeFaceLinkType>1</vymEyeFaceLinkType>
-    <vymUndressLinkType>1</vymUndressLinkType>
+    <vymUndressLinkType>false</vymUndressLinkType>
     <vymVibeLinkType>1</vymVibeLinkType>
     <vymFaceLinkType>1</vymFaceLinkType>
     <vymMotionLinkType>0</vymMotionLinkType>
