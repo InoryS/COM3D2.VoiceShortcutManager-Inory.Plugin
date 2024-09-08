@@ -54,7 +54,8 @@
   <ItemGroup>
     <Compile Include="COM3D2.VoiceShortcutManager.Plugin.cs" />
     <Compile Include="GearMenu.cs" />
-	<Compile Include="VoiceConfig.cs" />
+    <Compile Include="VoiceConfig.cs" />
+    <Compile Include="VymConfig.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

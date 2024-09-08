@@ -15,8 +15,9 @@ using UnityInjector.Attributes;
 /**
 音声認識で夜伽コマンド等を制御 ＋ ギアメニューにショートカットキーボタン配置 ＋ テンキー表示
 
+com3d2.vibeyourmaid.plugin.dll が必要 (ver2.1.0.0以降)
 build :
-C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe /t:library /lib:"..\COM3D2\Sybaris" /lib:"..\COM3D2\Sybaris\UnityInjector" /lib:"..\COM3D2\COM3D2x64_Data\Managed" /r:UnityEngine.dll /r:UnityEngine.VR.dll /r:UnityInjector.dll /r:Assembly-CSharp.dll /r:Assembly-CSharp-firstpass.dll COM3D2.VoiceShortcutManager.Plugin.cs VoiceConfig.cs GearMenu.cs
+C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe /t:library /lib:"..\COM3D2\Sybaris" /lib:"..\COM3D2\Sybaris\UnityInjector" /lib:"..\COM3D2\COM3D2x64_Data\Managed" /r:UnityEngine.dll /r:UnityEngine.VR.dll /r:UnityInjector.dll /r:Assembly-CSharp.dll /r:Assembly-CSharp-firstpass.dll /r:com3d2.vibeyourmaid.plugin.dll COM3D2.VoiceShortcutManager.Plugin.cs VoiceConfig.cs GearMenu.cs
 */
 
 #if COM3D2_5
@@ -24,16 +25,20 @@ C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe /t:library /lib:"..\COM3D2\Sybar
 #else
 [assembly: AssemblyTitle("VoiceShortcutManager COM3D2")]
 #endif
-[assembly: AssemblyVersion("1.2.0.0")]
+[assembly: AssemblyVersion("2.0.0.0")]
 
 namespace COM3D2.VoiceShortcutManager.Plugin
 {
 	[
-		PluginName("COM3D2.VoiceShortcutManager"), PluginVersion("1.2")
+		PluginName("COM3D2.VoiceShortcutManager"),
+		PluginVersion("2.0"),
+    	DefaultExecutionOrder(-10) //プラグインの実行順を他のプラグインより前にする
 	]
 	public class VoiceShortcutManager : PluginBase
 	{
-		const string VERSION = "1.2";
+		const string VERSION = "2.0";
+
+		private bool bVR = false;
 
 		//テンキー表示状態
 		public bool keyboardVisible = false;
@@ -61,6 +66,9 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		private GameObject micButton;
 		private GameObject[] gearMenuButton;
 
+		//Updateで送信するボタンに対応したキー
+		MenuInfo sendMenu = null;
+
 		//アイコン画像キャッシュ
 		private Dictionary<string, byte[]> icons = new Dictionary<string, byte[]>();
 
@@ -76,18 +84,27 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		//設定ファイル
 		Config cfg = null;
 		VoiceConfig voiceCfg = null;
+		VymConfig vymCfg = null;
 
 		//設定ファイルパス
 		const string configPath = @"Sybaris\UnityInjector\Config\VoiceShortcutManager\";
 		const string configFile =  configPath+"VoiceShortcutManager.xml";
 		const string voiceConfigFile =  configPath+"VoiceConfig.xml";
+		const string vymConfigFile =  configPath+"VymConfig.xml";
 
 		//設定ファイルの更新日時 再取得チェック用
+		DateTime configFileTime;
 		DateTime voiceConfigFileTime;
+		DateTime vymConfigFileTime;
+
+		//VibeYourMaidのクラス メソッド確認に利用 nullなら無効判定
+		Type vymType = null;
 
 		//設定ファイル
 		public class Config
 		{
+			public Config(){}
+
 			//バージョン番号 設定ファイル上書き保存判定に利用
 			public string version = "";
 
@@ -105,18 +122,39 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			public string keyboardLabelOFF = "テンキー表示";
 
 			//テンキーのサイズと色
+			public int keybordOffsetY = 60;  //テンキーの表示位置 マウス位置からのオフセット
 			public int buttonSize = 32;
 			public int fontSize = 16;
 			public Color32 color = new Color32(96, 96, 96, 240);
 
-			//夜伽コマンドが無効状態でも音声で実行する
+			//夜伽コマンドボタンが無効状態でも音声で実行する
 			public bool forceVoiceYotogiCommand = false;
 
+			//ポップアップのテキストに改行が含まれていたら表示したままにする 
+			public bool keepExplanationYotogi = false;
+			//夜伽シーン以外
+			public bool keepExplanation = false;
+
+			//VibeYourMaid連携有効
+			public bool vymEnabled = true;
+			public bool vymCamMoveEnabled = true; //個別有効設定 カメラ移動
+			public bool vymUnzipEnabled = true;   //個別有効設定 UNZIP
+			public bool vymFaceMotionEnabled = true;  //個別有効設定 表情とモーション
+
+			//対象メイドリンク種別  0:メインメイドのみ 1:メイン＋リンクしているメイド 2:UNZIPのメインとサブメイド 9:表示中のメイド全員
+			public int vymEyeFaceLinkType = 1;  //目線と顔向の変更対象
+			public int vymUndressLinkType = 1;  //脱衣の変更対象
+			public int vymVibeLinkType = 1;     //VibeYourMaidのバイブ操作時
+			public int vymFaceLinkType = 1;     //VibeYourMaidの表情変更時
+			public int vymMotionLinkType = 0;   //VibeYourMaidのモーション変更時
+
+			public float motionFadeTime = 0.7f; //VibeYourMaidのモーション切替のクロスフェードタイム
+			public float faceFadeTime = 0.5f;   //VibeYourMaidの表情切替のクロスフェードタイム
+			
 			//ショートカットボタンリスト
 			public List<MenuInfo> menuList = new List<MenuInfo>();
-
-			public Config() {}
 		}
+
 		//ギアメニューに配置するボタンの情報
 		public class MenuInfo
 		{
@@ -151,6 +189,8 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		void Awake()
 		{
 			GameObject.DontDestroyOnLoad(this);
+
+			bVR = GameMain.Instance.VRMode;
 		}
 
 		//開始時に1回だけ実行
@@ -163,79 +203,47 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			if (!System.IO.Directory.Exists(configPath)) {
 				System.IO.Directory.CreateDirectory(configPath);
 			}
-			//設定ファイル読み込み 読み込み時に引数なしでnewされる
-			if (System.IO.File.Exists(configFile)) {
-				try {
-					System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(Config));
-					using (System.IO.StreamReader sr = new System.IO.StreamReader(configFile, new System.Text.UTF8Encoding(false))) {
-						cfg = (Config)serializer.Deserialize(sr); //XMLファイルから読み込み
-					}
-					//バージョンが変わっていたら保存
-					if (cfg.version != VERSION) {
-						cfg.version = VERSION;
-						using (System.IO.StreamWriter sw = new System.IO.StreamWriter(configFile, false, new System.Text.UTF8Encoding(false))) {
-							serializer.Serialize(sw, cfg); //XMLファイルに保存
-						}
-					}
-				} catch (Exception e) {
-					Debug.LogError("[VoiceShortcutManager] VoiceShortcutManager.xml Error : "+e);
-				}
-			}
-			//ファイルがないならデフォルト設定にサンプル追加
-			else {
-				//サンプル設定
-				cfg.menuList.Add(new MenuInfo("PropMyItem", "PropMyItem", null, Keys.I, true, false, false, null, null));
-				cfg.menuList.Add(new MenuInfo("ModsSlider", "ModsSlider", null, Keys.F5, false, false, false, "^SceneEdit$", null));
-				cfg.menuList.Add(new MenuInfo("YotogiSlider", "YotogiSlider", null, Keys.F5, false, false, false, "^SceneYotogi$", null));
-				cfg.menuList.Add(new MenuInfo("Pause", "Pause", new string[]{"ポーズ","停止"}, Keys.Enter, false, false, false, "^(SceneDance_|SceneVR)", null));
-				//保存
-				cfg.version = VERSION;
-				System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(Config));
-				using (System.IO.StreamWriter sw = new System.IO.StreamWriter(configFile, false, new System.Text.UTF8Encoding(false))) {
-					serializer.Serialize(sw, cfg); //XMLファイルに保存
-				}
-			}
 
-			//ボタンオブジェクト格納用配列
-			this.gearMenuButton = new GameObject[cfg.menuList.Count()];
+			//設定ファイル読み込み
+			loadConfig();
 
-			//アイコン読み込み
-			string[] buttons = {"Keyboard", "MicON", "MicOFF", "MicDisabled"};
-			foreach (string button in buttons) {
-				if (System.IO.File.Exists(configPath+button+".png")) {
-					byte[] bytes = System.IO.File.ReadAllBytes(configPath+button+".png");
-					if (bytes != null && bytes.Length > 0) this.icons.Add(button, bytes);
-				}
-			}
-			foreach (MenuInfo menu in cfg.menuList) {
-				if (System.IO.File.Exists(configPath+menu.name+".png")) {
-					byte[] bytes = System.IO.File.ReadAllBytes(configPath+menu.name+".png");
-					if (bytes != null && bytes.Length > 0) this.icons.Add(menu.name, bytes);
-				}
-				//ついでにsceneIdの先頭の^と末尾の$を除去
-				if (menu.sceneId != null) {
-					menu.sceneId = menu.sceneId.TrimStart('^');
-					menu.sceneId = menu.sceneId.TrimEnd('$');
-				}
-			}
-
+			//GUI初期化
 			initGUI();
 
 			//音声設定ファイル読み込み
 			if (System.IO.File.Exists(voiceConfigFile)) {
-				try {
-					loadVoiceConfig();
-				} catch (Exception e) {
-					Debug.LogError("[VoiceShortcutManager] VoiceConfig.xml Error : "+e);
-				}
-				//バージョンが上がっていても保存しない（改行されるため）
+				loadVoiceConfig();
+				//バージョンが上がっていても保存しない（上書きされて改行もされるため）
 				//if (newVersion) saveVoiceConfig();
 			} else {
 				voiceCfg = new VoiceConfig(); //初期化
 				voiceCfg.initDefault();
 				saveVoiceConfig();
 			}
+
+			//VibeYourMaid設定ファイル読み込み
+			if (System.IO.File.Exists(vymConfigFile)) {
+				loadVymConfig();
+			} else {
+				vymCfg = new VymConfig(); //初期化
+				saveVymConfig();
+			}
+
+			//キャッシュ更新
 			createVoiceCache();
+
+			//VibeYourMaidクラスチェック  cfg.vymEnabled=trueならチェック時のエラーを表示
+			try {
+				vymType = Type.GetType("CM3D2.VibeYourMaid.Plugin.API, com3d2.vibeyourmaid.plugin");
+				if (vymType == null) {
+					if (cfg.vymEnabled) Debug.LogError("["+GetType().Name+"] VibeYourMaid API not found");
+				} else if (vymType.GetMethod("vymGetVersion") == null) {
+					if (cfg.vymEnabled) Debug.LogError("["+GetType().Name+"] VibeYourMaid vymGetVersion() not found");
+					vymType = null; //無効化
+				} else {
+					Debug.Log("["+GetType().Name+"] VibeYourMaid ("+vymGetVersion()+") found");
+				}
+			} catch (Exception e) { Debug.LogError(e); }
 		}
 
 		//シーンロード時に呼ばれる
@@ -248,12 +256,17 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			if (YotogiManager.instans || YotogiOldManager.instans) {
 				//コルーチン開始
 				if (this.yotogiCheckCoroutine == null) this.yotogiCheckCoroutine = StartCoroutine(yotogiCheck());
+
+				//GearMenuのポップアップ設定 夜伽のみ
+				GearMenu.Buttons.keepExplanation = cfg.keepExplanationYotogi;
 			} else {
 				//コルーチン停止
 				if (this.yotogiCheckCoroutine != null) {
 					StopCoroutine(this.yotogiCheckCoroutine);
 					this.yotogiCheckCoroutine = null;
 				}
+				//GearMenuのポップアップ設定 夜伽以外
+				GearMenu.Buttons.keepExplanation = cfg.keepExplanation;
 			}
 
 			//キーボード表示ボタン
@@ -288,9 +301,23 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			}
 		}
 
+		//fpsに関係なく一定時間間隔で実行される
+		/*public void FixedUpdate()
+		{
+			//他のプラグインが認識できるようにこのタイミングで実行
+			if (this.sendMenu != null) {
+				sendMenuKey(this.sendMenu);
+			}
+		}*/
+
 		//毎フレーム呼ばれる 更新処理
 		void Update()
 		{
+			//他のプラグインが認識できるようにこのタイミングで実行
+			if (this.sendMenu != null) {
+				sendMenuKey(this.sendMenu);
+			}
+
 			//パネル上のクリックは下に伝播させない ModsSlider用にEnterのみ無効化してから遅延実行する制御をおこなっている
 			if (this.keyboardVisible && this.guiStopPropagation) {
 				Vector2 pos = new Vector2(Input.mousePosition.x, (float)UnityEngine.Screen.height - Input.mousePosition.y);
@@ -305,6 +332,91 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		}
 
 		////////////////////////////////////////////////////////////////
+		//設定ファイル読み込みと設定からの各種初期化
+		private void loadConfig()
+		{
+			//設定ファイル読み込み 読み込み時に引数なしでnewされる
+			if (System.IO.File.Exists(configFile)) {
+				//更新されていなければ終了
+				if (configFileTime >= System.IO.File.GetLastWriteTime(configFile)) return;
+				try {
+					System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(Config));
+					using (System.IO.StreamReader sr = new System.IO.StreamReader(configFile, new System.Text.UTF8Encoding(false))) {
+						cfg = (Config)serializer.Deserialize(sr); //XMLファイルから読み込み
+					}
+					Debug.Log("[VoiceShortcutManager] VoiceShortcutManager.xml Loaded");
+					//バージョンが変わっていたら保存
+					if (cfg.version != VERSION) {
+						cfg.version = VERSION;
+						using (System.IO.StreamWriter sw = new System.IO.StreamWriter(configFile, false, new System.Text.UTF8Encoding(false))) {
+							serializer.Serialize(sw, cfg); //XMLファイルに保存
+						}
+						Debug.Log("[VoiceShortcutManager] VoiceShortcutManager.xml Updated to "+VERSION);
+					}
+					//更新日時 再読み込みチェック用
+					configFileTime = System.IO.File.GetLastWriteTime(configFile);
+				} catch (Exception e) {
+					Debug.LogError("[VoiceShortcutManager] VoiceShortcutManager.xml Error : "+e);
+				}
+			}
+			//ファイルがないならデフォルト設定にサンプル追加
+			else {
+				//サンプル設定
+				cfg.menuList.Add(new MenuInfo("PropMyItem", "PropMyItem", null, Keys.I, true, false, false, null, null));
+				cfg.menuList.Add(new MenuInfo("ModsSlider", "ModsSlider", null, Keys.F5, false, false, false, "^SceneEdit$", null));
+				cfg.menuList.Add(new MenuInfo("YotogiSlider", "YotogiSlider", null, Keys.F5, false, false, false, "^SceneYotogi$", null));
+				cfg.menuList.Add(new MenuInfo("Pause", "Pause", new string[]{"ポーズ","停止"}, Keys.Enter, false, false, false, "^(SceneDance_|SceneVR)", null));
+				//保存
+				cfg.version = VERSION;
+				System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(Config));
+				using (System.IO.StreamWriter sw = new System.IO.StreamWriter(configFile, false, new System.Text.UTF8Encoding(false))) {
+					serializer.Serialize(sw, cfg); //XMLファイルに保存
+				}
+				Debug.Log("[VoiceShortcutManager] VoiceShortcutManager.xml Created");
+				//更新日時 再読み込みチェック用
+				configFileTime = System.IO.File.GetLastWriteTime(configFile);
+			}
+
+			//ボタンオブジェクト格納用配列
+			this.gearMenuButton = new GameObject[cfg.menuList.Count()];
+
+			//アイコン読み込み
+			string[] buttons = {"Keyboard", "MicON", "MicOFF", "MicDisabled"};
+			foreach (string button in buttons) {
+				if (System.IO.File.Exists(configPath+button+".png")) {
+					byte[] bytes = System.IO.File.ReadAllBytes(configPath+button+".png");
+					if (bytes != null && bytes.Length > 0) {
+						if (this.icons.ContainsKey(button)) this.icons.Remove(button);
+						this.icons.Add(button, bytes);
+					}
+				}
+			}
+			foreach (MenuInfo menu in cfg.menuList) {
+				if (System.IO.File.Exists(configPath+menu.name+".png")) {
+					byte[] bytes = System.IO.File.ReadAllBytes(configPath+menu.name+".png");
+					if (bytes != null && bytes.Length > 0) {
+						if (this.icons.ContainsKey(menu.name)) this.icons.Remove(menu.name);
+						this.icons.Add(menu.name, bytes);
+					}
+				}
+				//設定のsceneIdに ^ と $ がついていたら除去しておく
+				if (menu.sceneId != null) {
+					menu.sceneId = menu.sceneId.TrimStart('^');
+					menu.sceneId = menu.sceneId.TrimEnd('$');
+				}
+			}
+
+			//GearMenuのポップアップ設定 夜伽のみ
+			if (YotogiManager.instans || YotogiOldManager.instans) {
+				GearMenu.Buttons.keepExplanation = cfg.keepExplanationYotogi;
+			} else {
+				//GearMenuのポップアップ設定 夜伽以外
+				GearMenu.Buttons.keepExplanation = cfg.keepExplanation;
+			}
+
+		}
+
+		////////////////////////////////////////////////////////////////
 		// システムショートカット
 
 		//テンキーのトグル
@@ -314,8 +426,8 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			guiStopPropagation = keyboardVisible;
 			GearMenu.Buttons.SetText(keyboardButton, (keyboardVisible ? cfg.keyboardLabelON : cfg.keyboardLabelOFF));
 
-			//位置変更 すぐドラッグ移動できるようにマウスの下に表示 ツールバーより下にする
-			Vector2 pos = new Vector2(Input.mousePosition.x, (float)UnityEngine.Screen.height - Input.mousePosition.y + 50);
+			//位置変更 すぐドラッグ移動できるようにマウスの下に表示 ツールバーには重ねない
+			Vector2 pos = new Vector2(Input.mousePosition.x, (float)UnityEngine.Screen.height - Input.mousePosition.y + cfg.keybordOffsetY);
 			gui.rect.x = pos.x-10;
 			gui.rect.y = pos.y-10;
 		}
@@ -358,37 +470,56 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 					//追加
 					byte[] icon = null;
 					if (this.icons.ContainsKey(menu.name)) icon = this.icons[menu.name];
-					this.gearMenuButton[idx] = GearMenu.Buttons.Add(menu.name, menu.label, icon, (go) => sendKey(menu.key, menu.shift, menu.ctrl, menu.alt));
+					this.gearMenuButton[idx] = GearMenu.Buttons.Add(menu.name, menu.label, icon, (go) => sendMenuKey(menu));
 				}
 			}
 		}
 
+		//次フレームのUpdateでキー送信場合はここでセット
+		private void setSendMenu(MenuInfo menu)
+		{
+			this.sendMenu = menu;
+		}
+		//MenuInfoのキー情報を送信
+		private void sendMenuKey(MenuInfo menu)
+		{
+			sendKey(menu.key, menu.shift, menu.ctrl, menu.alt);
+			this.sendMenu = null;
+		}
+
 		////////////////////////////////////////////////////////////////
 		// 音声関連
+		#region Voice
 		
-		//音声設定ファイル読み込み 読み込み時に引数なしでnewされる
+		//音声設定ファイル読み込み
 		private void loadVoiceConfig()
 		{
-			Debug.Log("[VoiceShortcutManager] Load VoiceConfig");
-			System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(VoiceConfig));
-			using (System.IO.StreamReader sr = new System.IO.StreamReader(voiceConfigFile, new System.Text.UTF8Encoding(false))) {
-				voiceCfg = (VoiceConfig)serializer.Deserialize(sr); //XMLファイルから読み込み
+			try {
+				System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(VoiceConfig));
+				using (System.IO.StreamReader sr = new System.IO.StreamReader(voiceConfigFile, new System.Text.UTF8Encoding(false))) {
+					//XMLファイルから読み込み voiceCfgは引数なしでnewされてXMLの値が設定される
+					voiceCfg = (VoiceConfig)serializer.Deserialize(sr);
+				}
+				//更新日時
+				voiceConfigFileTime = System.IO.File.GetLastWriteTime(voiceConfigFile);
+				Debug.Log("[VoiceShortcutManager] VoiceConfig.xml Loaded");
+			} catch (Exception e) {
+				Debug.LogError("[VoiceShortcutManager] VoiceConfig.xml Error : "+e);
 			}
-			//更新日時
-			voiceConfigFileTime = System.IO.File.GetLastWriteTime(voiceConfigFile);
+
 		}
 		//音声設定ファイル保存 基本ファイルがない場合のみ
 		private void saveVoiceConfig()
 		{
-			Debug.Log("[VoiceShortcutManager] Save VoiceConfig");
 			System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(VoiceConfig));
 			using (System.IO.StreamWriter sw = new System.IO.StreamWriter(voiceConfigFile, false, new System.Text.UTF8Encoding(false))) {
 				serializer.Serialize(sw, voiceCfg); //XMLファイルに保存
 			}
 			//更新日時
 			voiceConfigFileTime = System.IO.File.GetLastWriteTime(voiceConfigFile);
+			Debug.Log("[VoiceShortcutManager] VoiceConfig.xml Created");
 		}
-		//音声設定ファイルからDictionary作成
+		//夜伽用の音声設定からDictionary作成
 		private void createVoiceCache()
 		{
 			//キャッシュクリア
@@ -413,27 +544,68 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			}
 		}
 
+		//音声設定ファイル読み込み
+		private void loadVymConfig()
+		{
+			try {
+				System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(VymConfig));
+				using (System.IO.StreamReader sr = new System.IO.StreamReader(vymConfigFile, new System.Text.UTF8Encoding(false))) {
+					//XMLファイルから読み込み vymCfgは引数なしでnewされてXMLの値が設定される
+					vymCfg = (VymConfig)serializer.Deserialize(sr);
+				}
+				//更新日時
+				vymConfigFileTime = System.IO.File.GetLastWriteTime(vymConfigFile);
+				Debug.Log("[VoiceShortcutManager] "+vymConfigFile+" Loaded");
+			} catch (Exception e) {
+				Debug.LogError("[VoiceShortcutManager] "+vymConfigFile+" Error : "+e);
+			}
+
+		}
+		//音声設定ファイル保存 基本ファイルがない場合のみ
+		private void saveVymConfig()
+		{
+			System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(VymConfig));
+			using (System.IO.StreamWriter sw = new System.IO.StreamWriter(vymConfigFile, false, new System.Text.UTF8Encoding(false))) {
+				serializer.Serialize(sw, vymCfg); //XMLファイルに保存
+			}
+			//更新日時
+			vymConfigFileTime = System.IO.File.GetLastWriteTime(vymConfigFile);
+			Debug.Log("[VoiceShortcutManager] "+vymConfigFile+" Created");
+		}
+
+
 		//音声認識有効化
 		private void enableMic()
 		{
+			//設定ファイル再読み込み 更新されていなけば読み込まない
+			loadConfig();
+
+			//音声設定ファイル
 			if (System.IO.File.Exists(voiceConfigFile)) {
 				//ファイルが更新されていたら読み込み
 				if (voiceConfigFileTime < System.IO.File.GetLastWriteTime(voiceConfigFile)) {
-					try {
-						loadVoiceConfig();
-						createVoiceCache();
-					} catch (Exception e) {
-						Debug.LogError("[VoiceShortcutManager] VoiceConfig.xml Error : "+e);
-					}
+					loadVoiceConfig();
 				}
 			} else {
 				//ファイルがなくなっていたら初期化して出力
 				voiceCfg = new VoiceConfig();
 				voiceCfg.initDefault();
 				saveVoiceConfig();
-				createVoiceCache();
 			}
-			
+			//キャッシュ更新
+			createVoiceCache();
+
+			//VYM設定ファイル
+			if (System.IO.File.Exists(vymConfigFile)) {
+				//ファイルが更新されていたら読み込み
+				if (vymConfigFileTime < System.IO.File.GetLastWriteTime(vymConfigFile)) {
+					loadVymConfig();
+				}
+			} else {
+				//ファイルがなくなっていたら初期化して出力
+				vymCfg = new VymConfig();
+				saveVymConfig();
+			}
 
 			//シーンに対応したキーワードを設定して音声認識開始
 			setVoiceKeywords();
@@ -536,7 +708,8 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 							//実行時にも一応シーンをチェック ボタンは表示されないはず
 							if (isSceneValid(menu, sceneName, sceneLevel)) {
 								Debug.Log("Voice sendKey : "+k+" → "+menu.name);
-								sendKey(menu.key, menu.shift, menu.ctrl, menu.alt);
+								//sendMenuKey(menu);
+								setSendMenu(menu);
 							} else {
 								Debug.Log("Voice sendKey : 無効なシーンです");
 							}
@@ -544,6 +717,9 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 					}
 				}
 			}
+
+			//システム操作キーワード
+			setSystemKeyword();
 
 			//夜伽シーンキーワード設定
 			setYotogiKeywords();
@@ -555,7 +731,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			setUndressKeywoards();
 
 			//VYM連携
-
+			setVymKeywoards();
 
 			//DEBUG
 			if (!keywords.ContainsKey("テスト")) {
@@ -619,11 +795,11 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 									Debug.LogError("VoiceConfig.xml 夜伽別名が重複しています : "+keyword+" → "+alias);
 								} else {
 									Debug.Log("        Alias : → "+alias);
-									string a = alias; //スコープ対策
+									string _alias = alias; //スコープ対策
 									if (aliasLabel == "") aliasLabel = alias;
 									else aliasLabel += "  |  "+alias;
 									keywords.Add(alias, () => {
-										Debug.Log("YotogiCommand : "+keyword+" ("+a+")");
+										Debug.Log("YotogiCommand : "+keyword+" ("+_alias+")");
 										if (uiButton) {
 											if (uiButton.isEnabled) {
 												//ボタンが有効な場合のみクリック送信
@@ -688,7 +864,515 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			this.yotogiCommandCount = this.yotogiCommandUnit.transform.childCount;
 		}
 
+		//キーワードのコールバック設定  音声に対応するメソッドをInvokeで呼び出す
+		private void setVoiceKeywordInvoke(string[] voices, string name)
+		{
+			setVoiceKeywordInvoke(voices, name, null);
+		}
+		private void setVoiceKeywordInvoke(string[] voices, string name, object[] args)
+		{
+			foreach (string keyword in voices) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice "+name+" : "+k);
+					MethodInfo method = this.GetType().GetMethod(name);
+					if (method == null) Debug.LogError(name+" not found");
+					else method.Invoke(this, args);
+				});
+			}
+		}
+
+		#endregion
+
+		////////////////////////////////////////////////////////////////
+		// システム・設定周り
+		#region SystemVoice
+
+		private void setSystemKeyword()
+		{
+			//オートモード
+			foreach (string keyword in voiceCfg.autoModeOn) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice scriptAutoOn : "+k);
+					setAutoMode(true);
+				});
+			}
+			foreach (string keyword in voiceCfg.autoModeOff) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice scriptAutoOff : "+k);
+					setAutoMode(false);
+				});
+			}
+			foreach (string keyword in voiceCfg.playVoice) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice playVoice : "+k);
+					playVoice();
+				});
+			}
+
+			//自分のConfig変更
+			foreach (ConfigInfo info in voiceCfg.config) {
+				ConfigInfo value = info; //スコープ対策
+				foreach (string keyword in info.voice) {
+					if (keywords.ContainsKey(keyword)) continue;
+					string k = keyword; //スコープ対策
+					keywords.Add(keyword, () => {
+						Debug.Log("Voice config ("+value+") : "+k);
+						setConfig(value);
+					});
+				}
+			}
+		}
+
+		//オートモード切替
+		public void setAutoMode(bool auto)
+		{
+			ADVKagManager advKag = (ADVKagManager)GameMain.Instance.ScriptMgr.adv_kag;
+			if (GameMain.Instance.MsgWnd) {
+				if (advKag.auto_mode != auto) {
+					GameMain.Instance.MsgWnd.CallEvent(MessageWindowMgr.MessageWindowUnderButton.Auto);
+				}
+			} else {
+				advKag.auto_mode = auto;
+			}
+		}
+
+		//メッセージウィンドウのボイス再生 VOICEボタンを押す処理を事項
+		public void playVoice()
+		{
+			//位置に合わせた音声にならない
+			GameMain.Instance.MsgWnd.CallEvent(MessageWindowMgr.MessageWindowUnderButton.Voice);
+		}
+
+		//設定変更
+		public void setConfig(ConfigInfo info)
+		{
+			try {
+				//データ型に合わせて設定
+				FieldInfo cfgFieldInfo = cfg.GetType().GetField(info.name);
+				if (cfgFieldInfo != null) {
+					if (cfgFieldInfo.FieldType == typeof(bool)) {
+						bool value;
+						if (info.value == "toggle") value = !(bool)cfgFieldInfo.GetValue(cfg);
+						else value = bool.Parse(info.value);
+						cfgFieldInfo.SetValue(cfg, value);
+					} else if (cfgFieldInfo.FieldType == typeof(int)) {
+						cfgFieldInfo.SetValue(cfg, int.Parse(info.value));
+					} else if (cfgFieldInfo.FieldType == typeof(float)) {
+						cfgFieldInfo.SetValue(cfg, float.Parse(info.value));
+					} else if (cfgFieldInfo.FieldType == typeof(string)) {
+						cfgFieldInfo.SetValue(cfg, info.value);
+					} else {
+						Debug.Log("setConfig : "+info.name+" type="+cfgFieldInfo.FieldType+" is not support");
+						return;
+					}
+					Debug.Log("setConfig : "+info.name+" value="+info.value);
+				}
+			} catch (Exception e) { UnityEngine.Debug.LogError(e); }
+		}
+
+		#endregion
+
+		////////////////////////////////////////////////////////////////
+        //VibeYourMaid連携
+		#region VibeYourMaid
+
+		//VymVoiceinfoのキーワードに対応した連携メソッド呼び出し
+		private void setVymKeywordInvoke(string[] keywords, string name, object[] args)
+		{
+			setVymKeywordInvoke(keywords, name, null, args);
+		}
+		//VymVoiceinfoのキーワードに対応した連携メソッド呼び出し ログ表示用ラベルあり
+		private void setVymKeywordInvoke(string[] voices, string name, string label, object[] args)
+		{
+			foreach (string keyword in voices) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice "+name+ ( label==null ? "" : (" ("+label+")") ) +" : "+k);
+					MethodInfo method = vymType.GetMethod(name);
+					if (method == null) Debug.LogError(name+" not found");
+					else method.Invoke(null, args);
+				});
+			}
+		}
+
+		//キーワード登録
+		private void setVymKeywoards()
+		{
+			//リンク設定が無効かdllがなければキーワードは登録しない
+			if (!cfg.vymEnabled || vymType == null) return;
+
+			//正面のメイドをメインメイドにする
+			setVymKeywordInvoke(vymCfg.vymSelectFrontMaid, "vymSelectFrontMaid", null);
+			//名前でメインメイドを選択
+			foreach (VymVoiceInfo info in vymCfg.vymSelectMaidName) {
+				string value = info.value;
+				setVymKeywordInvoke(info.voice, "vymSelectMaidName", info.value, new object[]{value});
+			}
+			//前のメイド カメラ移動なし
+			setVymKeywordInvoke(vymCfg.vymPrevMaid, "vymPrevMaid", new object[]{false});
+			//次のメイド カメラ移動なし
+			setVymKeywordInvoke(vymCfg.vymNextMaid, "vymNextMaid", new object[]{false});
+			//前のメイド カメラ移動なし
+			setVymKeywordInvoke(vymCfg.vymLeftMaid, "vymLeftMaid", new object[]{false});
+			//次のメイド カメラ移動なし
+			setVymKeywordInvoke(vymCfg.vymRightMaid, "vymRightMaid", new object[]{false});
+
+			//リンク制御
+			foreach (VymVoiceInfo info in vymCfg.vymMaidLink) {
+				string value = info.value;
+				setVymKeywordInvoke(info.voice, "vymMaidLink", info.value, new object[]{value});
+			}
+
+			if (cfg.vymCamMoveEnabled) {
+				//VR移動
+				if (bVR) {
+					foreach (VymMoveInfo info in vymCfg.vymCamMove) {
+						setVymKeywordInvoke(info.voice, "vymCamMove", new object[]{info.move, info.useMoveValue});
+					}
+				}
+
+				//メイドとカメラの距離
+				foreach (VymVoiceInfo info in vymCfg.vymCamDistance) {
+					float value = float.Parse(info.value.Replace("%", ""));
+					int moveType = 0;
+					if (info.value.EndsWith("%")) moveType = 2;
+					else if (info.value.StartsWith("+") || info.value.StartsWith("-")) moveType = 1; //offset
+					setVymKeywordInvoke(info.voice, "vymCamDistance", info.value, new object[]{value, moveType});
+				}
+
+				//メイドの正面にカメラを移動 body0の正面
+				setVymKeywordInvoke(vymCfg.vymCamFront, "vymCamAround", "front", new object[]{1, 0f});
+				//メイドの後ろにカメラを移動 body0の後ろ
+				setVymKeywordInvoke(vymCfg.vymCamBack, "vymCamAround", "back", new object[]{1, 180f});
+
+				//メイドの顔の部位の正面にカメラを移動
+				foreach (VymVoiceInfo info in vymCfg.vymCamTarget) {
+					float value = float.Parse(info.value);
+					int value2 = int.Parse(info.value2);
+					setVymKeywordInvoke(info.voice, "vymCamTarget", info.value+" "+info.value2, new object[]{value, Math.Abs(value2), value2 < 0});
+				}
+
+				//ご主人様の頭にカメラを移動
+				foreach (VymVoiceInfo info in vymCfg.vymCamManHead) {
+					int value = int.Parse(info.value); //男指定
+					int value2 = int.Parse(info.value2); //視線方向指定
+					setVymKeywordInvoke(info.voice, "vymCamManHead", info.value+" "+info.value2, new object[]{value, value2});
+				}
+			}
+			
+			//一人称
+			foreach (VymVoiceInfo info in vymCfg.vymFps) {
+				int fps = int.Parse(info.value);
+				setVymKeywordInvoke(info.voice, "vymLookPoint", "Fps "+info.value, new object[]{fps, -1, -1});
+			}
+			//メイド固定
+			foreach (VymVoiceInfo info in vymCfg.vymFollow) {
+				int follow = int.Parse(info.value);
+				setVymKeywordInvoke(info.voice, "vymLookPoint", "Follow "+info.value, new object[]{-1, follow, -1});
+			}
+			//メイド固定 注視点
+			foreach (VymVoiceInfo info in vymCfg.vymLookPoint) {
+				int lookPoint = int.Parse(info.value);
+				int follow = lookPoint == 10 ? 1 : -1; //アングル固定時はメイドも固定
+				setVymKeywordInvoke(info.voice, "vymLookPoint", info.value, new object[]{-1, follow, lookPoint});
+			}
+
+			//地面判定
+			foreach (VymVoiceInfo info in vymCfg.vymBoneHitHeight) {
+				float value = float.Parse(info.value);
+				bool offset = info.value.StartsWith("+") || info.value.StartsWith("-");
+				setVymKeywordInvoke(info.voice, "vymBoneHitHeight", info.value, new object[]{value, offset});
+			}
+
+			//興奮値
+			foreach (VymVoiceInfo info in vymCfg.vymExcite) {
+				int value = int.Parse(info.value);
+				bool offset = info.value.StartsWith("+") || info.value.StartsWith("-");
+				setVymKeywordInvoke(info.voice, "vymExcite", info.value, new object[]{value, offset});
+			}
+
+			//男表示
+			foreach (VymVoiceInfo info in vymCfg.vymManVisible) {
+				int value = int.Parse(info.value);
+				setVymKeywordInvoke(info.voice, "vymManVisible", info.value, new object[]{value});
+			}
+			//男強制射精
+			foreach (VymVoiceInfo info in vymCfg.vymSyasei) {
+				int value = int.Parse(info.value);
+				bool lockMode = info.value.StartsWith("+") || info.value.StartsWith("-");
+				setVymKeywordInvoke(info.voice, "vymSyasei", info.value, new object[]{value, lockMode});
+			}
+
+			//拭き取り
+			foreach (VymVoiceInfo info in vymCfg.vymFukitori) {
+				int value = int.Parse(info.value);
+				setVymKeywordInvoke(info.voice, "vymFukitori", info.value, new object[]{value});
+			}
+
+			//尿
+			foreach (VymVoiceInfo info in vymCfg.vymStartNyo) {
+				int value = int.Parse(info.value);
+				setVymKeywordInvoke(info.voice, "vymStartNyo", info.value, new object[]{value});
+			}
+			//潮
+			foreach (VymVoiceInfo info in vymCfg.vymStartSio) {
+				int value = int.Parse(info.value);
+				setVymKeywordInvoke(info.voice, "vymStartSio", info.value, new object[]{value});
+			}
+
+			//バイブ切り替え
+			foreach (VymVoiceInfo info in vymCfg.vymVibe) {
+				int value = int.Parse(info.value);
+				setVymKeywordInvoke(info.voice, "vymVibe", info.value, new object[]{value, cfg.vymVibeLinkType});
+			}
+			//バイブオート
+			foreach (VymVoiceInfo info in vymCfg.vymVibeAuto) {
+				int value = int.Parse(info.value);
+				bool offset = info.value.StartsWith("+") || info.value.StartsWith("-");
+				setVymKeywordInvoke(info.voice, "vymVibeAuto", info.value, new object[]{value, offset, cfg.vymVibeLinkType});
+			}
+
+			//クパ
+			foreach (VymVoiceInfo info in vymCfg.vymKupa) {
+				float value = float.Parse(info.value);
+				bool offset = info.value.StartsWith("+") || info.value.StartsWith("-");
+				setVymKeywordInvoke(info.voice, "vymKupa", info.value, new object[]{value, offset});
+			}
+			//アナル
+			foreach (VymVoiceInfo info in vymCfg.vymAnal) {
+				float value = float.Parse(info.value);
+				bool offset = info.value.StartsWith("+") || info.value.StartsWith("-");
+				setVymKeywordInvoke(info.voice, "vymAnal", info.value, new object[]{value, offset});
+			}
+			//クリ
+			foreach (VymVoiceInfo info in vymCfg.vymBokki) {
+				float value = float.Parse(info.value);
+				bool offset = info.value.StartsWith("+") || info.value.StartsWith("-");
+				setVymKeywordInvoke(info.voice, "vymBokki", info.value, new object[]{value, offset});
+			}
+
+			if (cfg.vymUnzipEnabled) {
+				//UNZIPモーション
+				foreach (VymVoiceInfo info in vymCfg.vymUnzip) {
+					string value = info.value;
+					setVymKeywordInvoke(info.voice, "vymUnzip", info.value, new object[]{value});
+				}
+				//UNZIP派生モーション
+				foreach (VymVoiceInfo info in vymCfg.vymUnzipDerive) {
+					string[] value = null;
+					if (info.value != null) value = info.value.Split(',');
+					setVymKeywordInvoke(info.voice, "vymUnzipDerive", info.value, new object[]{value});
+				}
+				//UNZIPランダムモーション
+				foreach (VymVoiceInfo info in vymCfg.vymUnzipRandom) {
+					string value = info.value;
+					setVymKeywordInvoke(info.voice, "vymUnzipRandom", info.value, new object[]{value});
+				}
+				//UNZIPモーション切替
+				foreach (VymVoiceInfo info in vymCfg.vymUnzipChange) {
+					int value = int.Parse(info.value);
+					setVymKeywordInvoke(info.voice, "vymUnzipChange", info.value, new object[]{value});
+				}
+
+				//抜く trueなら強制外だし
+				foreach (VymVoiceInfo info in vymCfg.vymRemoveMotion) {
+					bool value = bool.Parse(info.value);
+					setVymKeywordInvoke(info.voice, "vymRemoveMotion", info.value, new object[]{value});
+				}
+				//再挿入
+				setVymKeywordInvoke(vymCfg.vymInsertMotion, "vymInsertMotion", null);
+				//素股
+				setVymKeywordInvoke(vymCfg.vymSumataMotion, "vymSumataMotion", null);
+
+				//後ろを使う 前を使う
+				foreach (VymVoiceInfo info in vymCfg.vymAnalMode) {
+					bool value = bool.Parse(info.value);
+					setVymKeywordInvoke(info.voice, "vymAnalMode", info.value, new object[]{value});
+				}
+			}
+
+			//ボイスセット
+			foreach (VymVoiceInfo info in vymCfg.vymVoiceSet) {
+				string value = info.value;
+				setVymKeywordInvoke(info.voice, "vymVoiceSet", info.value, new object[]{value});
+			}
+			//キスボイスセット
+			foreach (VymVoiceInfo info in vymCfg.vymKissVoiceSet) {
+				string value = info.value;
+				setVymKeywordInvoke(info.voice, "vymKissVoiceSet", info.value, new object[]{value});
+			}
+
+			if (cfg.vymFaceMotionEnabled) {
+				//表情とモーションとボイスセットは1つのキーワードで呼び出せるように設定
+				//マイポーズ 連続モーション  フェードは共通設定
+				foreach (VymFaceMotionInfo info in vymCfg.vymFaceMotion) {
+					string face = info.face;
+					string blend = info.blend;
+					string[] tags = info.tags;
+					string[] motion = info.motion;
+					bool loop = info.loop != null && info.loop == "true"; //文字列になっている
+					string voiceSet = info.voiceSet;
+					foreach (string keyword in info.voice) {
+						if (keywords.ContainsKey(keyword)) continue;
+						string k = keyword; //スコープ対策
+						keywords.Add(keyword, () => {
+							//ボイスセット
+							if (voiceSet != null) {
+								string name = "vymVoiceSet";
+								Debug.Log("Voice "+name+" : "+k);
+								if (vymType.GetMethod(name) == null) Debug.LogError(name+" not found");
+								else vymVoiceSet(voiceSet);
+							}
+							//モーション
+							if (motion != null) {
+								string name = "vymMotion";
+								Debug.Log("Voice "+name+" : "+k);
+								if (vymType.GetMethod(name) == null) Debug.LogError(name+" not found");
+								else vymMotion(motion, new float[]{cfg.motionFadeTime}, loop);
+							}
+							//表情 タグを優先
+							if (tags != null) {
+								string name = "vymFaceBlend";
+								Debug.Log("Voice "+name+" : "+k);
+								if (vymType.GetMethod(name) == null) Debug.LogError(name+" not found");
+								else vymFaceBlend(tags);
+							} else {
+								string name = "vymFace";
+								Debug.Log("Voice "+name+" ("+face+") : "+k);
+								if (vymType.GetMethod(name) == null) Debug.LogError(name+" not found");
+								else vymFace(face, blend, cfg.faceFadeTime);
+							}
+						});
+					}
+				}
+			}
+
+			//VYMのConfig変更
+			foreach (VymConfigInfo info in vymCfg.vymConfig) {
+				VymConfigInfo info2 = info; //スコープ対策
+				foreach (string keyword in info.voice) {
+					if (keywords.ContainsKey(keyword)) continue;
+					string k = keyword; //スコープ対策
+					keywords.Add(keyword, () => {
+						string name = "vymGetConfig";
+						Debug.Log("Voice vymConfig : "+k);
+						if (vymType.GetMethod(name) == null) Debug.LogError(name+" not found");
+						else vymGetConfig(info2);
+					});
+				}
+			}
+
+		}
+
+		//メソッドが無いとエラーになるのでメソッドの外で呼び出す前に有無をチェック
+		private string vymGetVersion() { return CM3D2.VibeYourMaid.Plugin.API.vymGetVersion(); }
+
+		private Maid vymGetFrontMaid() { return CM3D2.VibeYourMaid.Plugin.API.vymGetFrontMaid(); }
+		private List<Maid> vymGetMaidList(int linkType) { return CM3D2.VibeYourMaid.Plugin.API.vymGetMaidList(linkType); }
+
+		private void vymFace(string face, string blend, float fadeFace) { CM3D2.VibeYourMaid.Plugin.API.vymFace(face, blend, fadeFace, cfg.vymFaceLinkType); }
+		private void vymFaceBlend(string[] tags) { CM3D2.VibeYourMaid.Plugin.API.vymFaceBlend(tags, cfg.vymFaceLinkType); }
+		private void vymMotion(string[] motions, float[] motionFades, bool loop) {
+			CM3D2.VibeYourMaid.Plugin.API.vymMotion(motions, motionFades, loop, cfg.vymMotionLinkType);
+		}
+		private void vymVoiceSet(string voiceFile) { CM3D2.VibeYourMaid.Plugin.API.vymVoiceSet(voiceFile); }
+
+		//VibeYourMaidの設定変更 bool,int,float,string型のみ 
+		private void vymGetConfig(VymConfigInfo info)
+		{
+			try {
+				//VYM設定取得
+				CM3D2.VibeYourMaid.Plugin.VibeYourMaid.VibeYourMaidCfgWriting cfgw = CM3D2.VibeYourMaid.Plugin.API.vymGetConfig();
+				//データ型に合わせて設定
+				FieldInfo cfgwFieldInfo = cfgw.GetType().GetField(info.name);
+				if (cfgwFieldInfo != null) {
+					if (cfgwFieldInfo.FieldType == typeof(bool)) {
+						bool value;
+						if (info.value == "toggle") value = !(bool)cfgwFieldInfo.GetValue(cfgw);
+						else value = bool.Parse(info.value);
+						cfgwFieldInfo.SetValue(cfgw, value);
+					} else if (cfgwFieldInfo.FieldType == typeof(int)) {
+						cfgwFieldInfo.SetValue(cfgw, int.Parse(info.value));
+					} else if (cfgwFieldInfo.FieldType == typeof(float)) {
+						cfgwFieldInfo.SetValue(cfgw, float.Parse(info.value));
+					} else if (cfgwFieldInfo.FieldType == typeof(string)) {
+						cfgwFieldInfo.SetValue(cfgw, info.value);
+					} else {
+						Debug.Log("vymConfig : "+info.name+" type="+cfgwFieldInfo.FieldType+" is not support");
+						return;
+					}
+
+					Debug.Log("vymConfig : "+info.name+" value="+info.value);
+					if (info.init) CM3D2.VibeYourMaid.Plugin.API.vymInitConfig();
+				}
+			} catch (Exception e) { UnityEngine.Debug.LogError(e); }
+		}
+
+		//Invokeで呼んでいるので未使用 API変更チェック用に残している 
+		private void vymSelectFrontMaid() { CM3D2.VibeYourMaid.Plugin.API.vymSelectFrontMaid(); }
+        private void vymSelectMaidName(string name) { CM3D2.VibeYourMaid.Plugin.API.vymSelectMaidName(name); }
+		private void vymPrevMaid(bool camChange) { CM3D2.VibeYourMaid.Plugin.API.vymPrevMaid(camChange); }
+        private void vymNextMaid(bool camChange) { CM3D2.VibeYourMaid.Plugin.API.vymNextMaid(camChange); }
+		private void vymLeftMaid(bool camChange) { CM3D2.VibeYourMaid.Plugin.API.vymLeftMaid(camChange); }
+        private void vymRightMaid(bool camChange) { CM3D2.VibeYourMaid.Plugin.API.vymRightMaid(camChange); }
+        private void vymMaidLink(string type) { CM3D2.VibeYourMaid.Plugin.API.vymMaidLink(type); }
+		private void vymManVisible(int manVisible) { CM3D2.VibeYourMaid.Plugin.API.vymManVisible(manVisible); }
+
+		private void vymCamMove(Vector3 move, bool useMoveValue) { CM3D2.VibeYourMaid.Plugin.API.vymCamMove(move, useMoveValue); }
+		private void vymCamDistance(float distance, int moveType) { CM3D2.VibeYourMaid.Plugin.API.vymCamDistance(distance, moveType); }
+		private void vymCamAround(int aroundType, float angleOffset) { CM3D2.VibeYourMaid.Plugin.API.vymCamAround(aroundType, angleOffset); }
+		private void vymCamTarget(float distance, int target, bool backword) { CM3D2.VibeYourMaid.Plugin.API.vymCamTarget(distance, target, backword); }
+		private void vymCamManHead(int manID, int target) { CM3D2.VibeYourMaid.Plugin.API.vymCamManHead(manID, target); }
+		private void vymLookPoint(int fpsMod, int follow, int lookPoint) { CM3D2.VibeYourMaid.Plugin.API.vymLookPoint(fpsMod, follow, lookPoint); }
+
+		private void vymBoneHitHeight(float height, bool offset) { CM3D2.VibeYourMaid.Plugin.API.vymBoneHitHeight(height, offset); }
+		private void vymExcite(int excite, bool offset) { CM3D2.VibeYourMaid.Plugin.API.vymExcite(excite, offset); }
+		private void vymSyasei(int man, bool lockMode) { CM3D2.VibeYourMaid.Plugin.API.vymSyasei(man, lockMode); }
+		private void vymFukitori(int mode) { CM3D2.VibeYourMaid.Plugin.API.vymFukitori(mode); }
+        private void vymStartNyo(int linkType) { CM3D2.VibeYourMaid.Plugin.API.vymStartNyo(linkType); }
+        private void vymStartSio(int linkType) { CM3D2.VibeYourMaid.Plugin.API.vymStartSio(linkType); }
+
+		private void vymVibe(int level) { CM3D2.VibeYourMaid.Plugin.API.vymVibe(level, cfg.vymVibeLinkType); }
+		private void vymVibeAuto(int auto, bool offset) { CM3D2.VibeYourMaid.Plugin.API.vymVibeAuto(auto, offset, cfg.vymVibeLinkType); }
+        private void vymKupa(float kupa, bool offset) { CM3D2.VibeYourMaid.Plugin.API.vymKupa(kupa, offset); }
+        private void vymAnal(float kupa, bool offset) { CM3D2.VibeYourMaid.Plugin.API.vymAnal(kupa, offset); }
+        private void vymBokki(float bokki, bool offset) { CM3D2.VibeYourMaid.Plugin.API.vymBokki(bokki, offset); }
+
+		private void vymUnzip(string motion) { CM3D2.VibeYourMaid.Plugin.API.vymUnzip(motion); }
+		private void vymUnzipDerive(string[] derives) { CM3D2.VibeYourMaid.Plugin.API.vymUnzipDerive(derives); }
+		private void vymUnzipRandom(string emsFile) { CM3D2.VibeYourMaid.Plugin.API.vymUnzipRandom(emsFile); }
+		private void vymUnzipChange(int changeTYpe) { CM3D2.VibeYourMaid.Plugin.API.vymUnzipChange(changeTYpe); }
+
+        private void vymRemoveMotion(bool syasei) { CM3D2.VibeYourMaid.Plugin.API.vymRemoveMotion(syasei); }
+        private void vymInsertMotion() { CM3D2.VibeYourMaid.Plugin.API.vymInsertMotion(); }
+        private void vymSumataMotion() { CM3D2.VibeYourMaid.Plugin.API.vymSumataMotion(); }
+		private void vymAnalMode(bool analMode) { CM3D2.VibeYourMaid.Plugin.API.vymAnalMode(analMode); }
+
+		private void vymKissVoiceSet(string voiceFile) { CM3D2.VibeYourMaid.Plugin.API.vymKissVoiceSet(voiceFile); }
+
+		#endregion
+
+		////////////////////////////////////////////////////////////////
+		// 目線 顔向き
 		#region Face
+
+		//対象になるメイドを取得 顔向き用
+		private List<Maid> getFaceMaidList()
+		{
+			if (vymType != null) {
+				return vymGetMaidList(cfg.vymEyeFaceLinkType);
+			}
+			return GameMain.Instance.CharacterMgr.GetStockMaidList();
+		}
 
 		private void setFaceKeywoards()
 		{
@@ -748,7 +1432,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			//中央のメイド取得
 
 			//すべてのメイド（仮）
-			foreach (Maid maid in GameMain.Instance.CharacterMgr.GetStockMaidList()) {
+			foreach (Maid maid in getFaceMaidList()) {
 				if (maid.Visible) {
 					if (enabled) {
 						if (maid.body0.boHeadToCam) maid.EyeToCamera(Maid.EyeMoveType.目と顔を向ける, 1.0f);
@@ -764,7 +1448,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			//中央のメイド取得
 
 			//すべてのメイド（仮）
-			foreach (Maid maid in GameMain.Instance.CharacterMgr.GetStockMaidList()) {
+			foreach (Maid maid in getFaceMaidList()) {
 				if (maid.Visible) {
 					maid.EyeToCamera(Maid.EyeMoveType.目と顔を向ける, 1.0f);
 					maid.body0.boHeadToCam = enabled;
@@ -777,7 +1461,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			//中央のメイド取得
 
 			//すべてのメイド（仮）
-			foreach (Maid maid in GameMain.Instance.CharacterMgr.GetStockMaidList()) {
+			foreach (Maid maid in getFaceMaidList()) {
 				if (maid.Visible) {
 					maid.EyeToCamera(Maid.EyeMoveType.目だけそらす, 1.0f);
 				}
@@ -789,7 +1473,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			//中央のメイド取得
 
 			//すべてのメイド（仮）
-			foreach (Maid maid in GameMain.Instance.CharacterMgr.GetStockMaidList()) {
+			foreach (Maid maid in getFaceMaidList()) {
 				if (maid.Visible) {
 					maid.EyeToCamera(Maid.EyeMoveType.顔をそらす, 1.0f);
 				}
@@ -798,13 +1482,26 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 
 		#endregion
 
+		////////////////////////////////////////////////////////////////
+		// 脱衣関連
 		#region Undressing
 
-		//脱衣関連
+		//対象になるメイドを取得 脱衣用
+		private List<Maid> getUndressMaidList()
+		{
+			if (vymType != null) {
+				return vymGetMaidList(cfg.vymUndressLinkType);
+			}
+			return GameMain.Instance.CharacterMgr.GetStockMaidList();
+		}
 
 		//音声キーワード設定
 		private void setUndressKeywoards()
 		{
+			//動作確認が面倒なのでInvokeは使わない
+			//setVoiceKeywordInvoke(voiceCfg.dressAll, "dressAll");
+			//setVoiceKeywordInvoke(voiceCfg.undressAll, "undressAll");
+
 			foreach (string keyword in voiceCfg.dressAll) {
 				if (keywords.ContainsKey(keyword)) continue;
 				string k = keyword; //スコープ対策
@@ -835,6 +1532,14 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 				keywords.Add(keyword, () => {
 					Debug.Log("Voice undressTop : "+k);
 					undressTop();
+				});
+			}
+			foreach (string keyword in voiceCfg.dressBottom) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice dressBottom : "+k);
+					dressBottom();
 				});
 			}
 			foreach (string keyword in voiceCfg.undressBottom) {
@@ -925,6 +1630,22 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 					undressShoes();
 				});
 			}
+			foreach (string keyword in voiceCfg.dressAcc) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice dressAcc : "+k);
+					dressAcc();
+				});
+			}
+			foreach (string keyword in voiceCfg.undressAcc) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice undressAcc : "+k);
+					undressAcc();
+				});
+			}
 
 			foreach (string keyword in voiceCfg.modoshiPants) {
 				if (keywords.ContainsKey(keyword)) continue;
@@ -948,6 +1669,8 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		//夜伽シーンの脱衣パネル取得
 		private UndressingManager getUndressingManager()
 		{
+			if (cfg.vymUndressLinkType != -1) return null;
+
 			if (YotogiManager.instans && YotogiManager.instans.play_mgr && YotogiManager.instans.play_mgr.playingSkill != null) {
 				GameObject obj = GameObject.Find("UI Root/YotogiPlayPanel/UndressingViewer/UndressingViewer/MaskGroup/UndressParent");
 				if (obj) return obj.GetComponent<UndressingManager>();
@@ -959,56 +1682,71 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			return null;
 		}
 
+		private void setMaskWear(Maid maid, bool mask)
+		{
+			maid.body0.SetMask(TBody.SlotID.wear, mask);
+			maid.body0.SetMask(TBody.SlotID.onepiece, mask);
+			maid.body0.SetMask(TBody.SlotID.skirt, mask);
+			maid.body0.SetMask(TBody.SlotID.shoes, mask);
+			maid.body0.SetMask(TBody.SlotID.accSenaka, mask);
+		}
+		private void setMaskUnderware(Maid maid, bool mask)
+		{
+			maid.body0.SetMask(TBody.SlotID.mizugi, mask);
+			maid.body0.SetMask(TBody.SlotID.bra, mask);
+			maid.body0.SetMask(TBody.SlotID.panz, mask);
+		}
+		private void setMaskOther(Maid maid, bool mask)
+		{
+			maid.body0.SetMask(TBody.SlotID.stkg, mask); //靴下
+			maid.body0.SetMask(TBody.SlotID.glove, mask);
+			maid.body0.SetMask(TBody.SlotID.accUde, mask);
+			maid.body0.SetMask(TBody.SlotID.accKubi, mask);
+		}
+		private void setMaskAcc(Maid maid, bool mask)
+		{
+			maid.body0.SetMask(TBody.SlotID.headset, mask);
+			maid.body0.SetMask(TBody.SlotID.accHat, mask);
+			maid.body0.SetMask(TBody.SlotID.accHead, mask);
+			maid.body0.SetMask(TBody.SlotID.accKubiwa, mask);
+			maid.body0.SetMask(TBody.SlotID.accMiMiR, mask);
+			maid.body0.SetMask(TBody.SlotID.accMiMiL, mask);
+			maid.body0.SetMask(TBody.SlotID.megane, mask);
+			maid.body0.SetMask(TBody.SlotID.accXXX, mask);
+			maid.body0.SetMask(TBody.SlotID.accAshi, mask);
+			maid.body0.SetMask(TBody.SlotID.accShippo, mask);
+			maid.body0.SetMask(TBody.SlotID.accHana, mask);
+			maid.body0.SetMask(TBody.SlotID.accNipR, mask);
+			maid.body0.SetMask(TBody.SlotID.accNipL, mask);
+			maid.body0.SetMask(TBody.SlotID.accHeso, mask);
+		}
+
 		//全部着る
 		public void dressAll()
 		{
-			//すべてのメイド（仮）
-			foreach (Maid maid in GameMain.Instance.CharacterMgr.GetStockMaidList()) {
-				if (maid.Visible) dressAll(maid);
-			}
-		}
-		public void dressAll(Maid maid)
-		{
 			UndressingManager undressManager = getUndressingManager();
-			if (undressManager != null) {
-				undressManager.SetMaskMode(UndressingManager.UnitType.全着衣, UndressingManager.MaskStatus.On); //Onで実行
-			} else {
-				maid.body0.SetMask(TBody.SlotID.wear, true);
-				maid.body0.SetMask(TBody.SlotID.mizugi, true);
-				maid.body0.SetMask(TBody.SlotID.onepiece, true);
-				maid.body0.SetMask(TBody.SlotID.bra, true);
-				maid.body0.SetMask(TBody.SlotID.skirt, true);
-				maid.body0.SetMask(TBody.SlotID.panz, true);
-				maid.body0.SetMask(TBody.SlotID.glove, true);
-				maid.body0.SetMask(TBody.SlotID.accUde, true);
-				maid.body0.SetMask(TBody.SlotID.stkg, true);
-				maid.body0.SetMask(TBody.SlotID.shoes, true);
-				maid.body0.SetMask(TBody.SlotID.accKubi, true);
-				maid.body0.SetMask(TBody.SlotID.accKubiwa, true);
+			foreach (Maid maid in getUndressMaidList()) {
+				if (undressManager != null) {
+					undressManager.SetMaskMode(UndressingManager.UnitType.全着衣, UndressingManager.MaskStatus.On); //Onで実行
+				} else {
+					setMaskWear(maid, true);
+					setMaskUnderware(maid, true);
+					setMaskOther(maid, true);
+				}
 			}
 		}
 		//全部脱がす
 		public void undressAll()
 		{
 			UndressingManager undressManager = getUndressingManager();
-			//すべてのメイド（仮）
-			foreach (Maid maid in GameMain.Instance.CharacterMgr.GetStockMaidList()) {
+			foreach (Maid maid in getUndressMaidList()) {
 				if (maid.Visible) {
 					if (undressManager != null) {
 						undressManager.SetMaskMode(UndressingManager.UnitType.全脱衣, UndressingManager.MaskStatus.On); //Onで実行
 					} else {
-						maid.body0.SetMask(TBody.SlotID.wear, false);
-						maid.body0.SetMask(TBody.SlotID.mizugi, false);
-						maid.body0.SetMask(TBody.SlotID.onepiece, false);
-						maid.body0.SetMask(TBody.SlotID.bra, false);
-						maid.body0.SetMask(TBody.SlotID.skirt, false);
-						maid.body0.SetMask(TBody.SlotID.panz, false);
-						maid.body0.SetMask(TBody.SlotID.glove, false);
-						maid.body0.SetMask(TBody.SlotID.accUde, false);
-						maid.body0.SetMask(TBody.SlotID.stkg, false);
-						maid.body0.SetMask(TBody.SlotID.shoes, false);
-						maid.body0.SetMask(TBody.SlotID.accKubi, false);
-						maid.body0.SetMask(TBody.SlotID.accKubiwa, false);
+						setMaskWear(maid, false);
+						setMaskUnderware(maid, false);
+						setMaskOther(maid, false);
 					}
 				}
 			}
@@ -1030,9 +1768,24 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 						maid.body0.SetMask(TBody.SlotID.wear, false);
 						maid.body0.SetMask(TBody.SlotID.onepiece, false);
 						maid.body0.SetMask(TBody.SlotID.skirt, false);
-      						maid.body0.SetMask(TBody.SlotID.mizugi, false);
+						maid.body0.SetMask(TBody.SlotID.mizugi, false);
 						maid.body0.SetMask(TBody.SlotID.bra, false);
 						maid.body0.SetMask(TBody.SlotID.panz, false);
+					}
+				}
+			}
+		//服の上だけ着せる
+		public void dressTop()
+		{
+			UndressingManager undressManager = getUndressingManager();
+			foreach (Maid maid in getUndressMaidList()) {
+				if (maid.Visible) {
+					if (undressManager != null) {
+						undressManager.SetMaskMode(UndressingManager.UnitType.トップス, UndressingManager.MaskStatus.Off); //Offが表示
+					} else {
+						maid.body0.SetMask(TBody.SlotID.wear, true);
+						maid.body0.SetMask(TBody.SlotID.onepiece, true);
+		                maid.body0.SetMask(TBody.SlotID.accSenaka, true);
 					}
 				}
 			}
@@ -1041,14 +1794,28 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public void undressTop()
 		{
 			UndressingManager undressManager = getUndressingManager();
-			//すべてのメイド（仮）
-			foreach (Maid maid in GameMain.Instance.CharacterMgr.GetStockMaidList()) {
+			foreach (Maid maid in getUndressMaidList()) {
 				if (maid.Visible) {
 					if (undressManager != null) {
 						undressManager.SetMaskMode(UndressingManager.UnitType.トップス, UndressingManager.MaskStatus.On); //Onが非表示
 					} else {
 						maid.body0.SetMask(TBody.SlotID.wear, false);
 						maid.body0.SetMask(TBody.SlotID.onepiece, false);
+		                maid.body0.SetMask(TBody.SlotID.accSenaka, false);
+					}
+				}
+			}
+		}
+		//服の下だけ着せる
+		public void dressBottom()
+		{
+			UndressingManager undressManager = getUndressingManager();
+			foreach (Maid maid in getUndressMaidList()) {
+				if (maid.Visible) {
+					if (undressManager != null) {
+						undressManager.SetMaskMode(UndressingManager.UnitType.ボトムス, UndressingManager.MaskStatus.Off); //Offが表示
+					} else {
+						maid.body0.SetMask(TBody.SlotID.skirt, true);
 					}
 				}
 			}
@@ -1057,8 +1824,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public void undressBottom()
 		{
 			UndressingManager undressManager = getUndressingManager();
-			//すべてのメイド（仮）
-			foreach (Maid maid in GameMain.Instance.CharacterMgr.GetStockMaidList()) {
+			foreach (Maid maid in getUndressMaidList()) {
 				if (maid.Visible) {
 					if (undressManager != null) {
 						undressManager.SetMaskMode(UndressingManager.UnitType.ボトムス, UndressingManager.MaskStatus.On); //Onが非表示
@@ -1073,11 +1839,10 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public void dressMizugi()
 		{
 			UndressingManager undressManager = getUndressingManager();
-			//すべてのメイド（仮）
-			foreach (Maid maid in GameMain.Instance.CharacterMgr.GetStockMaidList()) {
+			foreach (Maid maid in getUndressMaidList()) {
 				if (maid.Visible) {
 					if (undressManager != null) {
-						undressManager.SetMaskMode(UndressingManager.UnitType.トップス, UndressingManager.MaskStatus.On); //Onが非表示
+						undressManager.SetMaskMode(UndressingManager.UnitType.トップス, UndressingManager.MaskStatus.Off); //Offが表示
 					} else {
 						maid.body0.SetMask(TBody.SlotID.mizugi, true);
 					}
@@ -1088,8 +1853,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public void undressMizugi()
 		{
 			UndressingManager undressManager = getUndressingManager();
-			//すべてのメイド（仮）
-			foreach (Maid maid in GameMain.Instance.CharacterMgr.GetStockMaidList()) {
+			foreach (Maid maid in getUndressMaidList()) {
 				if (maid.Visible) {
 					if (undressManager != null) {
 						undressManager.SetMaskMode(UndressingManager.UnitType.トップス, UndressingManager.MaskStatus.On); //Onが非表示
@@ -1104,16 +1868,13 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public void dressUnderWear()
 		{
 			UndressingManager undressManager = getUndressingManager();
-			//すべてのメイド（仮）
-			foreach (Maid maid in GameMain.Instance.CharacterMgr.GetStockMaidList()) {
+			foreach (Maid maid in getUndressMaidList()) {
 				if (maid.Visible) {
 					if (undressManager != null) {
 						undressManager.SetMaskMode(UndressingManager.UnitType.ブラジャー, UndressingManager.MaskStatus.Off); //Offが表示
 						undressManager.SetMaskMode(UndressingManager.UnitType.パンツ, UndressingManager.MaskStatus.Off); //Offが表示
 					} else {
-						maid.body0.SetMask(TBody.SlotID.mizugi, true);
-						maid.body0.SetMask(TBody.SlotID.bra, true);
-						maid.body0.SetMask(TBody.SlotID.panz, true);
+						setMaskUnderware(maid, true);
 					}
 				}
 			}
@@ -1122,16 +1883,13 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public void undressUnderWear()
 		{
 			UndressingManager undressManager = getUndressingManager();
-			//すべてのメイド（仮）
-			foreach (Maid maid in GameMain.Instance.CharacterMgr.GetStockMaidList()) {
+			foreach (Maid maid in getUndressMaidList()) {
 				if (maid.Visible) {
 					if (undressManager != null) {
 						undressManager.SetMaskMode(UndressingManager.UnitType.ブラジャー, UndressingManager.MaskStatus.On); //Onが非表示
 						undressManager.SetMaskMode(UndressingManager.UnitType.パンツ, UndressingManager.MaskStatus.On); //Onが非表示
 					} else {
-						maid.body0.SetMask(TBody.SlotID.mizugi, false);
-						maid.body0.SetMask(TBody.SlotID.bra, false);
-						maid.body0.SetMask(TBody.SlotID.panz, false);
+						setMaskUnderware(maid, false);
 					}
 				}
 			}
@@ -1140,8 +1898,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public void dressBra()
 		{
 			UndressingManager undressManager = getUndressingManager();
-			//すべてのメイド（仮）
-			foreach (Maid maid in GameMain.Instance.CharacterMgr.GetStockMaidList()) {
+			foreach (Maid maid in getUndressMaidList()) {
 				if (maid.Visible) {
 					if (undressManager != null) {
 						undressManager.SetMaskMode(UndressingManager.UnitType.ブラジャー, UndressingManager.MaskStatus.Off); //Offが表示
@@ -1155,8 +1912,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public void undressBra()
 		{
 			UndressingManager undressManager = getUndressingManager();
-			//すべてのメイド（仮）
-			foreach (Maid maid in GameMain.Instance.CharacterMgr.GetStockMaidList()) {
+			foreach (Maid maid in getUndressMaidList()) {
 				if (maid.Visible) {
 					if (undressManager != null) {
 						undressManager.SetMaskMode(UndressingManager.UnitType.ブラジャー, UndressingManager.MaskStatus.On); //Onが非表示
@@ -1170,8 +1926,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public void dressPants()
 		{
 			UndressingManager undressManager = getUndressingManager();
-			//すべてのメイド（仮）
-			foreach (Maid maid in GameMain.Instance.CharacterMgr.GetStockMaidList()) {
+			foreach (Maid maid in getUndressMaidList()) {
 				if (maid.Visible) {
 					if (undressManager != null) {
 						undressManager.SetMaskMode(UndressingManager.UnitType.パンツ, UndressingManager.MaskStatus.Off); //Offが表示
@@ -1185,8 +1940,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public void undressPants()
 		{
 			UndressingManager undressManager = getUndressingManager();
-			//すべてのメイド（仮）
-			foreach (Maid maid in GameMain.Instance.CharacterMgr.GetStockMaidList()) {
+			foreach (Maid maid in getUndressMaidList()) {
 				if (maid.Visible) {
 					if (undressManager != null) {
 						undressManager.SetMaskMode(UndressingManager.UnitType.パンツ, UndressingManager.MaskStatus.On); //Onが非表示
@@ -1200,8 +1954,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public void dressShoes()
 		{
 			UndressingManager undressManager = getUndressingManager();
-			//すべてのメイド（仮）
-			foreach (Maid maid in GameMain.Instance.CharacterMgr.GetStockMaidList()) {
+			foreach (Maid maid in getUndressMaidList()) {
 				if (maid.Visible) {
 					if (undressManager != null) {
 						undressManager.SetMaskMode(UndressingManager.UnitType.シューズ, UndressingManager.MaskStatus.Off); //Offが表示
@@ -1215,8 +1968,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public void undressShoes()
 		{
 			UndressingManager undressManager = getUndressingManager();
-			//すべてのメイド（仮）
-			foreach (Maid maid in GameMain.Instance.CharacterMgr.GetStockMaidList()) {
+			foreach (Maid maid in getUndressMaidList()) {
 				if (maid.Visible) {
 					if (undressManager != null) {
 						undressManager.SetMaskMode(UndressingManager.UnitType.シューズ, UndressingManager.MaskStatus.On); //Onが非表示
@@ -1226,11 +1978,41 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 				}
 			}
 		}
+		//アクセをすべてつける
+		public void dressAcc()
+		{
+			UndressingManager undressManager = getUndressingManager();
+			foreach (Maid maid in getUndressMaidList()) {
+				if (maid.Visible) {
+					if (undressManager != null) {
+						undressManager.SetMaskMode(UndressingManager.UnitType.ヘッドドレス, UndressingManager.MaskStatus.Off); //Offが表示
+						undressManager.SetMaskMode(UndressingManager.UnitType.メガネ, UndressingManager.MaskStatus.Off); //Offが表示
+					} else {
+						setMaskAcc(maid, true);
+					}
+				}
+			}
+		}
+		//アクセをすべて外す
+		public void undressAcc()
+		{
+			UndressingManager undressManager = getUndressingManager();
+			foreach (Maid maid in getUndressMaidList()) {
+				if (maid.Visible) {
+					if (undressManager != null) {
+						undressManager.SetMaskMode(UndressingManager.UnitType.ヘッドドレス, UndressingManager.MaskStatus.On); //Onが非表示
+						undressManager.SetMaskMode(UndressingManager.UnitType.メガネ, UndressingManager.MaskStatus.On); //Onが非表示
+					} else {
+						setMaskAcc(maid, false);
+					}
+				}
+			}
+		}
+
 		//パンツ戻す
 		public void modoshiPants()
 		{
-			//すべてのメイド（仮）
-			foreach (Maid maid in GameMain.Instance.CharacterMgr.GetStockMaidList()) {
+			foreach (Maid maid in getUndressMaidList()) {
 				if (maid.Visible) modoshiPants(maid);
 			}
 		}
@@ -1257,8 +2039,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		//パンツずらす
 		public void zurashiPants()
 		{
-			//すべてのメイド（仮）
-			foreach (Maid maid in GameMain.Instance.CharacterMgr.GetStockMaidList()) {
+			foreach (Maid maid in getUndressMaidList()) {
 				if (maid.Visible) zurashiPants(maid);
 			}
 		}
@@ -1304,9 +2085,9 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 
 		#endregion
 
+		////////////////////////////////////////////////////////////////
+		// テンキーウィンドウ
 		#region GUI
-
-		//テンキーウィンドウ
 
 		//GUIのスタイル情報
 		class GUIInfo
@@ -1321,7 +2102,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			public Texture2D lineTexture;
 		}
 
-		//初期化
+		//GUI初期化
 		private void initGUI()
 		{
 			this.gui = new GUIInfo();
@@ -1433,6 +2214,8 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 
 		#endregion
 
+		////////////////////////////////////////////////////////////////
+		// キー送信
 		#region SendKey
 
 		public void sendDelete()

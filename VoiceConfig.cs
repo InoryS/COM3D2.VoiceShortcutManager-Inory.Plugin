@@ -18,8 +18,56 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		}
 	}
 
+	public class ConfigInfo
+	{
+		public string name;
+		public string value; //文字列以外の型はパースしてからSetValue
+		public string[] voice;
+
+		public ConfigInfo(){}
+		public ConfigInfo(string name, string value, string[] voice)
+		{
+			this.name = name;
+			this.value = value;
+			this.voice = voice;
+		}
+	}
+
+
 	public class VoiceConfig
 	{
+		//コンストラクタ XML読み込みで必要
+		public VoiceConfig() { }
+
+		//メッセージウィンドウ操作
+		public string[] autoModeOn = {"オート開始", "オートオン", "オートモード"};
+		public string[] autoModeOff = {"オート終了", "オートオフ"};
+		public string[] playVoice = {"ボイス再生"};
+
+		//このプラグインの設定変更
+		public ConfigInfo[] config = {
+			new ConfigInfo("vymEyeFaceLinkType", "-1", new string[]{"目線全員"}),     //連携なし 全メイドが対象
+			new ConfigInfo("vymEyeFaceLinkType", "0", new string[]{"目線個別"}),      //目線顔向変更対象をVYMのメインメイドに限定
+			//new ConfigInfo("vymEyeFaceLinkType", "2", new string[]{"目線同時"}),    //VYMのリンクメイドにも適用する
+
+			new ConfigInfo("vymUndressLinkType", "-1", new string[]{"脱衣全員"}),     //連携なし 全メイドが対象 夜伽の脱衣ボタンも連動
+			new ConfigInfo("vymUndressLinkType", "0", new string[]{"脱衣個別"}),      //脱衣対象をVYMのメインメイドに限定
+			//new ConfigInfo("vymUndressLinkType", "2", new string[]{"脱衣同時"}),    //VYMのリンクメイドにも適用する
+
+			new ConfigInfo("vymVibeLinkType", "0", new string[]{"バイブ個別"}),       //メインメイドとUNZIPのサブメイド
+			new ConfigInfo("vymVibeLinkType", "1", new string[]{"バイブリンク"}),       //バイブ操作をVYMのリンクメイドにも適用する
+			new ConfigInfo("vymVibeLinkType", "2", new string[]{"バイブ同時"}),       //バイブ操作をVYMのUNZIPのメインとサブメイドに適用する
+
+			new ConfigInfo("vymFaceLinkType", "0", new string[]{"表情個別"}),         //メインメイドのみ
+			new ConfigInfo("vymFaceLinkType", "1", new string[]{"表情リンク"}),         //モーションをVYMのリンクメイドにも適用する
+			new ConfigInfo("vymFaceLinkType", "2", new string[]{"表情同時"}),         //モーションをVYMのUNZIPのメインとサブメイドに適用する
+
+			new ConfigInfo("vymMotionLinkType", "0", new string[]{"モーション個別"}), //メインメイドのみ
+			new ConfigInfo("vymMotionLinkType", "1", new string[]{"モーションリンク"}), //モーションをVYMのリンクメイドにも適用する
+			new ConfigInfo("vymMotionLinkType", "2", new string[]{"モーション同時"}), //モーションをVYMのUNZIPのメインとサブメイドに適用する
+		};
+
+		//目線顔向
 		public string[] eyeToCam = {"こっち見て", "こっちを見て", "目を見て", "目を向けて"};
 		public string[] eyeToFront = {"あっち見て", "前見て", "前を見て"};
 		public string[] eyeSorashi = {"目をそらして", "そっぽ見て"};
@@ -27,30 +75,33 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public string[] headToFront = {"あっち向いて", "前向いて", "前を向いて"};
 		public string[] headSorashi = {"顔をそらして", "そっぽ向いて"};
 
+		//脱衣
 		public string[] dressAll = {"服着て", "服を着て", "服を着せる"};
 		public string[] undressAll = {"全部脱いで", "全部脱がす", "裸になって"};
 		public string[] undressWear = {"服脱いで", "服を脱いで", "服を脱がす", "下着になって"};
+		public string[] dressTop = {"上着着て"};
 		public string[] undressTop = {"上脱いで"};
+		public string[] dressBottom = {"下履いて", "スカート履いて"};
 		public string[] undressBottom = {"下脱いで", "スカート脱いで"};
 		public string[] dressMizugi = {"水着着て"};
 		public string[] undressMizugi = {"水着脱いで"};
 		public string[] dressUnderWear = {"下着つけて", "下着をつけて", "下着着て", "下着を着て", "下着を着せる"};
 		public string[] undressUnderWear = {"下着脱いで", "下着を脱いで", "下着を脱がす"};
-		public string[] dressBra = {"ブラつけて", "ブラを着て", "ブラをつける"};
-		public string[] undressBra = {"ブラ外して", "ブラ脱いで", "ブラをを外す"};
-		public string[] dressPants = {"パンツ履いて", "パンツを履いて", "パンツを履かせる"};
-		public string[] undressPants = {"パンツ脱いで", "パンツを脱いで", "パンツを脱がす"};
+		public string[] dressBra = {"ブラつけて", "ブラを着て", "ブラつける", "ブラをつける"};
+		public string[] undressBra = {"ブラ外して", "ブラ脱いで", "ブラ外す", "ブラを外す"};
+		public string[] dressPants = {"パンツ履いて", "パンツを履いて", "パンツ履かせる", "パンツを履かせる"};
+		public string[] undressPants = {"パンツ脱いで", "パンツを脱いで", "パンツ脱がす", "パンツを脱がす"};
 		public string[] dressShoes = {"靴履いて", "靴を履いて", "靴を履かせる"};
 		public string[] undressShoes = {"靴脱いで", "靴を脱いで", "靴を脱がす"};
+		public string[] dressAcc = {"アクセつけて"};
+		public string[] undressAcc = {"アクセ外して"};
 
 		public string[] modoshiPants = {"パンツ戻す"};
 		public string[] zurashiPants = {"パンツずらす"};
 
+
 		//夜伽用音声別名リスト
 		public List<YotogiVoiceInfo> yotogiVoiceList = new List<YotogiVoiceInfo>();
-
-
-		public VoiceConfig() { }
 
 		private void addYotogiList(string command, string[] keywords)
 		{
@@ -61,8 +112,10 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			yotogiVoiceList.Add(new YotogiVoiceInfo(command, keywords, skill));
 		}
 		
+		//夜伽コマンド初期化
 		public void initDefault()
 		{
+			//夜伽コマンド
 			//複数スキル
 			addYotogiList("責める", new string[]{"奉仕して","洗って","こすって"}, "マットプレイ");
 			addYotogiList("責める", new string[]{"すまたして","あそこでこすって","こすりつけて"}, "素股");
@@ -99,9 +152,9 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			addYotogiList("胸を揉みながら", new string[]{"胸を揉む","胸揉むよ","おっぱい揉むよ","胸触るよ"});
 
 			//発情
-			addYotogiList("発情させる", new string[]{"発情して","アヘって","エッチになって"});
+			addYotogiList("発情させる", new string[]{"発情して","アヘって","イきまくって"});
 			addYotogiList("オホらせる", new string[]{"おほって"});
-			addYotogiList("ラブバイブで発情させる", new string[]{"発情させる","発情して","アヘって"});
+			addYotogiList("ラブバイブで発情させる", new string[]{"発情させる","発情して","バイブで発情して","アヘって","バイブでアヘって"});
 			addYotogiList("覚醒させる", new string[]{"覚醒して","覚醒してください"});
 			//開始・停止
 			addYotogiList("責めさせる", new string[]{"責めて","責めるよ","入れる","入れるよ","入れて"});
@@ -468,7 +521,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			addYotogiList("ポーズをとらせるA", new string[]{"おすわりポーズ","おすわりして"});
 			addYotogiList("ポーズをとらせるB", new string[]{"おっぱいポーズ","おっぱい寄せて"});
 			addYotogiList("ポーズをとらせるC", new string[]{"セクシーポーズ","足を上げて"});
-			addYotogiList("ホールドおねだり", new string[]{"ホールドおねだりして","おねだりして","ぎゅってしてほしい？"});
+			addYotogiList("ホールドおねだり", new string[]{"ホールドおねだりして","おねだりして","ぎゅってしたい？"});
 			addYotogiList("マゾであると認めさせる", new string[]{"マゾを認めろ","マゾなんだろ"});
 			addYotogiList("ママにして貰う", new string[]{"ママ、して","ママおねがい"});
 			addYotogiList("ママにディープキスしてもらう", new string[]{"ベロチューして"});

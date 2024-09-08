@@ -1,5 +1,6 @@
 //src from : https://github.com/neguse11/cm3d2_plugins_okiba/blob/master/Lib/GearMenu.cs
-//テキストが表示されるように修正 (改行に対応 2.5にも対応)
+//テキストが表示されるように修正 (改行に対応 COM3D2.5対応)
+//ポップアップテキストに改行を含んでいる場合は表示したままにする設定を追加 keepExplanation
 //ボタン画像変更メソッド追加
 //使っていないAddメソッドは削除
 
@@ -24,6 +25,9 @@ namespace GearMenu
 
         // バージョン文字列の実体。改善、改造した場合は文字列の辞書順がより大きい値に更新すること
         static string Version_ = Name_ + " 0.0.2.0";
+
+        // ポップアップのテキストに改行が含まれていたら表示したままにする
+        public static bool keepExplanation = false;
 
         /// <summary>
         /// 識別名
@@ -224,7 +228,11 @@ namespace GearMenu
         }
 
 
-        //テクスチャ画像を変更
+        /// <summary>
+        /// アイコンのテクスチャ画像を変更
+        /// </summary>
+        /// <param name="go">ボタンのGameObject。Add()の戻り値</param>
+        /// <param name="pngData">アイコン画像</param>
         public static void SetTexture(GameObject go, byte[] pngData)
         {
             var ut = go.GetComponentInChildren<UITexture>();
@@ -269,27 +277,43 @@ namespace GearMenu
             {
                 VisibleExplanation(label, label != null);
             }
+            else if (keepExplanation) {
+                if (label == null) VisibleExplanation(label, false);
+                else {
+                    if (label.Contains("\n")) VisibleExplanation(label, true); //更新して表示
+                    else {
+                        //ラベルを更新して改行がない状態にしないと閉じない
+                        VisibleExplanation(label, true); //改行なしのラベルに更新
+                        VisibleExplanation(label, false); //閉じる処理を実行
+                    }
+                }
+            }
         }
 
-		//ポップアップのラベル表示を置き換え ラベル取得用FieldInfo
-        static FieldInfo labelExplanationInfo = typeof(SystemShortcut).GetField("m_labelExplanation", BindingFlags.Instance | BindingFlags.NonPublic);
+        /// <summary>ポップアップのラベル表示を置き換えに利用 UISprite取得用FieldInfo</summary>
         static FieldInfo spriteExplanationInfo = typeof(SystemShortcut).GetField("m_spriteExplanation", BindingFlags.Instance | BindingFlags.NonPublic);
-		//ポップアップのラベル表示を置き換え 改行に対応
+        /// <summary>ポップアップのラベル表示を置き換えに利用 UILabel取得用FieldInfo</summary>
+        static FieldInfo labelExplanationInfo = typeof(SystemShortcut).GetField("m_labelExplanation", BindingFlags.Instance | BindingFlags.NonPublic);
+        /// <summary>
+        ///  ポップアップのラベル表示を置き換え 改行に対応
+        /// </summary>
+        /// <param name="text">ラベル文字列</param>
+        /// <param name="visible">ラベルの表示状態</param>
         public static void VisibleExplanation(string text, bool visible)
         {
             UISprite m_spriteExplanation = (UISprite)spriteExplanationInfo.GetValue(GameMain.Instance.SysShortcut);
-			UILabel m_labelExplanation = (UILabel)labelExplanationInfo.GetValue(GameMain.Instance.SysShortcut);
+            UILabel m_labelExplanation = (UILabel)labelExplanationInfo.GetValue(GameMain.Instance.SysShortcut);
             if (visible) {
-				if (m_labelExplanation) {
+                if (m_labelExplanation) {
                     //ラベル設定
                     m_labelExplanation.alignment = NGUIText.Alignment.Left; //左寄せ
-					m_labelExplanation.text = text;
+                    m_labelExplanation.text = text;
                     m_labelExplanation.width = 0;
                     m_labelExplanation.height = 0;
                     //改行ありなら行の下側に余白をつける
                     if (text.Contains("\n")) m_labelExplanation.spacingY = 4;
                     else m_labelExplanation.spacingY = 0;
-					m_labelExplanation.MakePixelPerfect();
+                    m_labelExplanation.MakePixelPerfect();
                     //背景設定
                     if (m_spriteExplanation != null) {
                         UISprite component = m_spriteExplanation;
@@ -302,10 +326,15 @@ namespace GearMenu
                             m_spriteExplanation.gameObject.transform.localPosition = v;
                         }
                     }
-				}
+                }
                 if (m_spriteExplanation) m_spriteExplanation.gameObject.SetActive(visible);
             } else {
-				if (m_labelExplanation) {
+                
+                if (m_labelExplanation) {
+                    //改行があったら閉じない
+                    if (keepExplanation && m_labelExplanation.text != null && m_labelExplanation.text.Contains("\n")) return;
+
+                    m_labelExplanation.text = null;
                     m_labelExplanation.spacingY = 0;
                 }
                 if (m_spriteExplanation) {
