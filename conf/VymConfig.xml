@@ -7,6 +7,10 @@
             <init>false</init>
             <voice>
                 <string>リモコン表示</string>
+                <string>GUI显示</string>
+                <string>显示GUI</string>
+                <string>展示GUI</string>
+                <string>开启GUI</string>
             </voice>
         </VymConfigInfo>
         <VymConfigInfo>
@@ -15,6 +19,9 @@
             <init>false</init>
             <voice>
                 <string>リモコン非表示</string>
+                <string>GUI隐藏</string>
+                <string>隐藏GUI</string>
+                <string>关闭GUI</string>
             </voice>
         </VymConfigInfo>
         <VymConfigInfo>
@@ -23,7 +30,12 @@
             <init>false</init>
             <voice>
                 <string>おさわり開始</string>
+                <string>触摸开始</string>
+                <string>启用触摸</string>
+                <string>开启触摸</string>
                 <string>おさわり有効</string>
+                <string>触摸有效</string>
+                <string>激活触摸</string>
             </voice>
         </VymConfigInfo>
         <VymConfigInfo>
@@ -32,7 +44,11 @@
             <init>false</init>
             <voice>
                 <string>おさわり終了</string>
+                <string>触摸结束</string>
+                <string>禁用触摸</string>
+                <string>关闭触摸</string>
                 <string>おさわり無効</string>
+                <string>触摸无效</string>
             </voice>
         </VymConfigInfo>
         <VymConfigInfo>
@@ -41,6 +57,8 @@
             <init>false</init>
             <voice>
                 <string>最短制限</string>
+                <string>最短限制</string>
+                <string>限制最短</string>
             </voice>
         </VymConfigInfo>
         <VymConfigInfo>
@@ -49,65 +67,94 @@
             <init>false</init>
             <voice>
                 <string>最短制限解除</string>
+                <string>最短限制解除</string>
+                <string>取消最短限制</string>
             </voice>
         </VymConfigInfo>
     </vymConfig>
     <vymSelectFrontMaid>
         <string>正面のメイド</string>
+        <string>正面的女仆</string>
+        <string>前面的女仆</string>
     </vymSelectFrontMaid>
     <vymSelectMaidName>
         <VymVoiceInfo>
             <value>聖道 まりあ</value>
             <voice>
                 <string>無垢ちゃん</string>
+                <string>纯洁酱</string>
+                <string>纯净酱</string>
             </voice>
         </VymVoiceInfo>
     </vymSelectMaidName>
     <vymPrevMaid>
         <string>前のメイド</string>
+        <string>前一个女仆</string>
+        <string>上一个女仆</string>
     </vymPrevMaid>
     <vymNextMaid>
         <string>次のメイド</string>
+        <string>下一个女仆</string>
+        <string>下一位女仆</string>
     </vymNextMaid>
     <vymLeftMaid>
         <string>左のメイド</string>
+        <string>左边的女仆</string>
+        <string>左侧的女仆</string>
     </vymLeftMaid>
     <vymRightMaid>
         <string>右のメイド</string>
+        <string>右边的女仆</string>
+        <string>右侧的女仆</string>
     </vymRightMaid>
     <vymMaidLink>
         <VymVoiceInfo>
             <value>all</value>
             <voice>
                 <string>全リンク</string>
+                <string>全链接</string>
+                <string>全部链接</string>
+                <string>连接所有</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>null</value>
             <voice>
                 <string>リンク解除</string>
+                <string>取消链接</string>
+                <string>解开链接</string>
+                <string>解除链接</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>left</value>
             <voice>
                 <string>左とリンク</string>
+                <string>左链接</string>
+                <string>连接左边</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>right</value>
             <voice>
                 <string>右とリンク</string>
+                <string>右链接</string>
+                <string>连接右边</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>sync</value>
             <voice>
                 <string>モーション同期</string>
+                <string>动作同步</string>
                 <string>同期する</string>
+                <string>同步</string>
+                <string>同步动作</string>
             </voice>
         </VymVoiceInfo>
     </vymMaidLink>
+
+
     <vymCamMove>
         <VymMoveInfo>
             <move>
@@ -118,6 +165,9 @@
             <useMoveValue>true</useMoveValue>
             <voice>
                 <string>右に移動</string>
+                <string>向右移动</string>
+                <string>移到右边</string>
+                <string>右移</string>
             </voice>
         </VymMoveInfo>
         <VymMoveInfo>
@@ -129,6 +179,9 @@
             <useMoveValue>true</useMoveValue>
             <voice>
                 <string>左に移動</string>
+                <string>向左移动</string>
+                <string>移到左边</string>
+                <string>左移</string>
             </voice>
         </VymMoveInfo>
         <VymMoveInfo>
@@ -140,6 +193,9 @@
             <useMoveValue>true</useMoveValue>
             <voice>
                 <string>上に移動</string>
+                <string>向上移动</string>
+                <string>移到上方</string>
+                <string>上移</string>
             </voice>
         </VymMoveInfo>
         <VymMoveInfo>
@@ -151,6 +207,9 @@
             <useMoveValue>true</useMoveValue>
             <voice>
                 <string>下に移動</string>
+                <string>向下移动</string>
+                <string>移到下方</string>
+                <string>下移</string>
             </voice>
         </VymMoveInfo>
         <VymMoveInfo>
@@ -162,6 +221,9 @@
             <useMoveValue>true</useMoveValue>
             <voice>
                 <string>前に移動</string>
+                <string>向前移动</string>
+                <string>移到前方</string>
+                <string>前移</string>
             </voice>
         </VymMoveInfo>
         <VymMoveInfo>
@@ -173,6 +235,10 @@
             <useMoveValue>true</useMoveValue>
             <voice>
                 <string>後ろに移動</string>
+                <string>向后移动</string>
+                <string>移到后方</string>
+                <string>后移</string>
+
             </voice>
         </VymMoveInfo>
         <VymMoveInfo>
@@ -247,21 +313,32 @@
             <value>-25%</value>
             <voice>
                 <string>近づく</string>
+                <string>靠近</string>
+                <string>接近</string>
+                <string>拉近</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>+25%</value>
             <voice>
                 <string>離れる</string>
+                <string>远离</string>
+                <string>拉远</string>
+                <string>移远</string>
             </voice>
         </VymVoiceInfo>
     </vymCamDistance>
     <vymCamFront>
         <string>メイド正面</string>
+        <string>女仆正面</string>
+        <string>女仆的前方</string>
     </vymCamFront>
     <vymCamBack>
         <string>メイド背面</string>
+        <string>女仆背面</string>
+        <string>女仆的后方</string>
         <string>メイドの後ろ</string>
+        <string>女仆的后面</string>
     </vymCamBack>
     <vymCamTarget>
         <VymVoiceInfo>
@@ -269,6 +346,8 @@
             <value2>1</value2>
             <voice>
                 <string>顔の前</string>
+                <string>脸前</string>
+                <string>脸部前方</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
@@ -316,7 +395,8 @@
             <value2>1</value2>
             <voice>
                 <string>男に移動</string>
-                <string>男の位置</string>
+                <string>移动到男性</string>
+                <string>转移到男人</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
@@ -324,6 +404,8 @@
             <value2>0</value2>
             <voice>
                 <string>男視点</string>
+                <string>男性视角</string>
+                <string>从男人视角</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
@@ -331,6 +413,8 @@
             <value2>0</value2>
             <voice>
                 <string>ご主人様視点</string>
+                <string>主人视角</string>
+                <string>从主人的视角</string>
             </voice>
         </VymVoiceInfo>
     </vymCamManHead>
@@ -339,16 +423,22 @@
             <value>0</value>
             <voice>
                 <string>一人称解除</string>
+                <string>解除第一人称</string>
                 <string>一人称終了</string>
+                <string>第一人称结束</string>
                 <string>FPS解除</string>
-                <string>FPS終了</string>
+                <string>解除FPS</string>
+                <string>退出第一人称</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>1</value>
             <voice>
                 <string>一人称開始</string>
+                <string>第一人称开始</string>
                 <string>FPS開始</string>
+                <string>FPS开始</string>
+                <string>进入第一人称</string>
             </voice>
         </VymVoiceInfo>
     </vymFps>
@@ -357,13 +447,18 @@
             <value>0</value>
             <voice>
                 <string>メイド固定解除</string>
-                <string>固定解除</string>
+                <string>解除女仆固定</string>
+                <string>取消女仆固定</string>
+                <string>取消女仆锁定</string>
+                <string>取消锁定女仆</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>1</value>
             <voice>
                 <string>メイド固定</string>
+                <string>固定女仆</string>
+                <string>锁定女仆</string>
             </voice>
         </VymVoiceInfo>
     </vymFollow>
@@ -372,30 +467,40 @@
             <value>0</value>
             <voice>
                 <string>胸に固定</string>
+                <string>固定在胸部</string>
+                <string>锁定胸部</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>1</value>
             <voice>
                 <string>顔に固定</string>
+                <string>固定在脸上</string>
+                <string>锁定脸部</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>2</value>
             <voice>
                 <string>腰に固定</string>
+                <string>固定在腰部</string>
+                <string>锁定腰部</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>10</value>
             <voice>
                 <string>アングル固定</string>
+                <string>固定角度</string>
+                <string>锁定角度</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>-10</value>
             <voice>
                 <string>アングル解除</string>
+                <string>解除角度</string>
+                <string>取消角度</string>
             </voice>
         </VymVoiceInfo>
     </vymLookPoint>
@@ -404,18 +509,24 @@
             <value>-1</value>
             <voice>
                 <string>地面下げる</string>
+                <string>降低地面</string>
+                <string>下调地面</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>+1</value>
             <voice>
                 <string>地面上げる</string>
+                <string>提升地面</string>
+                <string>上调地面</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>0</value>
             <voice>
                 <string>地面ゼロ</string>
+                <string>地面归零</string>
+                <string>重置地面</string>
             </voice>
         </VymVoiceInfo>
     </vymBoneHitHeight>
@@ -424,18 +535,24 @@
             <value>-50</value>
             <voice>
                 <string>興奮下げる</string>
+                <string>降低兴奋</string>
+                <string>减少兴奋</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>+50</value>
             <voice>
                 <string>興奮上げる</string>
+                <string>提升兴奋</string>
+                <string>增加兴奋</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>0</value>
             <voice>
                 <string>興奮なし</string>
+                <string>无兴奋</string>
+                <string>无兴奋感</string>
             </voice>
         </VymVoiceInfo>
     </vymExcite>
@@ -444,30 +561,40 @@
             <value>1</value>
             <voice>
                 <string>ご主人様表示</string>
+                <string>显示主人</string>
+                <string>显示主人公</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>-1</value>
             <voice>
                 <string>ご主人様非表示</string>
+                <string>隐藏主人</string>
+                <string>隐藏主人公</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>2</value>
             <voice>
                 <string>モブ表示</string>
+                <string>显示路人</string>
+                <string>显示群众</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>-255</value>
             <voice>
                 <string>男非表示</string>
+                <string>隐藏男性</string>
+                <string>隐藏男人</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>-254</value>
             <voice>
                 <string>モブ非表示</string>
+                <string>隐藏路人</string>
+                <string>隐藏群众</string>
             </voice>
         </VymVoiceInfo>
     </vymManVisible>
@@ -476,30 +603,39 @@
             <value>1</value>
             <voice>
                 <string>射精する</string>
+                <string>射精</string>
+                <string>开始射精</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>2</value>
             <voice>
                 <string>モブ射精</string>
+                <string>路人射精</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>255</value>
             <voice>
                 <string>全員射精</string>
+                <string>所有人射精</string>
+                <string>全员射精</string>
+                <string>全部射精</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>+255</value>
             <voice>
                 <string>射精ロック</string>
+                <string>锁定射精</string>
+                <string>射精锁定</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>-255</value>
             <voice>
                 <string>射精ロック解除</string>
+                <string>解除射精锁定</string>
             </voice>
         </VymVoiceInfo>
     </vymSyasei>
@@ -508,6 +644,8 @@
             <value>0</value>
             <voice>
                 <string>拭き取り</string>
+                <string>擦拭</string>
+                <string>擦掉</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
@@ -515,6 +653,8 @@
             <voice>
                 <string>顔拭き取り</string>
                 <string>顔を拭く</string>
+                <string>擦拭脸部</string>
+                <string>擦掉脸上的东西</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
@@ -522,9 +662,13 @@
             <voice>
                 <string>体拭き取り</string>
                 <string>体を拭く</string>
+                <string>擦拭身体</string>
+                <string>擦掉身体上的东西</string>
             </voice>
         </VymVoiceInfo>
     </vymFukitori>
+
+
     <vymStartNyo>
         <VymVoiceInfo>
             <value>0</value>
@@ -532,18 +676,29 @@
                 <string>おしっこして</string>
                 <string>おしっこかけて</string>
                 <string>漏らして</string>
+                <string>撒尿</string>
+                <string>排尿</string>
+                <string>小便</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>1</value>
             <voice>
                 <string>全員おしっこ</string>
+                <string>所有人排尿</string>
+                <string>全体撒尿</string>
+                <string>一起撒尿</string>
+                <string>一起尿尿</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>2</value>
             <voice>
                 <string>同時におしっこ</string>
+                <string>同时排尿</string>
+                <string>一起小便</string>
+                <string>同时撒尿</string>
+                <string>同时尿尿</string>
             </voice>
         </VymVoiceInfo>
     </vymStartNyo>
@@ -553,18 +708,27 @@
             <voice>
                 <string>潮吹き</string>
                 <string>潮吹いて</string>
+                <string>喷水</string>
+                <string>喷潮</string>
+                <string>潮吹</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>1</value>
             <voice>
                 <string>全員潮吹き</string>
+                <string>所有人喷水</string>
+                <string>所有人潮吹</string>
+                <string>全員潮吹</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>2</value>
             <voice>
                 <string>同時に潮吹き</string>
+                <string>同时喷水</string>
+                <string>一起喷潮</string>
+                <string>一起潮吹</string>
             </voice>
         </VymVoiceInfo>
     </vymStartSio>
@@ -574,8 +738,10 @@
             <voice>
                 <string>バイブOFF</string>
                 <string>バイブ停止</string>
-                <string>停止</string>
                 <string>バイブ抜く</string>
+                <string>关闭震动</string>
+                <string>停止震动</string>
+                <string>移除震动棒</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
@@ -585,6 +751,12 @@
                 <string>バイブ入れる</string>
                 <string>バイブ弱</string>
                 <string>バイブ弱く</string>
+                <string>打开震动</string>
+                <string>震动开启</string>
+                <string>开启震动</string>
+                <string>震动打开</string>
+                <string>震动减弱</string>
+                <string>减弱震动</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
@@ -592,6 +764,8 @@
             <voice>
                 <string>バイブ強</string>
                 <string>バイブ強く</string>
+                <string>震动加强</string>
+                <string>震动增强</string>
             </voice>
         </VymVoiceInfo>
     </vymVibe>
@@ -600,24 +774,32 @@
             <value>+1</value>
             <voice>
                 <string>バイブオート</string>
+                <string>震动自动</string>
+                <string>自动震动</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>1</value>
             <voice>
                 <string>バイブじっくり</string>
+                <string>震动轻柔</string>
+                <string>震动弱</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>2</value>
             <voice>
                 <string>バイブ激しく</string>
+                <string>震动激烈</string>
+                <string>震动强</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>3</value>
             <voice>
                 <string>バイブほどほど</string>
+                <string>震动适中</string>
+                <string>震动中</string>
             </voice>
         </VymVoiceInfo>
     </vymVibeAuto>
@@ -627,6 +809,15 @@
             <voice>
                 <string>あそこ閉じる</string>
                 <string>おまんこ閉じる</string>
+                <string>关闭kupa</string>
+                <string>kupa关闭</string>
+                <string>最小kupa</string>
+                <string>kupa最小</string>
+                <string>关闭小穴</string>
+                <string>关闭私处</string>
+                <string>闭合阴部</string>
+                <string>闭合小穴</string>
+                <string>最小小穴</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
@@ -637,6 +828,15 @@
                 <string>くぱぁして</string>
                 <string>あそこひらく</string>
                 <string>おまんこひらく</string>
+                <string>打开私处</string>
+                <string>展开阴部</string>
+                <string>kupa</string>
+                <string>打开小穴</string>
+                <string>打开私处</string>
+                <string>打开阴部</string>
+                <string>扩张小穴</string>
+                <string>扩张私处</string>
+                <string>扩张阴部</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
@@ -646,6 +846,17 @@
                 <string>おまんこ拡げる</string>
                 <string>あそこ拡げて</string>
                 <string>おまんこ拡げて</string>
+                <string>增大kupa</string>
+                <string>kupa增大</string>
+                <string>扩展小穴</string>
+                <string>扩展私处</string>
+                <string>扩展阴部</string>
+                <string>增大小穴</string>
+                <string>增大私处</string>
+                <string>增大阴部</string>
+                <string>扩张小穴</string>
+                <string>扩张私处</string>
+                <string>扩张阴部</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
@@ -655,6 +866,20 @@
                 <string>おまんこ閉める</string>
                 <string>あそこ締めて</string>
                 <string>おまんこ締めて</string>
+                <string>缩小kupa</string>
+                <string>kupa缩小</string>
+                <string>收缩小穴</string>
+                <string>收缩私处</string>
+                <string>收缩阴部</string>
+                <string>缩小小穴</string>
+                <string>缩小私处</string>
+                <string>缩小阴部</string>
+                <string>减小小穴</string>
+                <string>减小私处</string>
+                <string>减小阴部</string>
+                <string>收紧小穴</string>
+                <string>收紧私处</string>
+                <string>收紧阴部</string>
             </voice>
         </VymVoiceInfo>
     </vymKupa>
@@ -663,6 +888,10 @@
             <value>0</value>
             <voice>
                 <string>アナル閉じる</string>
+                <string>关闭肛门</string>
+                <string>关闭屁眼</string>
+                <string>闭合肛门</string>
+                <string>闭合屁眼</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
@@ -670,6 +899,12 @@
             <voice>
                 <string>アナルくぱぁ</string>
                 <string>アナルひらく</string>
+                <string>打开肛门</string>
+                <string>打开屁眼</string>
+                <string>扩张肛门</string>
+                <string>扩张屁眼</string>
+                <string>展开肛门</string>
+                <string>展开屁眼</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
@@ -677,6 +912,12 @@
             <voice>
                 <string>アナル拡げる</string>
                 <string>アナル拡げて</string>
+                <string>扩展肛门</string>
+                <string>扩展屁眼</string>
+                <string>增大肛门</string>
+                <string>增大屁眼</string>
+                <string>扩张肛门</string>
+                <string>扩张屁眼</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
@@ -684,6 +925,14 @@
             <voice>
                 <string>アナル閉める</string>
                 <string>アナル締めて</string>
+                <string>收紧肛门</string>
+                <string>收紧屁眼</string>
+                <string>收缩肛门</string>
+                <string>收缩屁眼</string>
+                <string>缩小肛门</string>
+                <string>缩小屁眼</string>
+                <string>减小肛门</string>
+                <string>减小屁眼</string>
             </voice>
         </VymVoiceInfo>
     </vymAnal>
@@ -692,12 +941,14 @@
             <value>0</value>
             <voice>
                 <string>クリ最小</string>
+                <string>阴蒂最小</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>100</value>
             <voice>
                 <string>クリ最大</string>
+                <string>阴蒂最大</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
@@ -706,6 +957,8 @@
                 <string>クリ大きく</string>
                 <string>クリ拡大</string>
                 <string>クリぼっき</string>
+                <string>阴蒂增大</string>
+                <string>阴蒂勃起</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
@@ -713,19 +966,26 @@
             <voice>
                 <string>クリ小さく</string>
                 <string>クリ縮小</string>
+                <string>阴蒂缩小</string>
+                <string>阴蒂减小</string>
+                <string>阴蒂缩小</string>
             </voice>
         </VymVoiceInfo>
     </vymBokki>
+
+
     <vymUnzip>
         <VymVoiceInfo>
             <value>om_aibu_hibu_1_f</value>
             <voice>
                 <string>愛撫</string>
+                <string>爱抚</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>om_seijyoui_1_f</value>
             <voice>
+                <string>正常位</string>
                 <string>正常位</string>
             </voice>
         </VymVoiceInfo>
@@ -733,18 +993,23 @@
             <value>manguri_1_f</value>
             <voice>
                 <string>まんぐり</string>
+                <string>打桩机</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>om_taimenkijyoui_1_f</value>
             <voice>
                 <string>対面騎乗位</string>
+                <string>对面骑乘位</string>
+                <string>对面乘骑位</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>kijyoui_sumata_1_f</value>
             <voice>
                 <string>騎乗位素股</string>
+                <string>素股骑乘位</string>
+                <string>素股乘骑位</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
@@ -781,6 +1046,8 @@
             <value>haimen_kijyoui_1_f</value>
             <voice>
                 <string>背面騎乗位</string>
+                <string>背面骑乘位</string>
+                <string>背面乘骑位</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
@@ -823,6 +1090,10 @@
             <value>ganmenkijyoui_1_f</value>
             <voice>
                 <string>顔面騎乗位</string>
+                <string>顔面骑乘位</string>
+                <string>顔面乘骑位</string>
+                <string>脸上骑乘位</string>
+                <string>脸上乘骑位</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
