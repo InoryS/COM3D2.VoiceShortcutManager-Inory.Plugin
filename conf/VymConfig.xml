@@ -679,6 +679,7 @@
                 <string>撒尿</string>
                 <string>排尿</string>
                 <string>小便</string>
+                <string>尿尿</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
@@ -741,7 +742,10 @@
                 <string>バイブ抜く</string>
                 <string>关闭震动</string>
                 <string>停止震动</string>
+                <string>移除震动</string>
                 <string>移除震动棒</string>
+                <string>关闭震动棒</string>
+                <string>停止震动棒</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
@@ -751,8 +755,13 @@
                 <string>バイブ入れる</string>
                 <string>バイブ弱</string>
                 <string>バイブ弱く</string>
+                <string>vibe</string>
+                <string>跳蛋</string>
+                <string>震动棒</string>
                 <string>打开震动</string>
                 <string>震动开启</string>
+                <string>打开震动棒</string>
+                <string>震动棒开启</string>
                 <string>开启震动</string>
                 <string>震动打开</string>
                 <string>震动减弱</string>
@@ -1182,6 +1191,7 @@
         <VymVoiceInfo>
             <voice>
                 <string>基本体位</string>
+
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
@@ -1301,6 +1311,8 @@
             <voice>
                 <string>前のモーション</string>
                 <string>前の体位</string>
+                <string>上一个体位</string>
+                <string>之前的体位</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
@@ -1309,18 +1321,27 @@
                 <string>次のモーション</string>
                 <string>次の体位</string>
                 <string>体位変更</string>
+                <string>变更体位</string>
+                <string>更改体位</string>
+                <string>换体位</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>2</value>
             <voice>
                 <string>カテゴリ変更</string>
+                <string>换种类</string>
+                <string>种类变更</string>
+                <string>换动作</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
             <value>-3</value>
             <voice>
                 <string>前のモーションセット</string>
+                <string>种类变更</string>
+                <string>前一个动作</string>
+                <string>之前的动作</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
@@ -1328,6 +1349,8 @@
             <voice>
                 <string>次のモーションセット</string>
                 <string>モーションセット変更</string>
+                <string>后一个动作</string>
+                <string>后面的动作</string>
             </voice>
         </VymVoiceInfo>
     </vymUnzipChange>
@@ -1338,6 +1361,8 @@
                 <string>抜く</string>
                 <string>ちんこ抜く</string>
                 <string>待機</string>
+                <string>待机</string>
+                <string>等待</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
@@ -1346,6 +1371,8 @@
                 <string>抜いて射精</string>
                 <string>抜いて出す</string>
                 <string>抜いてかける</string>
+                <string>外射</string>
+                <string>拔出射精</string>
             </voice>
         </VymVoiceInfo>
     </vymRemoveMotion>
@@ -1354,6 +1381,8 @@
         <string>ちんこ入れる</string>
         <string>挿入</string>
         <string>再挿入</string>
+        <string>插入</string>
+        <string>再插入</string>
     </vymInsertMotion>
     <vymSumataMotion>
         <string>素股</string>
@@ -1365,6 +1394,10 @@
             <voice>
                 <string>前を使う</string>
                 <string>前に入れる</string>
+                <string>使用前面</string>
+                <string>插前面</string>
+                <string>使用小穴</string>
+                <string>插小穴</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
@@ -1372,6 +1405,10 @@
             <voice>
                 <string>後ろを使う</string>
                 <string>後ろに入れる</string>
+                <string>使用后面</string>
+                <string>插后面</string>
+                <string>使用屁眼</string>
+                <string>插屁眼</string>
             </voice>
         </VymVoiceInfo>
     </vymAnalMode>
@@ -1379,6 +1416,8 @@
         <VymVoiceInfo>
             <voice>
                 <string>ボイスセット解除</string>
+                <string>语音设置取消</string>
+                <string>取消语音设置</string>
             </voice>
         </VymVoiceInfo>
         <VymVoiceInfo>
