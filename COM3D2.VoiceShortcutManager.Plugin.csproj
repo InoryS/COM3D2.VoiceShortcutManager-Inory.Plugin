@@ -44,11 +44,17 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="UnityEngine.VR">
+      <HintPath>.\lib\UnityEngine.VR.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>.\lib\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityInjector">
       <HintPath>.\lib\UnityInjector.dll</HintPath>
+    </Reference>
+    <Reference Include="COM3D2.VibeYourMaid.Plugin">
+      <HintPath>.\lib\COM3D2.VibeYourMaid.Plugin.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
