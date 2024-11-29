@@ -156,6 +156,8 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			
 			//ショートカットボタンリスト
 			public List<MenuInfo> menuList = new List<MenuInfo>();
+
+			public bool playVoicceMaidPos = false;
 		}
 
 		//ギアメニューに配置するボタンの情報
