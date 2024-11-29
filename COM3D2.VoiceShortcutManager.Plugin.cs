@@ -1972,7 +1972,12 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			} else {
 				foreach (Maid maid in getUndressMaidList()) {
 					if (maid.Visible) {
-						setMaskWear(maid, false);
+						maid.body0.SetMask(TBody.SlotID.wear, false);
+						maid.body0.SetMask(TBody.SlotID.onepiece, false);
+						maid.body0.SetMask(TBody.SlotID.skirt, false);
+						maid.body0.SetMask(TBody.SlotID.mizugi, false);
+						maid.body0.SetMask(TBody.SlotID.bra, false);
+						maid.body0.SetMask(TBody.SlotID.panz, false);
 					}
 				}
 			}
