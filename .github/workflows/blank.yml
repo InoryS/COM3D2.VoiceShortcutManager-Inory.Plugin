@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Setup MSBuild.exe path
         run: |
@@ -27,7 +27,7 @@ jobs:
           msbuild /p:Configuration=Release /p:TargetFrameworkVersion=v3.5
 
       - name: Publish Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: COM3D2.VoiceShortcutManager.Plugin
           path: /home/runner/work/COM3D2.VoiceShortcutManager/COM3D2.VoiceShortcutManager/bin/Release/COM3D2.VoiceShortcutManager.Plugin.dll
