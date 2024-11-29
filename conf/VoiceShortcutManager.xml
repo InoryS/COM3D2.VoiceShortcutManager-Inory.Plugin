@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <version>2.0</version>
-  <micActivateOnStart>true</micActivateOnStart>
+  <version>2.1</version>
+  <micActivateOnStart>false</micActivateOnStart>
   <micEnabled>true</micEnabled>
-  <micLabelON>语音识别开</micLabelON>
-  <micLabelOFF>语音识别关</micLabelOFF>
+  <micLabelON>音声認識 ON</micLabelON>
+  <micLabelOFF>音声認識 OFF</micLabelOFF>
   <keyboardEnabled>true</keyboardEnabled>
-  <keyboardLabelON>数字键盘开</keyboardLabelON>
-  <keyboardLabelOFF>数字键盘关</keyboardLabelOFF>
+  <keyboardLabelON>テンキー表示 ON</keyboardLabelON>
+  <keyboardLabelOFF>テンキー表示</keyboardLabelOFF>
   <keybordOffsetY>60</keybordOffsetY>
   <buttonSize>32</buttonSize>
   <fontSize>16</fontSize>
@@ -20,105 +20,25 @@
   <forceVoiceYotogiCommand>false</forceVoiceYotogiCommand>
   <keepExplanationYotogi>false</keepExplanationYotogi>
   <keepExplanation>false</keepExplanation>
+  <useUndressManager>true</useUndressManager>
+  <playVoicceMaidPos>true</playVoicceMaidPos>
   <vymEnabled>true</vymEnabled>
   <vymCamMoveEnabled>true</vymCamMoveEnabled>
   <vymUnzipEnabled>true</vymUnzipEnabled>
   <vymFaceMotionEnabled>true</vymFaceMotionEnabled>
+  <vymUndressLinkType>1</vymUndressLinkType>
   <vymEyeFaceLinkType>1</vymEyeFaceLinkType>
-  <vymUndressLinkType>0</vymUndressLinkType>
   <vymVibeLinkType>1</vymVibeLinkType>
-  <vymFaceLinkType>1</vymFaceLinkType>
+  <vymFaceLinkType>0</vymFaceLinkType>
   <vymMotionLinkType>0</vymMotionLinkType>
-  <motionFadeTime>0.7</motionFadeTime>
   <faceFadeTime>0.5</faceFadeTime>
+  <motionFadeTime>0.7</motionFadeTime>
   <menuList>
-    <MenuInfo>
-      <name>DanceCameraMotion</name>
-      <label>DanceCameraMotion</label>
-      <voice>
-        <string>Dance Camera Motion</string>
-        <string>DanceCameraMotion</string>
-        <string>DCM</string>
-      </voice>
-      <key>K</key>
-      <shift>true</shift>
-      <ctrl>false</ctrl>
-      <alt>false</alt>
-    </MenuInfo>
-    <MenuInfo>
-      <name>VibeYourMaid</name>
-      <label>VibeYourMaid</label>
-      <voice>
-        <string>V Y M</string>
-        <string>Vibe Your Maid</string>
-        <string>欧</string>
-        <string>O</string>
-      </voice>
-      <key>O</key>
-      <shift>false</shift>
-      <ctrl>false</ctrl>
-      <alt>false</alt>
-    </MenuInfo>
-    <MenuInfo>
-      <name>ShapeAnimetor</name>
-      <label>ShapeAnimetor</label>
-      <voice>
-        <string>形状键</string>
-        <string>形态键</string>
-        <string>Shape Animetor</string>
-        <string>ShapeAnimetor</string>
-        <string>SA</string>
-        <string>F4</string>
-        <string>F四</string>
-      </voice>
-      <key>F4</key>
-      <shift>false</shift>
-      <ctrl>false</ctrl>
-      <alt>false</alt>
-    </MenuInfo>
-    <MenuInfo>
-      <name>Highheel</name>
-      <label>Highheel</label>
-      <voice>
-        <string>高跟鞋设置</string>
-        <string>高跟设置</string>
-        <string>Highheel</string>
-        <string>High heel</string>
-        <string>HH</string>
-        <string>F9</string>
-        <string>F九</string>
-      </voice>
-      <key>F9</key>
-      <shift>false</shift>
-      <ctrl>false</ctrl>
-      <alt>false</alt>
-    </MenuInfo>
-    <MenuInfo>
-      <name>FirstPerson</name>
-      <label>firstperson</label>
-      <voice>
-        <string>切换第一人称</string>
-        <string>第一人称视角</string>
-        <string>FP</string>
-        <string>男视角</string>
-      </voice>
-      <key>F10</key>
-      <shift>false</shift>
-      <ctrl>false</ctrl>
-      <alt>false</alt>
-    </MenuInfo>
     <MenuInfo>
       <name>PropMyItem</name>
       <label>PropMyItem</label>
-      <voice>
-        <string>PropMyItem</string>
-        <string>Prop My Item</string>
-        <string>PMI</string>
-        <string>衣服设置</string>
-        <string>服装设置</string>
-      </voice>
       <key>I</key>
-      <shift>false</shift>
+      <shift>true</shift>
       <ctrl>false</ctrl>
       <alt>false</alt>
     </MenuInfo>
@@ -134,11 +54,6 @@
     <MenuInfo>
       <name>YotogiSlider</name>
       <label>YotogiSlider</label>
-      <voice>
-        <string>F5</string>
-        <string>F五</string>
-        <string>YS</string>
-      </voice>
       <key>F5</key>
       <shift>false</shift>
       <ctrl>false</ctrl>
@@ -150,11 +65,7 @@
       <label>Pause</label>
       <voice>
         <string>ポーズ</string>
-        <string>继续</string>
         <string>停止</string>
-        <string>暂停</string>
-        <string>暂停游戏</string>
-        <string>pause</string>
       </voice>
       <key>Enter</key>
       <shift>false</shift>
