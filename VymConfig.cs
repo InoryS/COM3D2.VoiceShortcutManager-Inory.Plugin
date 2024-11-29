@@ -190,7 +190,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			new VymVoiceInfo("0", new string[]{"胸に固定"}),
 			new VymVoiceInfo("1", new string[]{"顔に固定"}),
 			new VymVoiceInfo("2", new string[]{"腰に固定"}),
-			new VymVoiceInfo("10", new string[]{"アングル固定"}), //メイド固定がOFFならONになる
+			new VymVoiceInfo("10", new string[]{"アングル固定"}), //10ならアングルだけON 11ならメイド固定もON
 			new VymVoiceInfo("-10", new string[]{"アングル解除"}),
 		};
 
@@ -431,8 +431,8 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			new VymFaceMotionInfo(new string[]{"少し目を閉じて","目を細めて"}).addFaceTag(new string[]{"eyeclose:+10", "eyeclose2:-10", "eyebig:0"}),
 			new VymFaceMotionInfo(new string[]{"少しにっこり"}).addFaceTag(new string[]{"eyeclose:-10", "eyeclose2:+10", "eyebig:0"}),
 			new VymFaceMotionInfo(new string[]{"ウインク"}).addFaceTag(new string[]{"eyeclose:0", "eyeclose2:0", "eyeclose3:0", "eyeclose6:100", "eyebig:0"}),
-			new VymFaceMotionInfo(new string[]{"口を閉じて"}).addFaceTag(new string[]{"mouthup:25", "moutha:0", "mouthi:0", "mouthc:0", "mouthdw:0", "mouthhe:0", "mouths:0", "mouthuphalf:0", "toothoff:0", "tangopen:0", "tangout:0"}),
-			new VymFaceMotionInfo(new string[]{"口を開けて","口をひらいて"}).addFaceTag(new string[]{"mouthup:0", "moutha:100", "mouthi:0", "mouthc:0", "mouthdw:0", "mouthhe:0", "mouths:0", "mouthuphalf:0", "toothoff:0", "tangopen:0", "tangout:0"}),
+			new VymFaceMotionInfo(new string[]{"口を閉じて"}).addFaceTag(new string[]{"mouthup:25", "moutha:0", "mouthi:0", "mouthc:0", "mouthdw:0", "mouthhe:0", "mouths:0", "mouthuphalf:0", "toothoff:0", "tangopen:0", "tangout:0", "tangup:0"}),
+			new VymFaceMotionInfo(new string[]{"口を開けて","口をひらいて"}).addFaceTag(new string[]{"mouthup:0", "moutha:100", "mouthi:0", "mouthc:0", "mouthdw:0", "mouthhe:0", "mouths:0", "mouthuphalf:0", "toothoff:0", "tangopen:0", "tangout:0", "tangup:0"}),
 			new VymFaceMotionInfo(new string[]{"少し口を開けて"}).addFaceTag(new string[]{"moutha:+10"}),
 			new VymFaceMotionInfo(new string[]{"少し口を閉じて"}).addFaceTag(new string[]{"moutha:-10"}),
 			new VymFaceMotionInfo(new string[]{"口角上げて"}).addFaceTag(new string[]{"mouthup:+25"}),

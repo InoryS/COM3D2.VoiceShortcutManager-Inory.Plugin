@@ -313,7 +313,7 @@ namespace GearMenu
                     //改行ありなら行の下側に余白をつける
                     if (text.Contains("\n")) m_labelExplanation.spacingY = 4;
                     else m_labelExplanation.spacingY = 0;
-                    m_labelExplanation.MakePixelPerfect();
+                    m_labelExplanation.MakePixelPerfect(); //高さ調整
                     //背景設定
                     if (m_spriteExplanation != null) {
                         UISprite component = m_spriteExplanation;
@@ -336,6 +336,7 @@ namespace GearMenu
 
                     m_labelExplanation.text = null;
                     m_labelExplanation.spacingY = 0;
+                    m_labelExplanation.MakePixelPerfect(); //高さ調整
                 }
                 if (m_spriteExplanation) {
                     UISprite component = m_spriteExplanation;

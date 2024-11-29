@@ -15,9 +15,9 @@ using UnityInjector.Attributes;
 /**
 音声認識で夜伽コマンド等を制御 ＋ ギアメニューにショートカットキーボタン配置 ＋ テンキー表示
 
-com3d2.vibeyourmaid.plugin.dll が必要 (ver2.1.0.0以降)
+com3d2.vibeyourmaid.plugin.dll (ver2.1.0.0以降) が必要
 build :
-C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe /t:library /lib:"..\COM3D2\Sybaris" /lib:"..\COM3D2\Sybaris\UnityInjector" /lib:"..\COM3D2\COM3D2x64_Data\Managed" /r:UnityEngine.dll /r:UnityEngine.VR.dll /r:UnityInjector.dll /r:Assembly-CSharp.dll /r:Assembly-CSharp-firstpass.dll /r:com3d2.vibeyourmaid.plugin.dll COM3D2.VoiceShortcutManager.Plugin.cs VoiceConfig.cs GearMenu.cs
+C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe /t:library /lib:"..\COM3D2\Sybaris" /lib:"..\COM3D2\Sybaris\UnityInjector" /lib:"..\COM3D2\COM3D2x64_Data\Managed" /r:UnityEngine.dll /r:UnityEngine.VR.dll /r:UnityInjector.dll /r:Assembly-CSharp.dll /r:Assembly-CSharp-firstpass.dll /r:com3d2.vibeyourmaid.plugin.dll COM3D2.VoiceShortcutManager.Plugin.cs VoiceConfig.cs VymConfig.cs GearMenu.cs
 */
 
 #if COM3D2_5
@@ -25,18 +25,18 @@ C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe /t:library /lib:"..\COM3D2\Sybar
 #else
 [assembly: AssemblyTitle("VoiceShortcutManager COM3D2")]
 #endif
-[assembly: AssemblyVersion("2.0.0.0")]
+[assembly: AssemblyVersion("2.1.0.0")]
 
 namespace COM3D2.VoiceShortcutManager.Plugin
 {
 	[
 		PluginName("COM3D2.VoiceShortcutManager"),
-		PluginVersion("2.0"),
+		PluginVersion("2.1"),
     	DefaultExecutionOrder(-10) //プラグインの実行順を他のプラグインより前にする
 	]
 	public class VoiceShortcutManager : PluginBase
 	{
-		const string VERSION = "2.0";
+		const string VERSION = "2.1";
 
 		private bool bVR = false;
 
@@ -58,7 +58,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 
 		//GUI情報
 		private GUIInfo gui;
-		//イベントを透過させない Enterのみ遅延実行で投下させる制御に利用
+		//イベントを透過させない Enterのみ遅延実行で透過させる制御に利用
 		private bool guiStopPropagation = true;
 
 		//ギアメニューに配置するボタン
@@ -114,7 +114,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			//音声認識を利用するならtrue
 			public bool micEnabled = true;
 			public string micLabelON = "音声認識 ON";
-			public string micLabelOFF = "音声認識 無効";
+			public string micLabelOFF = "音声認識 OFF";
 
 			//テンキー表示を利用するならtrue
 			public bool keyboardEnabled = true;
@@ -135,6 +135,9 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			//夜伽シーン以外
 			public bool keepExplanation = false;
 
+			public bool useUndressManager = true; //夜伽シーンでは脱衣UIを利用 対象メイド設定は無視される
+			public bool playVoiceMaidPos = true; //ボイス再生時にメイドの位置から再生
+
 			//VibeYourMaid連携有効
 			public bool vymEnabled = true;
 			public bool vymCamMoveEnabled = true; //個別有効設定 カメラ移動
@@ -142,14 +145,14 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			public bool vymFaceMotionEnabled = true;  //個別有効設定 表情とモーション
 
 			//対象メイドリンク種別  0:メインメイドのみ 1:メイン＋リンクしているメイド 2:UNZIPのメインとサブメイド 9:表示中のメイド全員
+			public int vymUndressLinkType = 1;  //脱衣の変更対象 -1なら全員脱衣
 			public int vymEyeFaceLinkType = 1;  //目線と顔向の変更対象
-			public int vymUndressLinkType = 1;  //脱衣の変更対象
 			public int vymVibeLinkType = 1;     //VibeYourMaidのバイブ操作時
-			public int vymFaceLinkType = 1;     //VibeYourMaidの表情変更時
+			public int vymFaceLinkType = 0;     //VibeYourMaidの表情変更時
 			public int vymMotionLinkType = 0;   //VibeYourMaidのモーション変更時
 
-			public float motionFadeTime = 0.7f; //VibeYourMaidのモーション切替のクロスフェードタイム
 			public float faceFadeTime = 0.5f;   //VibeYourMaidの表情切替のクロスフェードタイム
+			public float motionFadeTime = 0.7f; //VibeYourMaidのモーション切替のクロスフェードタイム
 			
 			//ショートカットボタンリスト
 			public List<MenuInfo> menuList = new List<MenuInfo>();
@@ -252,7 +255,13 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			this.sceneLevel = level;
 			this.sceneName = GameMain.Instance.GetNowSceneName();
 
-			//夜伽シーンならチェック用コルーチン開始 
+			//ラベルを閉じて初期化
+			if (GearMenu.Buttons.keepExplanation) {
+				GearMenu.Buttons.VisibleExplanation(null, false);
+				if (micButton) GearMenu.Buttons.SetText(micButton, micON ? cfg.micLabelON : cfg.micLabelOFF);
+			}
+
+			//夜伽シーンなら終了チェック用コルーチン開始 
 			if (YotogiManager.instans || YotogiOldManager.instans) {
 				//コルーチン開始
 				if (this.yotogiCheckCoroutine == null) this.yotogiCheckCoroutine = StartCoroutine(yotogiCheck());
@@ -436,14 +445,8 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public void toggleMic()
 		{
 			micON = !micON;
-			//音声認識初期化
-			if (micON) {
-				enableMic();
-			}
-			//音声認識無効化
-			else {
-				disableMic();
-			}
+			if (micON) enableMic(); //有効化
+			else disableMic(); //無効化
 		}
 
 		//有効シーンかどうかチェック
@@ -913,7 +916,15 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 				string k = keyword; //スコープ対策
 				keywords.Add(keyword, () => {
 					Debug.Log("Voice playVoice : "+k);
-					playVoice();
+					playVoice(0);
+				});
+			}
+			foreach (string keyword in voiceCfg.playVoiceBefore) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice playVoiceBefore : "+k);
+					playVoice(1);
 				});
 			}
 
@@ -939,16 +950,47 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 				if (advKag.auto_mode != auto) {
 					GameMain.Instance.MsgWnd.CallEvent(MessageWindowMgr.MessageWindowUnderButton.Auto);
 				}
-			} else {
-				advKag.auto_mode = auto;
 			}
+			advKag.auto_mode = auto;
 		}
 
 		//メッセージウィンドウのボイス再生 VOICEボタンを押す処理を事項
-		public void playVoice()
+		public void playVoice(int skipCount)
 		{
-			//位置に合わせた音声にならない
-			GameMain.Instance.MsgWnd.CallEvent(MessageWindowMgr.MessageWindowUnderButton.Voice);
+			//ログのボイスデータの情報から直近のボイスを再生
+			if (GameMain.Instance.MsgWnd != null) {
+				FieldInfo backlogUnitInfo = typeof(MessageWindowMgr).GetField("m_listBacklogUnit", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.GetField);
+				List<BacklogCtrl.BacklogUnit> backlogList = (List<BacklogCtrl.BacklogUnit>)backlogUnitInfo.GetValue(GameMain.Instance.MsgWnd);
+				//新しい順
+				for (int i=backlogList.Count-1; i>=0; i--) {
+					BacklogCtrl.BacklogUnit unit = backlogList[i];
+					
+					//音声なしはスキップ
+					if (String.IsNullOrEmpty(unit.m_voiceId)) continue;
+
+					//指定回数のログ音声はスキップ
+					if (skipCount > 0) {
+						skipCount--;
+					} else {
+						if (cfg.playVoicceMaidPos) {
+							//名前からメイドを特定できたら再生
+							for (int j = 0; j < GameMain.Instance.CharacterMgr.GetStockMaidCount(); j++) {
+								Maid maid = GameMain.Instance.CharacterMgr.GetStockMaid(j);
+								if (maid.Visible && (maid.status.firstName == unit.m_speakerName || maid.status.lastName == unit.m_speakerName)) {
+									Debug.Log("playVoice : "+unit.m_speakerName+" : "+unit.m_voiceId);
+									maid.AudioMan.LoadPlay(unit.m_voiceId, 0f, false, false);
+									return;
+								}
+							}
+						}
+						//メイドが見つからなかったら通常再生
+						GameMain.Instance.SoundMgr.PlayDummyVoice(unit.m_voiceId, 0f, false, false, 50, AudioSourceMgr.Type.Voice);
+						return;
+					}
+				}
+				//再生されなかったら通常の再生処理実行
+				GameMain.Instance.MsgWnd.CallEvent(MessageWindowMgr.MessageWindowUnderButton.Voice);
+			}
 		}
 
 		//設定変更
@@ -1082,7 +1124,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			//メイド固定 注視点
 			foreach (VymVoiceInfo info in vymCfg.vymLookPoint) {
 				int lookPoint = int.Parse(info.value);
-				int follow = lookPoint == 10 ? 1 : -1; //アングル固定時はメイドも固定
+				int follow = lookPoint == 11 ? 1 : -1; //アングル固定時はメイドも固定
 				setVymKeywordInvoke(info.voice, "vymLookPoint", info.value, new object[]{-1, follow, lookPoint});
 			}
 
@@ -1502,6 +1544,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			//setVoiceKeywordInvoke(voiceCfg.dressAll, "dressAll");
 			//setVoiceKeywordInvoke(voiceCfg.undressAll, "undressAll");
 
+			//メイド脱衣
 			foreach (string keyword in voiceCfg.dressAll) {
 				if (keywords.ContainsKey(keyword)) continue;
 				string k = keyword; //スコープ対策
@@ -1647,6 +1690,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 				});
 			}
 
+			//めくれ・ずらし・ぽろり
 			foreach (string keyword in voiceCfg.modoshiPants) {
 				if (keywords.ContainsKey(keyword)) continue;
 				string k = keyword; //スコープ対策
@@ -1663,13 +1707,165 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 					zurashiPants();
 				});
 			}
+
+			foreach (string keyword in voiceCfg.mekureFront) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice mekureFront : "+k);
+					mekureFront();
+				});
+			}
+			foreach (string keyword in voiceCfg.mekureBack) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice mekureBack : "+k);
+					mekureBack();
+				});
+			}
+			foreach (string keyword in voiceCfg.mekureReset) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice mekureReset : "+k);
+					mekureReset();
+				});
+			}
+
+			foreach (string keyword in voiceCfg.pororiTop) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice pororiTop : "+k);
+					pororiTop();
+				});
+			}
+			foreach (string keyword in voiceCfg.pororiTopReset) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice pororiTopReset : "+k);
+					pororiTopReset();
+				});
+			}
+			foreach (string keyword in voiceCfg.pororiBottom) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice pororiBottom : "+k);
+					pororiBottom();
+				});
+			}
+			foreach (string keyword in voiceCfg.pororiBottomReset) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice pororiBottomReset : "+k);
+					pororiBottomReset();
+				});
+			}
+
+			//竿表示
+			foreach (string keyword in voiceCfg.manShowChinko) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice manShowChinko : "+k);
+					manChinkoVisible(true);
+				});
+			}
+			foreach (string keyword in voiceCfg.manHideChinko) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice manHideChinko : "+k);
+					manChinkoVisible(false);
+				});
+			}
+
+			//男脱衣
+			#if COM3D2_5
+			foreach (string keyword in voiceCfg.manDressAll) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice manDressAll : "+k);
+					manDressAll();
+				});
+			}
+			foreach (string keyword in voiceCfg.manUndressAll) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice manUndressAll : "+k);
+					manUndressAll();
+				});
+			}
+			foreach (string keyword in voiceCfg.manUndressWear) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice manUndressWear : "+k);
+					manUndressWear();
+				});
+			}
+			foreach (string keyword in voiceCfg.manDressPants) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice manDressPants : "+k);
+					manDressPants();
+				});
+			}
+			foreach (string keyword in voiceCfg.manUndressPants) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice manUndressPants : "+k);
+					manUndressPants();
+				});
+			}
+			foreach (string keyword in voiceCfg.manDressShoes) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice manDressShoes : "+k);
+					manDressShoes();
+				});
+			}
+			foreach (string keyword in voiceCfg.manUndressShoes) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice manUndressShoes : "+k);
+					manUndressShoes();
+				});
+			}
+			#endif
+
+			//Prop変更
+			foreach (PropVoiceInfo propVoice in voiceCfg.propVoiceList) {
+				PropInfo[] props = propVoice.props;
+				MaskInfo[] masks = propVoice.masks;
+				foreach (string keyword in propVoice.voice) {
+					if (keywords.ContainsKey(keyword)) continue;
+					string k = keyword; //スコープ対策
+					keywords.Add(keyword, () => {
+						Debug.Log("setPropMask : "+k);
+						setPropMask(props, masks);
+					});
+				}
+			}
+
 		}
 
 		//UnitType { 全脱衣, 全着衣, トップス, ボトムス, ブラジャー, パンツ, ソックス, シューズ, ヘッドドレス, メガネ, 背中, 手袋, Max }
 		//夜伽シーンの脱衣パネル取得
 		private UndressingManager getUndressingManager()
 		{
-			if (cfg.vymUndressLinkType != -1) return null;
+			//無効設定時
+			if (!cfg.useUndressManager) return null;
 
 			if (YotogiManager.instans && YotogiManager.instans.play_mgr && YotogiManager.instans.play_mgr.playingSkill != null) {
 				GameObject obj = GameObject.Find("UI Root/YotogiPlayPanel/UndressingViewer/UndressingViewer/MaskGroup/UndressParent");
@@ -1689,12 +1885,22 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			maid.body0.SetMask(TBody.SlotID.skirt, mask);
 			maid.body0.SetMask(TBody.SlotID.shoes, mask);
 			maid.body0.SetMask(TBody.SlotID.accSenaka, mask);
+			#if COM3D2_5
+			maid.body0.SetMask(TBody.SlotID.jacket, mask);
+			maid.body0.SetMask(TBody.SlotID.vest, mask);
+			maid.body0.SetMask(TBody.SlotID.shirt, mask);
+			#endif
 		}
 		private void setMaskUnderware(Maid maid, bool mask)
 		{
 			maid.body0.SetMask(TBody.SlotID.mizugi, mask);
 			maid.body0.SetMask(TBody.SlotID.bra, mask);
 			maid.body0.SetMask(TBody.SlotID.panz, mask);
+			#if COM3D2_5
+			maid.body0.SetMask(TBody.SlotID.mizugi_top, mask);
+			maid.body0.SetMask(TBody.SlotID.mizugi_buttom, mask);
+			maid.body0.SetMask(TBody.SlotID.slip, mask);
+			#endif
 		}
 		private void setMaskOther(Maid maid, bool mask)
 		{
@@ -1725,10 +1931,10 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public void dressAll()
 		{
 			UndressingManager undressManager = getUndressingManager();
-			foreach (Maid maid in getUndressMaidList()) {
-				if (undressManager != null) {
-					undressManager.SetMaskMode(UndressingManager.UnitType.全着衣, UndressingManager.MaskStatus.On); //Onで実行
-				} else {
+			if (undressManager != null) {
+				undressManager.SetMaskMode(UndressingManager.UnitType.全着衣, UndressingManager.MaskStatus.On); //Onで実行
+			} else {
+				foreach (Maid maid in getUndressMaidList()) {
 					setMaskWear(maid, true);
 					setMaskUnderware(maid, true);
 					setMaskOther(maid, true);
@@ -1739,11 +1945,11 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public void undressAll()
 		{
 			UndressingManager undressManager = getUndressingManager();
-			foreach (Maid maid in getUndressMaidList()) {
-				if (maid.Visible) {
-					if (undressManager != null) {
-						undressManager.SetMaskMode(UndressingManager.UnitType.全脱衣, UndressingManager.MaskStatus.On); //Onで実行
-					} else {
+			if (undressManager != null) {
+				undressManager.SetMaskMode(UndressingManager.UnitType.全脱衣, UndressingManager.MaskStatus.On); //Onで実行
+			} else {
+				foreach (Maid maid in getUndressMaidList()) {
+					if (maid.Visible) {
 						setMaskWear(maid, false);
 						setMaskUnderware(maid, false);
 						setMaskOther(maid, false);
@@ -1756,21 +1962,15 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public void undressWear()
 		{
 			UndressingManager undressManager = getUndressingManager();
-			//すべてのメイド（仮）
-			foreach (Maid maid in GameMain.Instance.CharacterMgr.GetStockMaidList()) {
-				if (maid.Visible) {
-					if (undressManager != null) {
-						undressManager.SetMaskMode(UndressingManager.UnitType.トップス, UndressingManager.MaskStatus.On); //Onが非表示
-						undressManager.SetMaskMode(UndressingManager.UnitType.ボトムス, UndressingManager.MaskStatus.On); //Onが非表示
-						undressManager.SetMaskMode(UndressingManager.UnitType.ブラジャー, UndressingManager.MaskStatus.On); //Onが非表示
-						undressManager.SetMaskMode(UndressingManager.UnitType.パンツ, UndressingManager.MaskStatus.On); //Onが非表示
-					} else {
-						maid.body0.SetMask(TBody.SlotID.wear, false);
-						maid.body0.SetMask(TBody.SlotID.onepiece, false);
-						maid.body0.SetMask(TBody.SlotID.skirt, false);
-						maid.body0.SetMask(TBody.SlotID.mizugi, false);
-						maid.body0.SetMask(TBody.SlotID.bra, false);
-						maid.body0.SetMask(TBody.SlotID.panz, false);
+			if (undressManager != null) {
+				undressManager.SetMaskMode(UndressingManager.UnitType.トップス, UndressingManager.MaskStatus.On); //Onが非表示
+				undressManager.SetMaskMode(UndressingManager.UnitType.ボトムス, UndressingManager.MaskStatus.On); //Onが非表示
+				undressManager.SetMaskMode(UndressingManager.UnitType.ブラジャー, UndressingManager.MaskStatus.On); //Onが非表示
+				undressManager.SetMaskMode(UndressingManager.UnitType.パンツ, UndressingManager.MaskStatus.On); //Onが非表示
+			} else {
+				foreach (Maid maid in getUndressMaidList()) {
+					if (maid.Visible) {
+						setMaskWear(maid, false);
 					}
 				}
 			}
@@ -1779,11 +1979,11 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public void dressTop()
 		{
 			UndressingManager undressManager = getUndressingManager();
-			foreach (Maid maid in getUndressMaidList()) {
-				if (maid.Visible) {
-					if (undressManager != null) {
-						undressManager.SetMaskMode(UndressingManager.UnitType.トップス, UndressingManager.MaskStatus.Off); //Offが表示
-					} else {
+			if (undressManager != null) {
+				undressManager.SetMaskMode(UndressingManager.UnitType.トップス, UndressingManager.MaskStatus.Off); //Offが表示
+			} else {
+				foreach (Maid maid in getUndressMaidList()) {
+					if (maid.Visible) {
 						maid.body0.SetMask(TBody.SlotID.wear, true);
 						maid.body0.SetMask(TBody.SlotID.onepiece, true);
 		                maid.body0.SetMask(TBody.SlotID.accSenaka, true);
@@ -1795,11 +1995,11 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public void undressTop()
 		{
 			UndressingManager undressManager = getUndressingManager();
-			foreach (Maid maid in getUndressMaidList()) {
-				if (maid.Visible) {
-					if (undressManager != null) {
-						undressManager.SetMaskMode(UndressingManager.UnitType.トップス, UndressingManager.MaskStatus.On); //Onが非表示
-					} else {
+			if (undressManager != null) {
+				undressManager.SetMaskMode(UndressingManager.UnitType.トップス, UndressingManager.MaskStatus.On); //Onが非表示
+			} else {
+				foreach (Maid maid in getUndressMaidList()) {
+					if (maid.Visible) {
 						maid.body0.SetMask(TBody.SlotID.wear, false);
 						maid.body0.SetMask(TBody.SlotID.onepiece, false);
 		                maid.body0.SetMask(TBody.SlotID.accSenaka, false);
@@ -1811,11 +2011,11 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public void dressBottom()
 		{
 			UndressingManager undressManager = getUndressingManager();
-			foreach (Maid maid in getUndressMaidList()) {
-				if (maid.Visible) {
-					if (undressManager != null) {
-						undressManager.SetMaskMode(UndressingManager.UnitType.ボトムス, UndressingManager.MaskStatus.Off); //Offが表示
-					} else {
+			if (undressManager != null) {
+				undressManager.SetMaskMode(UndressingManager.UnitType.ボトムス, UndressingManager.MaskStatus.Off); //Offが表示
+			} else {
+				foreach (Maid maid in getUndressMaidList()) {
+					if (maid.Visible) {
 						maid.body0.SetMask(TBody.SlotID.skirt, true);
 					}
 				}
@@ -1825,11 +2025,11 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public void undressBottom()
 		{
 			UndressingManager undressManager = getUndressingManager();
-			foreach (Maid maid in getUndressMaidList()) {
-				if (maid.Visible) {
-					if (undressManager != null) {
-						undressManager.SetMaskMode(UndressingManager.UnitType.ボトムス, UndressingManager.MaskStatus.On); //Onが非表示
-					} else {
+			if (undressManager != null) {
+				undressManager.SetMaskMode(UndressingManager.UnitType.ボトムス, UndressingManager.MaskStatus.On); //Onが非表示
+			} else {
+				foreach (Maid maid in getUndressMaidList()) {
+					if (maid.Visible) {
 						maid.body0.SetMask(TBody.SlotID.skirt, false);
 					}
 				}
@@ -1840,11 +2040,11 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public void dressMizugi()
 		{
 			UndressingManager undressManager = getUndressingManager();
-			foreach (Maid maid in getUndressMaidList()) {
-				if (maid.Visible) {
-					if (undressManager != null) {
-						undressManager.SetMaskMode(UndressingManager.UnitType.トップス, UndressingManager.MaskStatus.Off); //Offが表示
-					} else {
+			if (undressManager != null) {
+				undressManager.SetMaskMode(UndressingManager.UnitType.トップス, UndressingManager.MaskStatus.Off); //Offが表示
+			} else {
+				foreach (Maid maid in getUndressMaidList()) {
+					if (maid.Visible) {
 						maid.body0.SetMask(TBody.SlotID.mizugi, true);
 					}
 				}
@@ -1854,11 +2054,11 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public void undressMizugi()
 		{
 			UndressingManager undressManager = getUndressingManager();
-			foreach (Maid maid in getUndressMaidList()) {
-				if (maid.Visible) {
-					if (undressManager != null) {
-						undressManager.SetMaskMode(UndressingManager.UnitType.トップス, UndressingManager.MaskStatus.On); //Onが非表示
-					} else {
+			if (undressManager != null) {
+				undressManager.SetMaskMode(UndressingManager.UnitType.トップス, UndressingManager.MaskStatus.On); //Onが非表示
+			} else {
+				foreach (Maid maid in getUndressMaidList()) {
+					if (maid.Visible) {
 						maid.body0.SetMask(TBody.SlotID.mizugi, false);
 					}
 				}
@@ -1869,12 +2069,12 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public void dressUnderWear()
 		{
 			UndressingManager undressManager = getUndressingManager();
-			foreach (Maid maid in getUndressMaidList()) {
-				if (maid.Visible) {
-					if (undressManager != null) {
-						undressManager.SetMaskMode(UndressingManager.UnitType.ブラジャー, UndressingManager.MaskStatus.Off); //Offが表示
-						undressManager.SetMaskMode(UndressingManager.UnitType.パンツ, UndressingManager.MaskStatus.Off); //Offが表示
-					} else {
+			if (undressManager != null) {
+				undressManager.SetMaskMode(UndressingManager.UnitType.ブラジャー, UndressingManager.MaskStatus.Off); //Offが表示
+				undressManager.SetMaskMode(UndressingManager.UnitType.パンツ, UndressingManager.MaskStatus.Off); //Offが表示
+			} else {
+				foreach (Maid maid in getUndressMaidList()) {
+					if (maid.Visible) {
 						setMaskUnderware(maid, true);
 					}
 				}
@@ -1884,12 +2084,12 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public void undressUnderWear()
 		{
 			UndressingManager undressManager = getUndressingManager();
-			foreach (Maid maid in getUndressMaidList()) {
-				if (maid.Visible) {
-					if (undressManager != null) {
-						undressManager.SetMaskMode(UndressingManager.UnitType.ブラジャー, UndressingManager.MaskStatus.On); //Onが非表示
-						undressManager.SetMaskMode(UndressingManager.UnitType.パンツ, UndressingManager.MaskStatus.On); //Onが非表示
-					} else {
+			if (undressManager != null) {
+				undressManager.SetMaskMode(UndressingManager.UnitType.ブラジャー, UndressingManager.MaskStatus.On); //Onが非表示
+				undressManager.SetMaskMode(UndressingManager.UnitType.パンツ, UndressingManager.MaskStatus.On); //Onが非表示
+			} else {
+				foreach (Maid maid in getUndressMaidList()) {
+					if (maid.Visible) {
 						setMaskUnderware(maid, false);
 					}
 				}
@@ -1899,11 +2099,11 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public void dressBra()
 		{
 			UndressingManager undressManager = getUndressingManager();
-			foreach (Maid maid in getUndressMaidList()) {
-				if (maid.Visible) {
-					if (undressManager != null) {
-						undressManager.SetMaskMode(UndressingManager.UnitType.ブラジャー, UndressingManager.MaskStatus.Off); //Offが表示
-					} else {
+			if (undressManager != null) {
+				undressManager.SetMaskMode(UndressingManager.UnitType.ブラジャー, UndressingManager.MaskStatus.Off); //Offが表示
+			} else {
+				foreach (Maid maid in getUndressMaidList()) {
+					if (maid.Visible) {
 						maid.body0.SetMask(TBody.SlotID.bra, true);
 					}
 				}
@@ -1913,11 +2113,11 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public void undressBra()
 		{
 			UndressingManager undressManager = getUndressingManager();
-			foreach (Maid maid in getUndressMaidList()) {
-				if (maid.Visible) {
-					if (undressManager != null) {
-						undressManager.SetMaskMode(UndressingManager.UnitType.ブラジャー, UndressingManager.MaskStatus.On); //Onが非表示
-					} else {
+			if (undressManager != null) {
+				undressManager.SetMaskMode(UndressingManager.UnitType.ブラジャー, UndressingManager.MaskStatus.On); //Onが非表示
+			} else {
+				foreach (Maid maid in getUndressMaidList()) {
+					if (maid.Visible) {
 						maid.body0.SetMask(TBody.SlotID.bra, false);
 					}
 				}
@@ -1927,11 +2127,11 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public void dressPants()
 		{
 			UndressingManager undressManager = getUndressingManager();
-			foreach (Maid maid in getUndressMaidList()) {
-				if (maid.Visible) {
-					if (undressManager != null) {
-						undressManager.SetMaskMode(UndressingManager.UnitType.パンツ, UndressingManager.MaskStatus.Off); //Offが表示
-					} else {
+			if (undressManager != null) {
+				undressManager.SetMaskMode(UndressingManager.UnitType.パンツ, UndressingManager.MaskStatus.Off); //Offが表示
+			} else {
+				foreach (Maid maid in getUndressMaidList()) {
+					if (maid.Visible) {
 						maid.body0.SetMask(TBody.SlotID.panz, true);
 					}
 				}
@@ -1941,11 +2141,11 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public void undressPants()
 		{
 			UndressingManager undressManager = getUndressingManager();
-			foreach (Maid maid in getUndressMaidList()) {
-				if (maid.Visible) {
-					if (undressManager != null) {
-						undressManager.SetMaskMode(UndressingManager.UnitType.パンツ, UndressingManager.MaskStatus.On); //Onが非表示
-					} else {
+			if (undressManager != null) {
+				undressManager.SetMaskMode(UndressingManager.UnitType.パンツ, UndressingManager.MaskStatus.On); //Onが非表示
+			} else {
+				foreach (Maid maid in getUndressMaidList()) {
+					if (maid.Visible) {
 						maid.body0.SetMask(TBody.SlotID.panz, false);
 					}
 				}
@@ -1955,11 +2155,11 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public void dressShoes()
 		{
 			UndressingManager undressManager = getUndressingManager();
-			foreach (Maid maid in getUndressMaidList()) {
-				if (maid.Visible) {
-					if (undressManager != null) {
-						undressManager.SetMaskMode(UndressingManager.UnitType.シューズ, UndressingManager.MaskStatus.Off); //Offが表示
-					} else {
+			if (undressManager != null) {
+				undressManager.SetMaskMode(UndressingManager.UnitType.シューズ, UndressingManager.MaskStatus.Off); //Offが表示
+			} else {
+				foreach (Maid maid in getUndressMaidList()) {
+					if (maid.Visible) {
 						maid.body0.SetMask(TBody.SlotID.shoes, true);
 					}
 				}
@@ -1969,11 +2169,11 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public void undressShoes()
 		{
 			UndressingManager undressManager = getUndressingManager();
-			foreach (Maid maid in getUndressMaidList()) {
-				if (maid.Visible) {
-					if (undressManager != null) {
-						undressManager.SetMaskMode(UndressingManager.UnitType.シューズ, UndressingManager.MaskStatus.On); //Onが非表示
-					} else {
+			if (undressManager != null) {
+				undressManager.SetMaskMode(UndressingManager.UnitType.シューズ, UndressingManager.MaskStatus.On); //Onが非表示
+			} else {
+				foreach (Maid maid in getUndressMaidList()) {
+					if (maid.Visible) {
 						maid.body0.SetMask(TBody.SlotID.shoes, false);
 					}
 				}
@@ -1983,14 +2183,14 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public void dressAcc()
 		{
 			UndressingManager undressManager = getUndressingManager();
+			if (undressManager != null) {
+				undressManager.SetMaskMode(UndressingManager.UnitType.ヘッドドレス, UndressingManager.MaskStatus.Off); //Offが表示
+				undressManager.SetMaskMode(UndressingManager.UnitType.メガネ, UndressingManager.MaskStatus.Off); //Offが表示
+			}
+			//その他のアクセもマスク設定
 			foreach (Maid maid in getUndressMaidList()) {
 				if (maid.Visible) {
-					if (undressManager != null) {
-						undressManager.SetMaskMode(UndressingManager.UnitType.ヘッドドレス, UndressingManager.MaskStatus.Off); //Offが表示
-						undressManager.SetMaskMode(UndressingManager.UnitType.メガネ, UndressingManager.MaskStatus.Off); //Offが表示
-					} else {
-						setMaskAcc(maid, true);
-					}
+					setMaskAcc(maid, true);
 				}
 			}
 		}
@@ -1998,14 +2198,14 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public void undressAcc()
 		{
 			UndressingManager undressManager = getUndressingManager();
+			if (undressManager != null) {
+				undressManager.SetMaskMode(UndressingManager.UnitType.ヘッドドレス, UndressingManager.MaskStatus.On); //Onが非表示
+				undressManager.SetMaskMode(UndressingManager.UnitType.メガネ, UndressingManager.MaskStatus.On); //Onが非表示
+			}
+			//その他のアクセもマスク設定
 			foreach (Maid maid in getUndressMaidList()) {
 				if (maid.Visible) {
-					if (undressManager != null) {
-						undressManager.SetMaskMode(UndressingManager.UnitType.ヘッドドレス, UndressingManager.MaskStatus.On); //Onが非表示
-						undressManager.SetMaskMode(UndressingManager.UnitType.メガネ, UndressingManager.MaskStatus.On); //Onが非表示
-					} else {
-						setMaskAcc(maid, false);
-					}
+					setMaskAcc(maid, false);
 				}
 			}
 		}
@@ -2019,23 +2219,9 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		}
 		public void modoshiPants(Maid maid)
 		{
-			MPN mpn;
-            if (maid.body0.GetSlotVisible(TBody.SlotID.panz)) mpn = MPN.panz;
-			else if (maid.body0.GetSlotVisible(TBody.SlotID.mizugi)) mpn = MPN.mizugi;
-			else return; //見えてなければ終了
-
-			MaidProp prop = maid.GetProp(mpn);
-			//仮衣装
-			if (prop.nTempFileNameRID != 0) {
-				//zurashiを除去した衣装に変更
-				maid.SetProp(mpn, maid.GetProp(mpn).strTempFileName.Replace("_zurashi", ""), 0, true, false);
+			if (maid.mekureController.IsSupportedCostumeType(MaidExtension.MaidCostumeChangeController.CostumeType.Zurasi)) {
+				maid.mekureController.SetEnabledCostumeType(MaidExtension.MaidCostumeChangeController.CostumeType.Zurasi, false, null);
 			}
-			//本衣装
-			else if (prop.nFileNameRID != 0) {
-				//本衣装に戻す
-				maid.ResetProp(mpn, false);
-			}
-			maid.AllProcPropSeqStart();
 		}
 		//パンツずらす
 		public void zurashiPants()
@@ -2046,43 +2232,333 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		}
 		public void zurashiPants(Maid maid)
 		{
-			MPN mpn; 
-            if (maid.body0.GetSlotVisible(TBody.SlotID.panz)) mpn = MPN.panz;
-			else if (maid.body0.GetSlotVisible(TBody.SlotID.mizugi)) mpn = MPN.mizugi;
-			else return; //見えてなければ終了
-
-			SortedDictionary<string, string> sortedDictionary;
-			//ずらしファイル名
-			string filename = "";
-			MaidProp prop = maid.GetProp(mpn);
-			//仮衣装状態
-			if (prop.nTempFileNameRID != 0) {
-				//衣装なし
-				if (prop.strTempFileName.Contains("del.menu")) return;
-				//すでにずれている
-				if (prop.strTempFileName.Contains("_zurashi")) return;
-				//仮衣装のずらしファイルを取得
-				if (Menu.m_dicResourceRef.TryGetValue(prop.nTempFileNameRID, out sortedDictionary) && sortedDictionary.TryGetValue("パンツずらし", out filename)) {
-					//仮衣装がすでにずれている
-					if (filename.Equals(prop.strTempFileName)) return;
-					//ずらし衣装に設定
-					maid.SetProp(mpn, filename, 0, true, false);
-				}
+			if (maid.mekureController.IsSupportedCostumeType(MaidExtension.MaidCostumeChangeController.CostumeType.Zurasi)) {
+				maid.mekureController.SetEnabledCostumeType(MaidExtension.MaidCostumeChangeController.CostumeType.Zurasi, true, null);
 			}
-			//本衣装 仮衣装状態でない
-			else if (prop.nFileNameRID != 0) {
-				//すでにずれている
-				if (prop.strTempFileName.Contains("_zurashi")) return;
-				//本衣装のずらしファイルを取得
-				if (Menu.m_dicResourceRef.TryGetValue(prop.nFileNameRID, out sortedDictionary) && sortedDictionary.TryGetValue("パンツずらし", out filename)) {
-					//すでにずれている
-					if (filename.Equals(prop.strTempFileName)) return;
-					//ずらし衣装に設定
-					maid.SetProp(mpn, filename, 0, true, false);
-				}
-			}
-			maid.AllProcPropSeqStart();
 		}
+
+		//めくれ戻す
+		public void mekureReset()
+		{
+			foreach (Maid maid in getUndressMaidList()) {
+				if (maid.Visible) mekureReset(maid);
+			}
+		}
+		public void mekureReset(Maid maid)
+		{
+			if (maid.mekureController.IsSupportedCostumeType(MaidExtension.MaidCostumeChangeController.CostumeType.MekureFront)) {
+				maid.mekureController.SetEnabledCostumeType(MaidExtension.MaidCostumeChangeController.CostumeType.MekureFront, false, null);
+			}
+			if (maid.mekureController.IsSupportedCostumeType(MaidExtension.MaidCostumeChangeController.CostumeType.MekureBack)) {
+				maid.mekureController.SetEnabledCostumeType(MaidExtension.MaidCostumeChangeController.CostumeType.MekureBack, false, null);
+			}
+		}
+
+		//めくれ
+		public void mekureFront()
+		{
+			foreach (Maid maid in getUndressMaidList()) {
+				if (maid.Visible) mekureFront(maid);
+			}
+		}
+		public void mekureBack()
+		{
+			foreach (Maid maid in getUndressMaidList()) {
+				if (maid.Visible) mekureBack(maid);
+			}
+		}
+		public void mekureFront(Maid maid)
+		{
+			if (maid.mekureController.IsSupportedCostumeType(MaidExtension.MaidCostumeChangeController.CostumeType.MekureFront)) {
+				bool flag = maid.mekureController.IsEnabledCostumeType(MaidExtension.MaidCostumeChangeController.CostumeType.MekureFront);
+				if (!flag) {
+					maid.mekureController.SetEnabledCostumeType(MaidExtension.MaidCostumeChangeController.CostumeType.MekureFront, true, null);
+					maid.mekureController.SetEnabledCostumeType(MaidExtension.MaidCostumeChangeController.CostumeType.MekureBack, false, null);
+				}
+			}
+		}
+		public void mekureBack(Maid maid)
+		{
+			if (maid.mekureController.IsSupportedCostumeType(MaidExtension.MaidCostumeChangeController.CostumeType.MekureBack)) {
+				bool flag = maid.mekureController.IsEnabledCostumeType(MaidExtension.MaidCostumeChangeController.CostumeType.MekureBack);
+				if (!flag) {
+					maid.mekureController.SetEnabledCostumeType(MaidExtension.MaidCostumeChangeController.CostumeType.MekureBack, true, null);
+					maid.mekureController.SetEnabledCostumeType(MaidExtension.MaidCostumeChangeController.CostumeType.MekureFront, false, null);
+				}
+			}
+		}
+
+		//ぽろり上 CRCボディのはだけにも対応
+		public void pororiTop()
+		{
+			foreach (Maid maid in getUndressMaidList()) {
+				if (maid.Visible) pororiTop(maid);
+			}
+		}
+		public void pororiBottom()
+		{
+			foreach (Maid maid in getUndressMaidList()) {
+				if (maid.Visible) pororiBottom(maid);
+			}
+		}
+		public void pororiTopReset()
+		{
+			foreach (Maid maid in getUndressMaidList()) {
+				if (maid.Visible) pororiTopReset(maid);
+			}
+		}
+		public void pororiBottomReset()
+		{
+			foreach (Maid maid in getUndressMaidList()) {
+				if (maid.Visible) {
+					if (PororiOff(maid, "panz",  MPN.panz)) maid.AllProcPropSeqStart();
+				}
+			}
+		}
+		public void pororiTop(Maid maid)
+		{
+			#if COM3D2_5
+			//はだけ
+			if (maid.IsCrcBody) {
+				if (maid.mekureController.IsSupportedCostumeType(MaidExtension.MaidCostumeChangeController.CostumeType.Hadake)) {
+					maid.mekureController.SetEnabledCostumeType(MaidExtension.MaidCostumeChangeController.CostumeType.Hadake, true, null);
+				}
+				return;
+			}
+			#endif
+
+			//ぽろり上を実行 上着とブラは段階的に実行
+			PororiTop(maid);
+		}
+		public void pororiTopReset(Maid maid)
+		{
+			#if COM3D2_5
+			if (maid.IsCrcBody) {
+				if (maid.mekureController.IsSupportedCostumeType(MaidExtension.MaidCostumeChangeController.CostumeType.Hadake)) {
+					maid.mekureController.SetEnabledCostumeType(MaidExtension.MaidCostumeChangeController.CostumeType.Hadake, false, null);
+				}
+				return;
+			}
+			#endif
+			bool changed = false;
+			if (PororiOff(maid, "wear", MPN.wear)) changed = true;
+			if (PororiOff(maid, "onepiece", MPN.onepiece)) changed = true;
+			if (PororiOff(maid, "mizugi", MPN.mizugi)) changed = true;
+			if (PororiOff(maid, "bra", MPN.bra)) changed = true;
+			if (changed) maid.AllProcPropSeqStart();
+		}
+
+		public void pororiBottom(Maid maid)
+		{
+			PororiChange(maid, "panz", TBody.SlotID.panz, MPN.panz);
+		}
+
+		private bool isPorori(Maid maid, string name)
+		{
+			MaidProp prop = maid.GetProp(name);
+			return prop.strFileName.Contains("_porori") || prop.strTempFileName.Contains("_porori");
+		}
+
+		//ぽろり上 上着とブラで2段階で切り替え
+		private bool PororiTop(Maid maid)
+		{
+			if (!isPorori(maid, "wear")) {
+				if (PororiChange(maid, "wear", TBody.SlotID.wear, MPN.wear)) return true;
+			}
+			if (!isPorori(maid, "onepiece")) {
+				if (PororiChange(maid, "onepiece", TBody.SlotID.onepiece, MPN.onepiece)) return true;
+			}
+			if (!isPorori(maid, "mizugi")) {
+				if (PororiChange(maid, "mizugi", TBody.SlotID.mizugi, MPN.mizugi)) return true;
+			}
+			if (!isPorori(maid, "bra")) {
+				if (PororiChange(maid, "bra", TBody.SlotID.bra, MPN.bra)) return true;
+			}
+			return false;
+		}
+
+		//ぽろり処理 ぽろししたらtrue
+		private bool PororiChange(Maid maid, string name, TBody.SlotID slotID, MPN mpn)
+		{
+			//非表示なら処理しない
+			if (!maid.body0.GetSlotVisible(slotID)) return false;
+
+			MaidProp prop = maid.GetProp(mpn);
+			if (prop.nFileNameRID != 0 && !prop.strFileName.Contains("_porori")) { //本衣装でぽろりし無し
+				if (ItemChangeTempSuffix(maid, name, "_porori", false)) {
+					maid.AllProcPropSeqStart();
+					return true;
+				}
+			} else if (prop.nTempFileNameRID != 0 && !prop.strTempFileName.Contains("_porori")) { //仮衣装でぽろり無し
+				if (ItemChangeTempSuffix(maid, name, "_porori", true)) {
+					maid.AllProcPropSeqStart();
+					return true;
+				}
+			}
+			return false;
+		}
+		//ぽろりを戻す
+        private bool PororiOff(Maid maid, string name, MPN mpn)
+        {
+			MaidProp prop = maid.GetProp(name);
+			if (prop.strFileName.Contains("_porori")) {
+				maid.SetProp(mpn, maid.GetProp(mpn).strFileName.Replace("_porori", ""), 0, true, false);
+				return true;
+			} else if (prop.strTempFileName.Contains("_porori")) {
+				maid.SetProp(mpn, maid.GetProp(mpn).strTempFileName.Replace("_porori", ""), 0, true, false);
+				return true;
+			}
+			return false;
+        }
+		//メニューファイル名変更処理
+        private bool ItemChangeTempSuffix(Maid maid, string mpn, string suffix, bool temp)
+		{
+          MaidProp prop = maid.GetProp(mpn);
+          string filename = temp ?  prop.strTempFileName : prop.strFileName;
+          filename = filename.Replace(suffix, "").Replace(".menu", suffix+".menu");
+          //menuファイルがあれば変更
+          if (GameUty.IsExistFile(filename, null)) {
+            maid.SetProp(mpn, filename, 0, true, false);
+            return true;
+          }
+          //ずらし等を解除してからmenuファイルがあるかチェック
+          filename = temp ?  prop.strTempFileName : prop.strFileName;
+          filename = filename.Replace("_zurashi", "").Replace("_mekure_back", "").Replace("_mekure", "");
+          filename = filename.Replace(suffix, "").Replace(".menu", suffix+".menu");
+          if (GameUty.IsExistFile(filename, null)) {
+            maid.SetProp(mpn, filename, 0, true, false);
+            return true;
+          }
+          return false;
+        }
+
+
+		//指定したMPNにアイテムをセット & スロット名でマスク
+		private void setPropMask(PropInfo[] props, MaskInfo[] masks)
+		{
+			foreach (Maid maid in getUndressMaidList()) {
+				if (maid.Visible) setPropMask(maid, props, masks);
+			}
+		}
+		private void setPropMask(Maid maid, PropInfo[] props, MaskInfo[] masks)
+		{
+			if (props != null) { 
+				foreach (PropInfo propInfo in props) {
+					try {
+						MPN mpn = (MPN)Enum.Parse(typeof(MPN), propInfo.mpn);
+						if (propInfo.filename == null) {
+							maid.ResetProp(propInfo.mpn, false);
+						} else {
+							//maid.SetProp(propInfo.mpn, propInfo.filename, propInfo.rid, propInfo.temp, propInfo.noscale);
+							maid.SetProp(propInfo.mpn, propInfo.filename, 0, propInfo.temp, false);
+						}
+					} catch {
+						Debug.LogError("指定されたプロパティ名がありません。" + propInfo.mpn);
+					}
+				}
+				maid.AllProcPropSeqStart();
+			}
+			if (masks != null) {
+				foreach (MaskInfo maskInfo in masks) {
+					if (TBody.hashSlotName.ContainsKey(maskInfo.slot)) {
+						int num = (int)TBody.hashSlotName[maskInfo.slot];
+						if (maskInfo.visible != null) {
+							bool mask = maskInfo.visible != "false";
+							maid.body0.SetMask((TBody.SlotID)num, mask);
+							if (maskInfo.visible == "force") maid.body0.goSlot[num].boVisible = true;
+						}
+					}
+				}
+			}
+		}
+
+
+		//竿表示
+		public void manChinkoVisible(bool visible)
+		{
+			for (int i=0; i<GameMain.Instance.CharacterMgr.GetStockManCount(); i++) {
+				Maid man = GameMain.Instance.CharacterMgr.GetStockMan(i);
+				if (man.Visible) {
+					man.body0.SetChinkoVisible(visible);
+				}
+		        #if COM3D2_5
+				if (man.HasNewRealMan && man.pairMan.Visible) {
+					man.pairMan.body0.SetChinkoVisible(visible);
+				}
+				#endif
+			}
+		}
+
+		//男着衣
+        #if COM3D2_5
+		public void manDressAll()
+		{
+			for (int i=0; i<GameMain.Instance.CharacterMgr.GetStockManCount(); i++) {
+				Maid man = GameMain.Instance.CharacterMgr.GetStockMan(i);
+				if (man.HasNewRealMan && man.pairMan.Visible) {
+					setMaskWear(man.pairMan, true);
+					setMaskUnderware(man.pairMan, true);
+					setMaskOther(man.pairMan, true);
+				}
+			}
+		}
+		public void manUndressAll()
+		{
+			for (int i=0; i<GameMain.Instance.CharacterMgr.GetStockManCount(); i++) {
+				Maid man = GameMain.Instance.CharacterMgr.GetStockMan(i);
+				if (man.HasNewRealMan && man.pairMan.Visible) {
+					setMaskWear(man.pairMan, false);
+					setMaskUnderware(man.pairMan, false);
+					setMaskOther(man.pairMan, false);
+				}
+			}
+		}
+		public void manUndressWear()
+		{
+			for (int i=0; i<GameMain.Instance.CharacterMgr.GetStockManCount(); i++) {
+				Maid man = GameMain.Instance.CharacterMgr.GetStockMan(i);
+				if (man.HasNewRealMan && man.pairMan.Visible) {
+					setMaskWear(man.pairMan, false);
+				}
+			}
+		}
+		public void manDressPants()
+		{
+			for (int i=0; i<GameMain.Instance.CharacterMgr.GetStockManCount(); i++) {
+				Maid man = GameMain.Instance.CharacterMgr.GetStockMan(i);
+				if (man.HasNewRealMan && man.pairMan.Visible) {
+					man.pairMan.body0.SetMask(TBody.SlotID.panz, true);
+				}
+			}
+		}
+		public void manUndressPants()
+		{
+			for (int i=0; i<GameMain.Instance.CharacterMgr.GetStockManCount(); i++) {
+				Maid man = GameMain.Instance.CharacterMgr.GetStockMan(i);
+				if (man.HasNewRealMan && man.pairMan.Visible) {
+					man.pairMan.body0.SetMask(TBody.SlotID.panz, false);
+				}
+			}
+		}
+		public void manDressShoes()
+		{
+			for (int i=0; i<GameMain.Instance.CharacterMgr.GetStockManCount(); i++) {
+				Maid man = GameMain.Instance.CharacterMgr.GetStockMan(i);
+				if (man.HasNewRealMan && man.pairMan.Visible) {
+					man.pairMan.body0.SetMask(TBody.SlotID.shoes, true);
+				}
+			}
+		}
+		public void manUndressShoes()
+		{
+			for (int i=0; i<GameMain.Instance.CharacterMgr.GetStockManCount(); i++) {
+				Maid man = GameMain.Instance.CharacterMgr.GetStockMan(i);
+				if (man.HasNewRealMan && man.pairMan.Visible) {
+					man.pairMan.body0.SetMask(TBody.SlotID.shoes, false);
+				}
+			}
+		}
+		#endif
 
 		#endregion
 

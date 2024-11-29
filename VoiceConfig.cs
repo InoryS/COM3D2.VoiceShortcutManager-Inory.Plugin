@@ -33,6 +33,52 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		}
 	}
 
+	//Slot指定でマスクと強制表示
+	public class PropVoiceInfo
+	{
+		public string[] voice;
+		public PropInfo[] props;
+		public MaskInfo[] masks;
+
+		public PropVoiceInfo(){}
+		public PropVoiceInfo(string[] voice, PropInfo[] props, MaskInfo[] masks)
+		{
+			this.voice = voice;
+			this.props = props;
+			this.masks = masks;
+		}
+	}
+	public class PropInfo
+	{
+		public string mpn; //MPN名
+		public string filename; //アイテムファイル nullならリセット delなら削除
+		//public int rid = 0;
+		public bool temp = true;  //一時的な変更
+		//public bool noscale = false; //スケール対応
+
+		public PropInfo(){}
+		//public PropInfo(string mpn, string filename, int rid, bool temp, bool noscale)
+		public PropInfo(string mpn, string filename, bool temp)
+		{
+			this.mpn = mpn;
+			this.filename = filename;
+			//this.rid = rid;
+			this.temp = temp;
+			//this.noscale = noscale;
+		}
+	}
+	public class MaskInfo
+	{
+		public string slot; //スロット名
+		public string visible; //true=マスク表示 false=マスク非表示 force=強制表示
+
+		public MaskInfo(){}
+		public MaskInfo(string slot, string visible)
+		{
+			this.slot = slot;
+			this.visible = visible;
+		}
+	}
 
 	public class VoiceConfig
 	{
@@ -43,6 +89,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public string[] autoModeOn = {"オート開始", "オートオン", "オートモード"};
 		public string[] autoModeOff = {"オート終了", "オートオフ"};
 		public string[] playVoice = {"ボイス再生"};
+		public string[] playVoiceBefore = {"前のボイス"};
 
 		//このプラグインの設定変更
 		public ConfigInfo[] config = {
@@ -99,6 +146,31 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public string[] modoshiPants = {"パンツ戻す"};
 		public string[] zurashiPants = {"パンツずらす"};
 
+		public string[] mekureFront = {"めくれ前", "前めくる"};
+		public string[] mekureBack = {"めくれ後ろ", "後ろめくる"};
+		public string[] mekureReset = {"めくれ戻す"};
+
+		public string[] pororiTop = {"ポロリ", "はだける"};
+		public string[] pororiTopReset = {"ポロリ戻す"};
+		public string[] pororiBottom = {"ずり下げ"};
+		public string[] pororiBottomReset = {"ずり上げ"};
+		
+		public string[] manShowChinko = {"竿表示"};
+		public string[] manHideChinko = {"竿非表示"};
+
+		#if COM3D2_5
+		public string[] manDressAll = {"服を着る","男着衣"};
+		public string[] manUndressAll = {"全裸になる","男全裸"};
+		public string[] manUndressWear = {"服を脱ぐ", "男脱衣"};
+		public string[] manDressPants = {"パンツ履く"};
+		public string[] manUndressPants = {"パンツ脱ぐ"};
+		public string[] manDressShoes = {"靴を履く"};
+		public string[] manUndressShoes = {"靴を脱ぐ"};
+		#endif
+
+
+		//Prop設定 + マスク 強制表示
+		public List<PropVoiceInfo> propVoiceList = new List<PropVoiceInfo>();
 
 		//夜伽用音声別名リスト
 		public List<YotogiVoiceInfo> yotogiVoiceList = new List<YotogiVoiceInfo>();
@@ -112,25 +184,43 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			yotogiVoiceList.Add(new YotogiVoiceInfo(command, keywords, skill));
 		}
 		
-		//夜伽コマンド初期化
+		//コマンド初期化
 		public void initDefault()
 		{
+			//PropとMask
+			propVoiceList.Add(new PropVoiceInfo( new string[]{"ブラ表示"}, null, new MaskInfo[]{new MaskInfo("bra", "force")} ));
+			propVoiceList.Add(new PropVoiceInfo( new string[]{"手袋つける"}, null, new MaskInfo[]{new MaskInfo("glope", "true")}));
+			propVoiceList.Add(new PropVoiceInfo( new string[]{"手袋外す"}, null, new MaskInfo[]{new MaskInfo("glope", "false")}));
+
+			propVoiceList.Add(new PropVoiceInfo( new string[]{"バイブ入れる"}, new PropInfo[]{new PropInfo("accvag", "accVag_VibePink_I_.menu", true)}, new MaskInfo[]{new MaskInfo("accVag", "true")} ));
+			propVoiceList.Add(new PropVoiceInfo( new string[]{"バイブ抜く","バイブ外す"}, new PropInfo[]{new PropInfo("accvag", null, true)}, new MaskInfo[]{new MaskInfo("accVag", "false")} ));
+
+			propVoiceList.Add(new PropVoiceInfo( new string[]{"ハート目"}, new PropInfo[]{new PropInfo("eye_hi", "_i_skinhi_nky003.menu", true),new PropInfo("eye_hi_r", "_i_skinhi_nky003.menu", true)}, null ));
+			propVoiceList.Add(new PropVoiceInfo( new string[]{"ハイライト無し"}, new PropInfo[]{new PropInfo("eye_hi", "_i_skinhi002.menu", true), new PropInfo("eye_hi_r", "_i_skinhi002.menu", true)}, null ));
+			propVoiceList.Add(new PropVoiceInfo( new string[]{"ハイライト戻す"}, new PropInfo[]{new PropInfo("eye_hi", null, true), new PropInfo("eye_hi_r", null, true)}, null ));
+			
+			propVoiceList.Add(new PropVoiceInfo( new string[]{"リップ無し"}, new PropInfo[]{new PropInfo("lip", "_i_lip_del.menu", true)}, null ));
+			propVoiceList.Add(new PropVoiceInfo( new string[]{"リップ戻す"}, new PropInfo[]{new PropInfo("lip", null, true)}, null ));
+
 			//夜伽コマンド
+			//汎用コマンドより優先するもの
+			addYotogiList("動いてもらう", new string[]{"動いて"});
+
 			//複数スキル
 			addYotogiList("責める", new string[]{"奉仕して","洗って","こすって"}, "マットプレイ");
 			addYotogiList("責める", new string[]{"すまたして","あそこでこすって","こすりつけて"}, "素股");
-			addYotogiList("責める", new string[]{"責めるよ","舐めるよ","舐めて","しゃぶって"}, "シックスナイン");
-			addYotogiList("責める", new string[]{"責めるよ","つっこむ"}, "イラマチオ");
+			addYotogiList("責める", new string[]{"舐めるよ","舐めて","しゃぶって"}, "シックスナイン");
+			addYotogiList("責める", new string[]{"イラマする","つっこむ"}, "イラマチオ");
 			addYotogiList("責める", new string[]{"責めて","さわって","いじって"}, "百合愛撫");
-			addYotogiList("責める", new string[]{"責めて","舐めて"}, "百合クンニ");
+			addYotogiList("責める", new string[]{"舐めて"}, "百合クンニ");
 			addYotogiList("責める", new string[]{"責めて","バイブ入れて"}, "(百合バイブ|百合双頭バイブ)");
 			addYotogiList("責める", new string[]{"責めて","貝合わせして","あそこ合わせて"}, "百合貝合わせ");
 			addYotogiList("責める", new string[]{"責めて","バイブ入れるよ"}, "バイブ責め");
 			addYotogiList("責める", new string[]{"顔に乗って","押し付けて"}, "顔面騎乗位");
-			addYotogiList("責める", new string[]{"責めるよ","入れて","動いて"}, "騎乗位");
-			addYotogiList("責める", new string[]{"責めるよ","入れる","入れるよ","動くよ"}, "(セックス|アナル|正常位|後背位|座位|立位|測位|駅弁|寝バック|性交)");
-			addYotogiList("責める", new string[]{"責めるよ","さわるよ","いじるよ"}, "愛撫");
-			addYotogiList("責める", new string[]{"責めるよ"});
+			addYotogiList("責める", new string[]{"責めて","入れて","動いて"}, "騎乗位");
+			addYotogiList("責める", new string[]{"入れる","入れるよ","動くよ"}, "(セックス|アナル|正常位|後背位|座位|立位|測位|駅弁|寝バック|性交)");
+			addYotogiList("責める", new string[]{"さわる","さわるよ","いじるよ"}, "愛撫");
+			addYotogiList("責める", new string[]{"入れる","入れるよ"});
 			addYotogiList("強く責める", new string[]{"強くして","もっとこすって"}, "マットプレイ");
 			addYotogiList("強く責める", new string[]{"強くして","もっと舐めて"}, "百合クンニ");
 			addYotogiList("強く責める", new string[]{"強くして","もっと責めて"}, "百合");
@@ -183,7 +273,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			addYotogiList("激しく奉仕させる", new string[]{"激しくして","強くして"});
 			addYotogiList("激しく舐める", new string[]{"激しく舐めるよ"});
 			addYotogiList("丁寧にオナホでシゴいて頂く", new string[]{"オナホでシゴいてください","シゴいてください"});
-			addYotogiList("丁寧に愛撫する", new string[]{"丁寧にする","丁寧にするよ","じっくり愛撫するよ"});
+			addYotogiList("丁寧に愛撫する", new string[]{"丁寧にする","丁寧にするよ","丁寧にさわる"});
 			addYotogiList("丁寧に手で奉仕させる", new string[]{"丁寧に奉仕して","丁寧にして"});
 			addYotogiList("丁寧に責めさせる", new string[]{"丁寧に責めて","丁寧にして"});
 			addYotogiList("丁寧に責めさせる_A", new string[]{"丁寧に責めて","丁寧にして"});
@@ -490,7 +580,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			addYotogiList("ちんちんをさせる", new string[]{"ちんちんして"});
 			addYotogiList("チンポの感想を聞く", new string[]{"チンポどうだった？","チンポよかった？"});
 			addYotogiList("どこが敏感になっているのか言わせる", new string[]{"どこが敏感になってる？","どこが感じる？"});
-			addYotogiList("とても動いて頂く", new string[]{"とても動いてください","たくさん動いてください","いっぱい動いてください"});
+			addYotogiList("とても動いて頂く", new string[]{"動いてください","たくさん動いてください","いっぱい動いてください"});
 			addYotogiList("パートナーに外出しさせる", new string[]{"","パートナーにそと出しさせる","そと出しさせる"});
 			addYotogiList("パートナーに中出しさせる", new string[]{"中出しさせる"});
 			addYotogiList("パートナーを絶頂させる", new string[]{"絶頂させる","絶頂して","行って"});
@@ -541,7 +631,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			addYotogiList("ラブバイブで高速責め", new string[]{"高速責め","速くするよ"});
 			addYotogiList("ラブバイブで最奥責め", new string[]{"最奥責め","奥を責めるよ"});
 			addYotogiList("ラブバイブで責める", new string[]{"責める","バイブ入れるよ"});
-			addYotogiList("ラブバイブを止める", new string[]{"やめる","やめるよ"});
+			addYotogiList("ラブバイブを止める", new string[]{"とめる","バイブとめる"});
 			addYotogiList("リードさせる", new string[]{"リードして"});
 			addYotogiList("ロウを胸に垂らす", new string[]{"胸に垂らす","おっぱいに垂らす"});
 			addYotogiList("ロウを秘部に垂らす", new string[]{"秘部に垂らす","あそこに垂らす","おまんこに垂らす"});
@@ -726,7 +816,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			addYotogiList("超・みんなで責める", new string[]{"みんなで責める","みんなでするよ"});
 			addYotogiList("超・みんなに奉仕させる", new string[]{"みんなに奉仕させる","みんなに奉仕して","みんなにして"});
 			addYotogiList("超・責める", new string[]{"責める"});
-			addYotogiList("超・奉仕させる", new string[]{"奉仕させる","奉仕して"});
+			addYotogiList("超・奉仕させる", new string[]{"奉仕させる","もっと奉仕して"});
 			addYotogiList("痛烈にビンタをして頂く", new string[]{"ビンタしてください"});
 			addYotogiList("抵抗させる", new string[]{"抵抗して","嫌がって"});
 			addYotogiList("電マ告白", new string[]{"でんまどうだった？"});
@@ -742,14 +832,13 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			addYotogiList("頭を撫でながら", new string[]{"頭を撫でる","頭撫でるよ","撫でるよ"});
 			addYotogiList("頭を撫でる", new string[]{"頭撫でるよ","撫でるよ"});
 			addYotogiList("頭を抑えつける", new string[]{"抑えつける"});
-			addYotogiList("動いてもらう", new string[]{"動いて"});
 			addYotogiList("動いて頂く", new string[]{"動いてください"});
 			addYotogiList("内緒で愛撫_おねだりさせる", new string[]{"おねだりして"});
 			addYotogiList("二人に止めさせる", new string[]{"やめて"});
 			addYotogiList("二人に丁寧に奉仕させる", new string[]{"丁寧に奉仕して","丁寧に舐めて"});
 			addYotogiList("二人に奉仕させる", new string[]{"奉仕して","ふたりで奉仕して","ふたりで舐めて"});
 			addYotogiList("二人の自分の胸を揉ませながら", new string[]{"胸揉んで","おっぱい揉んで","自分で揉んで"});
-			addYotogiList("二人を責める", new string[]{"動いて","二人で動いて"});
+			addYotogiList("二人を責める", new string[]{"二人で動いて"});
 			addYotogiList("肉便器おねだり", new string[]{"おねだり","おねだりして","おねだりしろ"});
 			addYotogiList("肉便器だと罵倒する", new string[]{"肉便器め","罵倒する"});
 			addYotogiList("乳首でイカせる", new string[]{"乳首で行って"});
@@ -818,16 +907,16 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			addYotogiList("膣内放尿", new string[]{"中におしっこする"});
 			addYotogiList("貪らせる", new string[]{"貪って"});
 			//優先度低
-			addYotogiList("ドＭの脚に高温ロウを垂らす", new string[]{"どえむの脚に垂らす"});
-			addYotogiList("ドＭの脚を一本ムチで叩く", new string[]{"どえむの脚を叩く"});
-			addYotogiList("ドＭの胸に高温ロウを垂らす", new string[]{"どえむの胸に垂らす"});
-			addYotogiList("ドＭの胸を一本ムチで叩く", new string[]{"どえむの胸を叩く"});
-			addYotogiList("ドMの首を絞めながら", new string[]{"どえむの首を絞める","首を絞める"});
-			addYotogiList("ドＭの尻を叩きながら", new string[]{"どえむの尻を叩く","尻を叩く"});
-			addYotogiList("ドＭの背中に高温ロウを垂らす", new string[]{"どえむの背中に垂らす"});
-			addYotogiList("ドＭの背中を一本ムチで叩く", new string[]{"どえむの背中を叩く"});
-			addYotogiList("ドＭの秘部に高温ロウを垂らす", new string[]{"どえむのあそこに垂らす"});
-			addYotogiList("ドＭの秘部を一本ムチで叩く", new string[]{"どえむのあそこを叩く"});
+			addYotogiList("ドＭの脚に高温ロウを垂らす", new string[]{"ドエムの脚に垂らす"});
+			addYotogiList("ドＭの脚を一本ムチで叩く", new string[]{"ドエムの脚を叩く"});
+			addYotogiList("ドＭの胸に高温ロウを垂らす", new string[]{"ドエムの胸に垂らす"});
+			addYotogiList("ドＭの胸を一本ムチで叩く", new string[]{"ドエムの胸を叩く"});
+			addYotogiList("ドMの首を絞めながら", new string[]{"ドエムの首を絞める","首を絞める"});
+			addYotogiList("ドＭの尻を叩きながら", new string[]{"ドエムの尻を叩く","尻を叩く"});
+			addYotogiList("ドＭの背中に高温ロウを垂らす", new string[]{"ドエムの背中に垂らす"});
+			addYotogiList("ドＭの背中を一本ムチで叩く", new string[]{"ドエムの背中を叩く"});
+			addYotogiList("ドＭの秘部に高温ロウを垂らす", new string[]{"ドエムのあそこに垂らす"});
+			addYotogiList("ドＭの秘部を一本ムチで叩く", new string[]{"ドエムのあそこを叩く"});
 			//スワッピング
 			addYotogiList("はるのに外出し", new string[]{"","そと出しする","外に出す","はるのにぶっかける"});
 			addYotogiList("はるのに顔射", new string[]{"顔射する","顔にかける","はるのにぶっかける"});
