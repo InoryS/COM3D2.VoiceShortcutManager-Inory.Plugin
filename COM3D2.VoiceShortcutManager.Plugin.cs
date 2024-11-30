@@ -157,7 +157,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 			//ショートカットボタンリスト
 			public List<MenuInfo> menuList = new List<MenuInfo>();
 
-			public bool playVoicceMaidPos = false;
+			public bool playVoicceMaidPos = false;  // the maker missing this
 		}
 
 		//ギアメニューに配置するボタンの情報
@@ -1786,6 +1786,143 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 				});
 			}
 
+			//#109 modified
+			foreach (string keyword in voiceCfg.dressAccXXX) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice dressAccXXX : "+k);
+					dressAccXXX();
+				});
+			}
+			foreach (string keyword in voiceCfg.undressAccXXX) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice undressAccXXX : "+k);
+					undressAccXXX();
+				});
+			}
+			foreach (string keyword in voiceCfg.dressAccShippo) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice dressAccShippo : "+k);
+					dressAccShippo();
+				});
+			}
+			foreach (string keyword in voiceCfg.undressAccShippo) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice undressAccShippo : "+k);
+					undressAccShippo();
+				});
+			}
+			foreach (string keyword in voiceCfg.dressAccVag) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice dressAccVag : "+k);
+					dressAccVag();
+				});
+			}
+			foreach (string keyword in voiceCfg.undressAccVag) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice undressAccVag : "+k);
+					undressAccVag();
+				});
+			}
+			foreach (string keyword in voiceCfg.dressAccAnl) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice dressAccAnl : "+k);
+					dressAccAnl();
+				});
+			}
+			foreach (string keyword in voiceCfg.undressAccAnl) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice undressAccAnl : "+k);
+					undressAccAnl();
+				});
+			}
+			// 背中
+			foreach (string keyword in voiceCfg.dressAccSenaka) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice dressAccSenaka : "+k);
+					dressAccSenaka();
+				});
+			}
+			foreach (string keyword in voiceCfg.undressAccSenaka) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice undressAccSenaka : "+k);
+					undressAccSenaka();
+				});
+			}
+			// 肚脐
+			foreach (string keyword in voiceCfg.dressAccHeso) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice dressAccHeso : "+k);
+					dressAccHeso();
+				});
+			}
+			foreach (string keyword in voiceCfg.undressAccHeso) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice undressAccHeso : "+k);
+					undressAccHeso();
+				});
+			}
+			// 鼻
+			foreach (string keyword in voiceCfg.dressAccHana) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice dressAccHana : "+k);
+					dressAccHana();
+				});
+			}
+			foreach (string keyword in voiceCfg.undressAccHana) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice undressAccHana : "+k);
+					undressAccHana();
+				});
+			}
+			// 脚踝
+			foreach (string keyword in voiceCfg.dressAccAshi) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice dressAccAshi : "+k);
+					dressAccAshi();
+				});
+			}
+			foreach (string keyword in voiceCfg.undressAccAshi) {
+				if (keywords.ContainsKey(keyword)) continue;
+				string k = keyword; //スコープ対策
+				keywords.Add(keyword, () => {
+					Debug.Log("Voice undressAccAshi : "+k);
+					undressAccAshi();
+				});
+			}
+			//#109 modified
+
+
+
 			//男脱衣
 			#if COM3D2_5
 			foreach (string keyword in voiceCfg.manDressAll) {
@@ -1961,6 +2098,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		}
 
 		//服だけ脱がす
+		//#109 modified
 		public void undressWear()
 		{
 			UndressingManager undressManager = getUndressingManager();
@@ -1982,6 +2120,160 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 				}
 			}
 		}
+		//#109 modified
+
+
+
+		//#109 modified
+		public void dressAccXXX()
+		{
+			foreach (Maid maid in getUndressMaidList()) {
+				if (maid.Visible) {
+					maid.body0.SetMask(TBody.SlotID.accXXX, true);
+				}
+			}
+		}
+
+		public void undressAccXXX()
+		{
+			foreach (Maid maid in getUndressMaidList()) {
+				if (maid.Visible) {
+					maid.body0.SetMask(TBody.SlotID.accXXX, false);
+				}
+			}
+		}
+
+		public void dressAccShippo()
+		{
+			foreach (Maid maid in getUndressMaidList()) {
+				if (maid.Visible) {
+					maid.body0.SetMask(TBody.SlotID.accShippo, true);
+				}
+			}
+		}
+
+		public void undressAccShippo()
+		{
+			foreach (Maid maid in getUndressMaidList()) {
+				if (maid.Visible) {
+					maid.body0.SetMask(TBody.SlotID.accShippo, false);
+				}
+			}
+		}
+
+		public void dressAccAnl()
+		{
+			foreach (Maid maid in getUndressMaidList()) {
+				if (maid.Visible) {
+					maid.body0.SetMask(TBody.SlotID.accAnl, true);
+				}
+			}
+		}
+
+		public void undressAccAnl()
+		{
+			foreach (Maid maid in getUndressMaidList()) {
+				if (maid.Visible) {
+					maid.body0.SetMask(TBody.SlotID.accAnl, false);
+				}
+			}
+		}
+
+		public void dressAccVag()
+		{
+			foreach (Maid maid in getUndressMaidList()) {
+				if (maid.Visible) {
+					maid.body0.SetMask(TBody.SlotID.accVag, true);
+				}
+			}
+		}
+
+		public void undressAccVag()
+		{
+			foreach (Maid maid in getUndressMaidList()) {
+				if (maid.Visible) {
+					maid.body0.SetMask(TBody.SlotID.accVag, false);
+				}
+			}
+		}
+
+		public void dressAccSenaka()
+		{
+			foreach (Maid maid in getUndressMaidList()) {
+				if (maid.Visible) {
+					maid.body0.SetMask(TBody.SlotID.accSenaka, true);
+				}
+			}
+		}
+
+		public void undressAccSenaka()
+		{
+			foreach (Maid maid in getUndressMaidList()) {
+				if (maid.Visible) {
+					maid.body0.SetMask(TBody.SlotID.accSenaka, false);
+				}
+			}
+		}
+
+		public void dressAccHeso()
+		{
+			foreach (Maid maid in getUndressMaidList()) {
+				if (maid.Visible) {
+					maid.body0.SetMask(TBody.SlotID.accHeso, true);
+				}
+			}
+		}
+
+		public void undressAccHeso()
+		{
+			foreach (Maid maid in getUndressMaidList()) {
+				if (maid.Visible) {
+					maid.body0.SetMask(TBody.SlotID.accHeso, false);
+				}
+			}
+		}
+
+		public void dressAccHana()
+		{
+			foreach (Maid maid in getUndressMaidList()) {
+				if (maid.Visible) {
+					maid.body0.SetMask(TBody.SlotID.accHana, true);
+				}
+			}
+		}
+
+		public void undressAccHana()
+		{
+			foreach (Maid maid in getUndressMaidList()) {
+				if (maid.Visible) {
+					maid.body0.SetMask(TBody.SlotID.accHana, false);
+				}
+			}
+		}
+
+		public void dressAccAshi()
+		{
+			foreach (Maid maid in getUndressMaidList()) {
+				if (maid.Visible) {
+					maid.body0.SetMask(TBody.SlotID.accAshi, true);
+				}
+			}
+		}
+
+		public void undressAccAshi()
+		{
+			foreach (Maid maid in getUndressMaidList()) {
+				if (maid.Visible) {
+					maid.body0.SetMask(TBody.SlotID.accAshi, false);
+				}
+			}
+		}
+		//#109 modified
+
+
+
+
+
 		//服の上だけ着せる
 		public void dressTop()
 		{

@@ -1,3 +1,6 @@
 
 /.idea
 *.user
+*.cache
+/bin
+/obj

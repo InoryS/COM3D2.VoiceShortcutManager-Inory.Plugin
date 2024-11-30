@@ -158,6 +158,26 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 		public string[] manShowChinko = {"竿表示"};
 		public string[] manHideChinko = {"竿非表示"};
 
+		//#109 modified
+		public string[] dressAccXXX = { "dress Acc XXX", "穿上阴蒂", "戴上阴蒂", "穿阴蒂", "穿上阴蒂配饰", "戴上阴蒂配饰", "穿阴蒂配饰" };
+		public string[] undressAccXXX = { "undress Acc XXX", "脱下阴蒂", "脱掉阴蒂", "脱阴蒂", "脱下阴蒂配饰", "脱掉阴蒂配饰", "脱阴蒂配饰" };
+		public string[] dressAccShippo = { "dress Acc Shippo", "穿上尾巴", "戴上尾巴", "穿尾巴" };
+		public string[] undressAccShippo = { "undress Acc Shippo", "脱下尾巴", "脱掉尾巴", "脱尾巴" };
+		public string[] dressAccVag = { "dress Acc Vag", "穿上小穴", "戴上小穴", "穿小穴", "穿上小穴配饰", "戴上小穴配饰", "穿小穴配饰" };
+		public string[] undressAccVag = { "undress Acc Vag", "脱下小穴", "脱掉小穴", "脱小穴", "脱下小穴配饰", "脱掉小穴配饰", "脱小穴配饰" };
+		public string[] dressAccAnl = { "dress Acc Anl", "穿上屁眼", "戴上屁眼", "穿屁眼", "穿上屁眼配饰", "戴上屁眼配饰", "穿屁眼配饰" };
+		public string[] undressAccAnl = { "undress Acc Anl", "脱下屁眼", "脱掉屁眼", "脱屁眼", "脱下屁眼配饰", "脱掉屁眼配饰", "脱屁眼配饰" };
+		public string[] dressAccSenaka = { "dress Acc Senaka", "穿上背部", "戴上背部", "穿背部", "穿上背部配饰", "戴上背部配饰", "穿背部配饰" };
+		public string[] undressAccSenaka = { "undress Acc Senaka", "脱下背部", "脱掉背部", "脱背部", "脱下背部配饰", "脱掉背部配饰", "脱背部配饰" };
+		public string[] dressAccHeso = { "dress Acc Heso", "穿上肚脐", "戴上肚脐", "穿肚脐", "穿上肚脐配饰", "戴上肚脐配饰", "穿肚脐配饰" };
+		public string[] undressAccHeso = { "undress Acc Heso", "脱下肚脐", "脱掉肚脐", "脱肚脐", "脱下肚脐配饰", "脱掉肚脐配饰", "脱肚脐配饰" };
+		public string[] dressAccHana = { "dress Acc Hana", "穿上鼻子", "戴上鼻子", "穿鼻子", "穿上鼻子配饰", "戴上鼻子配饰", "穿鼻子配饰" };
+		public string[] undressAccHana = { "undress Acc Hana", "脱下鼻子", "脱掉鼻子", "脱鼻子", "脱下鼻子配饰", "脱掉鼻子配饰", "脱鼻子配饰" };
+		public string[] dressAccAshi = { "dress Acc Hana", "穿上脚踝", "戴上脚踝", "穿脚踝", "穿上脚踝配饰", "戴上脚踝配饰", "穿脚踝配饰" };
+		public string[] undressAccAshi = { "undress Acc Hana", "脱下脚踝", "脱掉脚踝", "脱脚踝", "脱下脚踝配饰", "脱掉脚踝配饰", "脱脚踝配饰" };
+		//#109 modified
+
+
 		#if COM3D2_5
 		public string[] manDressAll = {"服を着る","男着衣"};
 		public string[] manUndressAll = {"全裸になる","男全裸"};
