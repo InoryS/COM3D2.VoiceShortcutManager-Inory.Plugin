@@ -26,7 +26,7 @@ jobs:
         with:
           nuget-api-key: ${{ secrets.NuGetAPIKey }}
           nuget-version: '5.x'
-      - run: nuget restore COM3D2.SyncGripMoveGUI.Plugin.sln
+      - run: nuget restore COM3D2.VoiceShortcutManager.Plugin.csproj
         
       - name: Build
         run: |
