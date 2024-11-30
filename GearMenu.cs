@@ -32,12 +32,18 @@ namespace GearMenu
         /// <summary>
         /// 識別名
         /// </summary>
-        public static string Name { get { return Name_; } }
+        public static string Name
+        {
+            get { return Name_; }
+        }
 
         /// <summary>
         /// バージョン文字列
         /// </summary>
-        public static string Version { get { return Version_; } }
+        public static string Version
+        {
+            get { return Version_; }
+        }
 
         /// <summary>
         /// 歯車メニューにボタンを追加
@@ -135,8 +141,10 @@ namespace GearMenu
                     NGUITools.Destroy(goButton);
                     goButton = null;
                 }
+
                 throw;
             }
+
             return goButton;
         }
 
@@ -198,14 +206,18 @@ namespace GearMenu
             if (uiTexture == null) return;
             var tex = uiTexture.mainTexture as Texture2D;
             if (tex == null) return;
-            for (int x = 1; x < tex.width - 1; x++) {
+            for (int x = 1; x < tex.width - 1; x++)
+            {
                 tex.SetPixel(x, 0, color);
                 tex.SetPixel(x, tex.height - 1, color);
             }
-            for (int y = 1; y < tex.height - 1; y++) {
+
+            for (int y = 1; y < tex.height - 1; y++)
+            {
                 tex.SetPixel(0, y, color);
                 tex.SetPixel(tex.width - 1, y, color);
             }
+
             tex.Apply();
         }
 
@@ -243,7 +255,8 @@ namespace GearMenu
             tex.LoadImage(pngData);
 
             ut.material = new Material(ut.shader);
-            if (ut.material) {
+            if (ut.material)
+            {
                 ut.material.mainTexture = tex;
                 ut.MakePixelPerfect();
             }
@@ -277,11 +290,14 @@ namespace GearMenu
             {
                 VisibleExplanation(label, label != null);
             }
-            else if (keepExplanation) {
+            else if (keepExplanation)
+            {
                 if (label == null) VisibleExplanation(label, false);
-                else {
+                else
+                {
                     if (label.Contains("\n")) VisibleExplanation(label, true); //更新して表示
-                    else {
+                    else
+                    {
                         //ラベルを更新して改行がない状態にしないと閉じない
                         VisibleExplanation(label, true); //改行なしのラベルに更新
                         VisibleExplanation(label, false); //閉じる処理を実行
@@ -291,9 +307,13 @@ namespace GearMenu
         }
 
         /// <summary>ポップアップのラベル表示を置き換えに利用 UISprite取得用FieldInfo</summary>
-        static FieldInfo spriteExplanationInfo = typeof(SystemShortcut).GetField("m_spriteExplanation", BindingFlags.Instance | BindingFlags.NonPublic);
+        static FieldInfo spriteExplanationInfo =
+            typeof(SystemShortcut).GetField("m_spriteExplanation", BindingFlags.Instance | BindingFlags.NonPublic);
+
         /// <summary>ポップアップのラベル表示を置き換えに利用 UILabel取得用FieldInfo</summary>
-        static FieldInfo labelExplanationInfo = typeof(SystemShortcut).GetField("m_labelExplanation", BindingFlags.Instance | BindingFlags.NonPublic);
+        static FieldInfo labelExplanationInfo =
+            typeof(SystemShortcut).GetField("m_labelExplanation", BindingFlags.Instance | BindingFlags.NonPublic);
+
         /// <summary>
         ///  ポップアップのラベル表示を置き換え 改行に対応
         /// </summary>
@@ -303,8 +323,10 @@ namespace GearMenu
         {
             UISprite m_spriteExplanation = (UISprite)spriteExplanationInfo.GetValue(GameMain.Instance.SysShortcut);
             UILabel m_labelExplanation = (UILabel)labelExplanationInfo.GetValue(GameMain.Instance.SysShortcut);
-            if (visible) {
-                if (m_labelExplanation) {
+            if (visible)
+            {
+                if (m_labelExplanation)
+                {
                     //ラベル設定
                     m_labelExplanation.alignment = NGUIText.Alignment.Left; //左寄せ
                     m_labelExplanation.text = text;
@@ -315,38 +337,50 @@ namespace GearMenu
                     else m_labelExplanation.spacingY = 0;
                     m_labelExplanation.MakePixelPerfect(); //高さ調整
                     //背景設定
-                    if (m_spriteExplanation != null) {
+                    if (m_spriteExplanation != null)
+                    {
                         UISprite component = m_spriteExplanation;
-                        if (component) {
+                        if (component)
+                        {
                             component.width = m_labelExplanation.width + 15;
                             component.height = m_labelExplanation.height + 15;
                             //位置調整
                             Vector3 v = m_spriteExplanation.gameObject.transform.localPosition;
-                            v.y = Base.transform.localPosition.y - BaseSprite.height - m_spriteExplanation.height * 0.5f - 10f;  //下がマイナス
+                            v.y = Base.transform.localPosition.y - BaseSprite.height -
+                                  m_spriteExplanation.height * 0.5f - 10f; //下がマイナス
                             m_spriteExplanation.gameObject.transform.localPosition = v;
                         }
                     }
                 }
+
                 if (m_spriteExplanation) m_spriteExplanation.gameObject.SetActive(visible);
-            } else {
-                
-                if (m_labelExplanation) {
+            }
+            else
+            {
+                if (m_labelExplanation)
+                {
                     //改行があったら閉じない
-                    if (keepExplanation && m_labelExplanation.text != null && m_labelExplanation.text.Contains("\n")) return;
+                    if (keepExplanation && m_labelExplanation.text != null &&
+                        m_labelExplanation.text.Contains("\n")) return;
 
                     m_labelExplanation.text = null;
                     m_labelExplanation.spacingY = 0;
                     m_labelExplanation.MakePixelPerfect(); //高さ調整
                 }
-                if (m_spriteExplanation) {
+
+                if (m_spriteExplanation)
+                {
                     UISprite component = m_spriteExplanation;
-                    if (component) {
+                    if (component)
+                    {
                         component.height = 33;
                         //位置調整
                         Vector3 v = m_spriteExplanation.gameObject.transform.localPosition;
-                        v.y = Base.transform.localPosition.y - BaseSprite.height - m_spriteExplanation.height * 0.5f - 10f;  //下がマイナス
+                        v.y = Base.transform.localPosition.y - BaseSprite.height - m_spriteExplanation.height * 0.5f -
+                              10f; //下がマイナス
                         m_spriteExplanation.gameObject.transform.localPosition = v;
                     }
+
                     m_spriteExplanation.gameObject.SetActive(visible);
                 }
             }
@@ -446,22 +480,51 @@ namespace GearMenu
             return targetVersion;
         }
 
-        public static SystemShortcut SysShortcut { get { return GameMain.Instance.SysShortcut; } }
-        public static UIPanel SysShortcutPanel { get { return SysShortcut.GetComponent<UIPanel>(); } }
+        public static SystemShortcut SysShortcut
+        {
+            get { return GameMain.Instance.SysShortcut; }
+        }
+
+        public static UIPanel SysShortcutPanel
+        {
+            get { return SysShortcut.GetComponent<UIPanel>(); }
+        }
+
         public static UISprite SysShortcutExplanation
         {
             get
             {
                 Type type = typeof(SystemShortcut);
                 FieldInfo fi = type.GetField("m_spriteExplanation", BindingFlags.Instance | BindingFlags.NonPublic);
-                if (fi == null) { return null; }
+                if (fi == null)
+                {
+                    return null;
+                }
+
                 return fi.GetValue(SysShortcut) as UISprite;
             }
         }
-        public static GameObject Base { get { return SysShortcut.gameObject.transform.Find("Base").gameObject; } }
-        public static UISprite BaseSprite { get { return Base.GetComponent<UISprite>(); } }
-        public static GameObject Grid { get { return Base.gameObject.transform.Find("Grid").gameObject; } }
-        public static UIGrid GridUI { get { return Grid.GetComponent<UIGrid>(); } }
+
+        public static GameObject Base
+        {
+            get { return SysShortcut.gameObject.transform.Find("Base").gameObject; }
+        }
+
+        public static UISprite BaseSprite
+        {
+            get { return Base.GetComponent<UISprite>(); }
+        }
+
+        public static GameObject Grid
+        {
+            get { return Base.gameObject.transform.Find("Grid").gameObject; }
+        }
+
+        public static UIGrid GridUI
+        {
+            get { return Grid.GetComponent<UIGrid>(); }
+        }
+
         public static readonly Color DefaultFrameColor = new Color(1f, 1f, 1f, 0f);
 
         // UIGrid.onReposition処理用のクラス
@@ -521,11 +584,16 @@ namespace GearMenu
                 {
                     int a = 0;
                     string[] specialNames = GameMain.Instance.CMSystem.NetUse ? OnlineButtonNames : OfflineButtonNames;
-                    foreach (Transform child in children) {
+                    foreach (Transform child in children)
+                    {
                         int i = a++;
                         // システムが持っているオブジェクトの場合は特別に順番をつける
                         int si = Array.IndexOf(specialNames, child.gameObject.name);
-                        if (si >= 0) { i = si; }
+                        if (si >= 0)
+                        {
+                            i = si;
+                        }
+
                         float x = (-i % g.maxPerLine + spriteItemX - 1) * g.cellWidth;
                         float y = (i / g.maxPerLine) * g.cellHeight;
                         child.localPosition = new Vector3(x, -y, 0f);
@@ -542,12 +610,14 @@ namespace GearMenu
             }
 
             // オンライン時のボタンの並び順。インデクスの若い側が右になる
-            static string[] OnlineButtonNames = new string[] {
+            static string[] OnlineButtonNames = new string[]
+            {
                 "Config", "Ss", "SsUi", "Shop", "ToTitle", "Info", "Exit"
             };
 
             // オフライン時のボタンの並び順。インデクスの若い側が右になる
-            static string[] OfflineButtonNames = new string[] {
+            static string[] OfflineButtonNames = new string[]
+            {
                 "Config", "Ss", "SsUi", "ToTitle", "Info", "Exit"
             };
         }
@@ -556,9 +626,12 @@ namespace GearMenu
     // デフォルトアイコン
     internal static class DefaultIcon
     {
-        public static byte[] Png {
-            get {
-                if (png == null) {
+        public static byte[] Png
+        {
+            get
+            {
+                if (png == null)
+                {
                     // 32x32 ピクセルの PNG データを Base64 エンコードしたもの
                     png = Convert.FromBase64String(
                         "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAA3NCSVQICAjb4U/g" +
@@ -571,9 +644,11 @@ namespace GearMenu
                         "AAAAAElFTkSuQmCC"
                     );
                 }
+
                 return png;
             }
         }
+
         static byte[] png = null;
     }
 }
