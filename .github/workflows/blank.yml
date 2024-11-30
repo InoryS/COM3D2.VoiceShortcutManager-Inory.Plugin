@@ -36,5 +36,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: COM3D2.VoiceShortcutManager.Plugin
-          path: /home/runner/work/COM3D2.VoiceShortcutManager/COM3D2.VoiceShortcutManager/bin/Release/COM3D2.VoiceShortcutManager.Plugin.dll
+          path: /home/runner/work/COM3D2.VoiceShortcutManager-Inory.Plugin/COM3D2.VoiceShortcutManager-Inory.Plugin/bin/Release/net35/COM3D2.VoiceShortcutManager.Plugin.dll
     
