@@ -1,1186 +1,1790 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <VymConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <vymConfig>
-    <VymConfigInfo>
-      <name>mainGuiFlag</name>
-      <value>1</value> <init>false</init>
-      <voice> <string>リモコン表示</string> </voice>
-    </VymConfigInfo>
-    <VymConfigInfo>
-      <name>mainGuiFlag</name>
-      <value>0</value> <init>false</init>
-      <voice> <string>リモコン非表示</string> </voice>
-    </VymConfigInfo>
-    <VymConfigInfo>
-      <name>osawariEnabled</name>
-      <value>true</value> <init>false</init>
-      <voice> <string>おさわり開始</string><string>おさわり有効</string> </voice>
-    </VymConfigInfo>
-    <VymConfigInfo>
-      <name>osawariEnabled</name>
-      <value>false</value> <init>false</init>
-      <voice> <string>おさわり終了</string><string>おさわり無効</string> </voice>
-    </VymConfigInfo>
-    <VymConfigInfo>
-      <name>vrCameraMoveLimit</name>
-      <value>true</value> <init>false</init>
-      <voice> <string>最短制限</string> </voice>
-    </VymConfigInfo>
-    <VymConfigInfo>
-      <name>vrCameraMoveLimit</name>
-      <value>false</value> <init>false</init>
-      <voice> <string>最短制限解除</string> </voice>
-    </VymConfigInfo>
-  </vymConfig>
-  <vymSelectFrontMaid>
-    <string>正面のメイド</string>
-  </vymSelectFrontMaid>
-  <vymSelectMaidName>
-    <VymVoiceInfo>
-      <value>聖道 まりあ</value>
-      <voice> <string>無垢ちゃん</string> </voice>
-    </VymVoiceInfo>
-  </vymSelectMaidName>
-  <vymPrevMaid>
-    <string>前のメイド</string>
-  </vymPrevMaid>
-  <vymNextMaid>
-    <string>次のメイド</string>
-  </vymNextMaid>
-  <vymLeftMaid>
-    <string>左のメイド</string>
-  </vymLeftMaid>
-  <vymRightMaid>
-    <string>右のメイド</string>
-  </vymRightMaid>
-  <vymMaidLink>
-    <VymVoiceInfo>
-      <value>all</value>
-      <voice> <string>全リンク</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>null</value>
-      <voice> <string>リンク解除</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>left</value>
-      <voice> <string>左とリンク</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>right</value>
-      <voice> <string>右とリンク</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>sync</value>
-      <voice> <string>モーション同期</string><string>同期する</string> </voice>
-    </VymVoiceInfo>
-  </vymMaidLink>
-  <vymCamMove>
-    <VymMoveInfo>
-      <move>
-        <x>1</x>
-        <y>0</y>
-        <z>0</z>
-      </move>
-      <useMoveValue>true</useMoveValue>
-      <voice> <string>右に移動</string> </voice>
-    </VymMoveInfo>
-    <VymMoveInfo>
-      <move>
-        <x>-1</x>
-        <y>0</y>
-        <z>0</z>
-      </move>
-      <useMoveValue>true</useMoveValue>
-      <voice> <string>左に移動</string> </voice>
-    </VymMoveInfo>
-    <VymMoveInfo>
-      <move>
-        <x>0</x>
-        <y>1</y>
-        <z>0</z>
-      </move>
-      <useMoveValue>true</useMoveValue>
-      <voice> <string>上に移動</string> </voice>
-    </VymMoveInfo>
-    <VymMoveInfo>
-      <move>
-        <x>0</x>
-        <y>-1</y>
-        <z>0</z>
-      </move>
-      <useMoveValue>true</useMoveValue>
-      <voice> <string>下に移動</string> </voice>
-    </VymMoveInfo>
-    <VymMoveInfo>
-      <move>
-        <x>0</x>
-        <y>0</y>
-        <z>1</z>
-      </move>
-      <useMoveValue>true</useMoveValue>
-      <voice> <string>前に移動</string> </voice>
-    </VymMoveInfo>
-    <VymMoveInfo>
-      <move>
-        <x>0</x>
-        <y>0</y>
-        <z>-1</z>
-      </move>
-      <useMoveValue>true</useMoveValue>
-      <voice> <string>後ろに移動</string> </voice>
-    </VymMoveInfo>
-    <VymMoveInfo>
-      <move>
-        <x>0.05</x>
-        <y>0</y>
-        <z>0</z>
-      </move>
-      <useMoveValue>false</useMoveValue>
-      <voice> <string>5センチ右</string> </voice>
-    </VymMoveInfo>
-    <VymMoveInfo>
-      <move>
-        <x>-0.05</x>
-        <y>0</y>
-        <z>0</z>
-      </move>
-      <useMoveValue>false</useMoveValue>
-      <voice> <string>5センチ左</string> </voice>
-    </VymMoveInfo>
-    <VymMoveInfo>
-      <move>
-        <x>0</x>
-        <y>0.05</y>
-        <z>0</z>
-      </move>
-      <useMoveValue>false</useMoveValue>
-      <voice> <string>5センチ上</string> </voice>
-    </VymMoveInfo>
-    <VymMoveInfo>
-      <move>
-        <x>0</x>
-        <y>-0.05</y>
-        <z>0</z>
-      </move>
-      <useMoveValue>false</useMoveValue>
-      <voice> <string>5センチ下</string> </voice>
-    </VymMoveInfo>
-    <VymMoveInfo>
-      <move>
-        <x>0</x>
-        <y>0</y>
-        <z>0.05</z>
-      </move>
-      <useMoveValue>false</useMoveValue>
-      <voice> <string>5センチ前</string> </voice>
-    </VymMoveInfo>
-    <VymMoveInfo>
-      <move>
-        <x>0</x>
-        <y>0</y>
-        <z>-0.05</z>
-      </move>
-      <useMoveValue>false</useMoveValue>
-      <voice> <string>5センチ後ろ</string> </voice>
-    </VymMoveInfo>
-  </vymCamMove>
-  <vymCamDistance>
-    <VymVoiceInfo>
-      <value>-25%</value>
-      <voice> <string>近づく</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>+25%</value>
-      <voice> <string>離れる</string> </voice>
-    </VymVoiceInfo>
-  </vymCamDistance>
-  <vymCamFront>
-    <string>メイド正面</string>
-  </vymCamFront>
-  <vymCamBack>
-    <string>メイド背面</string><string>メイドの後ろ</string>
-  </vymCamBack>
-  <vymCamTarget>
-    <VymVoiceInfo>
-      <value>0.3</value>
-      <value2>1</value2>
-      <voice> <string>顔の前</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>0.3</value>
-      <value2>-1</value2>
-      <voice> <string>顔の後ろ</string><string>頭の後ろ</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>0.4</value>
-      <value2>2</value2>
-      <voice> <string>胸の前</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>0.4</value>
-      <value2>-2</value2>
-      <voice> <string>胸の後ろ</string><string>背中の前</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>0.3</value>
-      <value2>3</value2>
-      <voice> <string>腰の前</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>0.3</value>
-      <value2>-3</value2>
-      <voice> <string>腰の後ろ</string><string>尻の前</string> </voice>
-    </VymVoiceInfo>
-  </vymCamTarget>
-  <vymCamManHead>
-    <VymVoiceInfo>
-      <value>-1</value>
-      <value2>1</value2>
-      <voice> <string>男に移動</string><string>男の位置</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>-1</value>
-      <value2>0</value2>
-      <voice> <string>男視点</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>0</value>
-      <value2>0</value2>
-      <voice> <string>ご主人様視点</string> </voice>
-    </VymVoiceInfo>
-  </vymCamManHead>
-  <vymFps>
-    <VymVoiceInfo>
-      <value>0</value>
-      <voice> <string>一人称解除</string><string>一人称終了</string><string>FPS解除</string><string>FPS終了</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>1</value>
-      <voice> <string>一人称開始</string><string>FPS開始</string> </voice>
-    </VymVoiceInfo>
-  </vymFps>
-  <vymFollow>
-    <VymVoiceInfo>
-      <value>0</value>
-      <voice> <string>メイド固定解除</string><string>固定解除</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>1</value>
-      <voice> <string>メイド固定</string> </voice>
-    </VymVoiceInfo>
-  </vymFollow>
-  <vymLookPoint>
-    <VymVoiceInfo>
-      <value>0</value>
-      <voice> <string>胸に固定</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>1</value>
-      <voice> <string>顔に固定</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>2</value>
-      <voice> <string>腰に固定</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>10</value>
-      <voice> <string>アングル固定</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>-10</value>
-      <voice> <string>アングル解除</string> </voice>
-    </VymVoiceInfo>
-  </vymLookPoint>
-  <vymBoneHitHeight>
-    <VymVoiceInfo>
-      <value>-1</value>
-      <voice> <string>地面下げる</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>+1</value>
-      <voice> <string>地面上げる</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>0</value>
-      <voice> <string>地面ゼロ</string> </voice>
-    </VymVoiceInfo>
-  </vymBoneHitHeight>
-  <vymExcite>
-    <VymVoiceInfo>
-      <value>-50</value>
-      <voice> <string>興奮下げる</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>+50</value>
-      <voice> <string>興奮上げる</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>0</value>
-      <voice> <string>興奮なし</string> </voice>
-    </VymVoiceInfo>
-  </vymExcite>
-  <vymManVisible>
-    <VymVoiceInfo>
-      <value>1</value>
-      <voice> <string>ご主人様表示</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>-1</value>
-      <voice> <string>ご主人様非表示</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>2</value>
-      <voice> <string>モブ表示</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>-255</value>
-      <voice> <string>男非表示</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>-254</value>
-      <voice> <string>モブ非表示</string> </voice>
-    </VymVoiceInfo>
-  </vymManVisible>
-  <vymSyasei>
-    <VymVoiceInfo>
-      <value>1</value>
-      <voice> <string>射精する</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>2</value>
-      <voice> <string>モブ射精</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>255</value>
-      <voice> <string>全員射精</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>+255</value>
-      <voice> <string>射精ロック</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>-255</value>
-      <voice> <string>射精ロック解除</string> </voice>
-    </VymVoiceInfo>
-  </vymSyasei>
-  <vymFukitori>
-    <VymVoiceInfo>
-      <value>0</value>
-      <voice> <string>拭き取り</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>1</value>
-      <voice> <string>顔拭き取り</string><string>顔を拭く</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>2</value>
-      <voice> <string>体拭き取り</string><string>体を拭く</string> </voice>
-    </VymVoiceInfo>
-  </vymFukitori>
-  <vymStartNyo>
-    <VymVoiceInfo>
-      <value>0</value>
-      <voice> <string>おしっこして</string><string>おしっこかけて</string><string>漏らして</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>1</value>
-      <voice> <string>全員おしっこ</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>2</value>
-      <voice> <string>同時におしっこ</string> </voice>
-    </VymVoiceInfo>
-  </vymStartNyo>
-  <vymStartSio>
-    <VymVoiceInfo>
-      <value>0</value>
-      <voice> <string>潮吹き</string><string>潮吹いて</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>1</value>
-      <voice> <string>全員潮吹き</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>2</value>
-      <voice> <string>同時に潮吹き</string> </voice>
-    </VymVoiceInfo>
-  </vymStartSio>
-  <vymVibe>
-    <VymVoiceInfo>
-      <value>0</value>
-      <voice> <string>バイブOFF</string><string>バイブ停止</string><string>停止</string><string>バイブ抜く</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>1</value>
-      <voice> <string>バイブON</string><string>バイブ入れる</string><string>バイブ弱</string><string>バイブ弱く</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>2</value>
-      <voice> <string>バイブ強</string><string>バイブ強く</string> </voice>
-    </VymVoiceInfo>
-  </vymVibe>
-  <vymVibeAuto>
-    <VymVoiceInfo>
-      <value>+1</value>
-      <voice> <string>バイブオート</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>1</value>
-      <voice> <string>バイブじっくり</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>2</value>
-      <voice> <string>バイブ激しく</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>3</value>
-      <voice> <string>バイブほどほど</string> </voice>
-    </VymVoiceInfo>
-  </vymVibeAuto>
-  <vymKupa>
-    <VymVoiceInfo>
-      <value>0</value>
-      <voice> <string>あそこ閉じる</string><string>おまんこ閉じる</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>60</value>
-      <voice> <string>くぱぁ</string><string>くぱぁする</string><string>くぱぁして</string><string>あそこひらく</string><string>おまんこひらく</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>+20</value>
-      <voice> <string>あそこ拡げる</string><string>おまんこ拡げる</string><string>あそこ拡げて</string><string>おまんこ拡げて</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>-20</value>
-      <voice> <string>あそこ閉める</string><string>おまんこ閉める</string><string>あそこ締めて</string><string>おまんこ締めて</string> </voice>
-    </VymVoiceInfo>
-  </vymKupa>
-  <vymAnal>
-    <VymVoiceInfo>
-      <value>0</value>
-      <voice> <string>アナル閉じる</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>60</value>
-      <voice> <string>アナルくぱぁ</string><string>アナルひらく</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>+20</value>
-      <voice> <string>アナル拡げる</string><string>アナル拡げて</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>-20</value>
-      <voice> <string>アナル閉める</string><string>アナル締めて</string> </voice>
-    </VymVoiceInfo>
-  </vymAnal>
-  <vymBokki>
-    <VymVoiceInfo>
-      <value>0</value>
-      <voice> <string>クリ最小</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>100</value>
-      <voice> <string>クリ最大</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>+30</value>
-      <voice> <string>クリ大きく</string><string>クリ拡大</string><string>クリぼっき</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>-30</value>
-      <voice> <string>クリ小さく</string><string>クリ縮小</string> </voice>
-    </VymVoiceInfo>
-  </vymBokki>
-  <vymUnzip>
-    <VymVoiceInfo>
-      <value>om_aibu_hibu_1_f</value>
-      <voice> <string>愛撫</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>om_seijyoui_1_f</value>
-      <voice> <string>正常位</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>manguri_1_f</value>
-      <voice> <string>まんぐり</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>om_taimenkijyoui_1_f</value>
-      <voice> <string>対面騎乗位</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>kijyoui_sumata_1_f</value>
-      <voice> <string>騎乗位素股</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>om_taimenzai_1_f</value>
-      <voice> <string>対面座位</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>om_kouhaii_1_f</value>
-      <voice> <string>こうはいい</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>ritui_1_f</value>
-      <voice> <string>りつい</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>haimenritui_1_f</value>
-      <voice> <string>背面立位</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>sokui_1_f</value>
-      <voice> <string>そくい</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>haimen_kijyoui_1_f</value>
-      <voice> <string>背面騎乗位</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>haimenzai2_1_f</value>
-      <voice> <string>背面座位</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>ekiben_1_f</value>
-      <voice> <string>駅弁</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>haimenekiben_1_f</value>
-      <voice> <string>背面駅弁</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>sukebeisu_sex_1_f</value>
-      <voice> <string>スケベ椅子</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>tikan_aibu_1_f</value>
-      <voice> <string>痴漢</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>tikan_sex_1_f</value>
-      <voice> <string>痴漢挿入</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>ganmenkijyoui_1_f</value>
-      <voice> <string>顔面騎乗位</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>sixnine_1_f</value>
-      <voice> <string>シックスナイン</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>fera_mzi_1_f</value>
-      <voice> <string>フェラえむじ</string><string>しゃがみフェラ</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>om_fera_ir_1_f</value>
-      <voice> <string>フェライラマ</string><string>イラマチオ</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>asikoki_1_f</value>
-      <voice> <string>足こき</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>paizuri_1_f</value>
-      <voice> <string>パイズリ</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>paizuri_fera_1_f</value>
-      <voice> <string>パイズリフェラ</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>om_onani_1_f</value>
-      <voice> <string>オナニー</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>om_fera_onani_1_f</value>
-      <voice> <string>フェラオナニー</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>wfera_1_f</value>
-      <voice> <string>ダブルフェラ</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>wasikoki_1_f</value>
-      <voice> <string>ダブル足こき</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>harem_housi_1_f</value>
-      <voice> <string>ハーレム奉仕</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>ran3p_seijyoui_kuti_1_f</value>
-      <voice> <string>乱交3P</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>ran3p_2ana_1_f</value>
-      <voice> <string>乱交にけつ</string><string>乱交にあな</string> </voice>
-    </VymVoiceInfo>
-  </vymUnzip>
-  <vymUnzipDerive>
-    <VymVoiceInfo>
-      <voice> <string>基本体位</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>_gr</value>
-      <voice> <string>グラインドに変更</string><string>グラインドして</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>_daki,_kakae</value>
-      <voice> <string>抱きに変更</string><string>抱える</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>_hold</value>
-      <voice> <string>ホールドに変更</string><string>ホールドして</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>_69</value>
-      <voice> <string>シックスナインに変更</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>_kiss</value>
-      <voice> <string>キスに変更</string><string>キスする</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>_aibu,_hibu_aibu</value>
-      <voice> <string>愛撫に変更</string><string>愛撫する</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>_momi,_ryoumomi</value>
-      <voice> <string>揉みに変更</string><string>おっぱい揉む</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>_kuti,_kutiosae,_kutifusagu</value>
-      <voice> <string>口に変更</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>_cli</value>
-      <voice> <string>クリに変更</string><string>クリさわる</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>_hibu,_maeyubi,_hibuhiraki</value>
-      <voice> <string>秘部に変更</string><string>あそこさわる</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>_siri,_siriyubi</value>
-      <voice> <string>尻に変更</string><string>尻さわる</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>_name</value>
-      <voice> <string>舐めに変更</string><string>舐めて</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>_fera</value>
-      <voice> <string>フェラに変更</string><string>フェラして</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>_tekoki</value>
-      <voice> <string>手こきに変更</string><string>手こきして</string> </voice>
-    </VymVoiceInfo>
-  </vymUnzipDerive>
-  <vymUnzipRandom>
-    <VymVoiceInfo>
-      <value>ems_オナニーセット</value>
-      <voice> <string>オナニーセット</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>ems_正常位セット</value>
-      <voice> <string>正常位セット</string> </voice>
-    </VymVoiceInfo>
-  </vymUnzipRandom>
-  <vymUnzipChange>
-    <VymVoiceInfo>
-      <value>-1</value>
-      <voice> <string>前のモーション</string><string>前の体位</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>1</value>
-      <voice> <string>次のモーション</string><string>次の体位</string><string>体位変更</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>2</value>
-      <voice> <string>カテゴリ変更</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>-3</value>
-      <voice> <string>前のモーションセット</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>3</value>
-      <voice> <string>次のモーションセット</string><string>モーションセット変更</string> </voice>
-    </VymVoiceInfo>
-  </vymUnzipChange>
-  <vymRemoveMotion>
-    <VymVoiceInfo>
-      <value>false</value>
-      <voice> <string>抜く</string><string>ちんこ抜く</string><string>待機</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>true</value>
-      <voice> <string>抜いて射精</string><string>抜いて出す</string><string>抜いてかける</string> </voice>
-    </VymVoiceInfo>
-  </vymRemoveMotion>
-  <vymInsertMotion>
-    <string>入れる</string><string>ちんこ入れる</string><string>挿入</string><string>再挿入</string>
-  </vymInsertMotion>
-  <vymSumataMotion>
-    <string>素股</string><string>素股して</string>
-  </vymSumataMotion>
-  <vymAnalMode>
-    <VymVoiceInfo>
-      <value>false</value>
-      <voice> <string>前を使う</string><string>前に入れる</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>true</value>
-      <voice> <string>後ろを使う</string><string>後ろに入れる</string> </voice>
-    </VymVoiceInfo>
-  </vymAnalMode>
-  <vymVoiceSet>
-    <VymVoiceInfo>
-      <voice> <string>ボイスセット解除</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>evs_オナニー(初々)_連動</value>
-      <voice> <string>オナニーボイス</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>evs_オナニー(慣れ)_連動</value>
-      <voice> <string>オナニーボイス慣れ</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>evs_オナニー(結婚)_連動</value>
-      <voice> <string>オナニーボイス結婚</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>evs_愛撫(初々)_連動</value>
-      <voice> <string>愛撫ボイス</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>evs_愛撫(慣れ)_連動</value>
-      <voice> <string>愛撫ボイス慣れ</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>evs_愛撫(結婚)_連動</value>
-      <voice> <string>愛撫ボイス結婚</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>evs_素股(初々)_連動</value>
-      <voice> <string>素股ボイス</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>evs_素股(慣れ)_連動</value>
-      <voice> <string>素股ボイス慣れ</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>evs_素股(結婚)_連動</value>
-      <voice> <string>素股ボイス結婚</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>evs_挿入(初々)_連動</value>
-      <voice> <string>挿入ボイス</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>evs_挿入(慣れ)_連動</value>
-      <voice> <string>挿入ボイス慣れ</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>evs_挿入(結婚)_連動</value>
-      <voice> <string>挿入ボイス結婚</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>evs_挿入事後(中出し)</value>
-      <voice> <string>事後中出しボイス</string><string>中出しボイス</string> </voice>
-    </VymVoiceInfo>
-  </vymVoiceSet>
-  <vymKissVoiceSet>
-    <VymVoiceInfo>
-      <voice> <string>キスボイス解除</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>evs_キス(初々)</value>
-      <voice> <string>キスボイス</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>evs_キス(慣れ)</value>
-      <voice> <string>キスボイス慣れ</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>evs_キス(結婚)</value>
-      <voice> <string>キスボイス結婚</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>evs_キス(嫌悪)</value>
-      <voice> <string>キスボイス嫌悪</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>evs_キス(初々)_客</value>
-      <voice> <string>キスボイス客</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>evs_キス(慣れ)_客</value>
-      <voice> <string>キスボイス慣れ客</string> </voice>
-    </VymVoiceInfo>
-    <VymVoiceInfo>
-      <value>evs_キス(嫌悪)_客</value>
-      <voice> <string>キスボイス嫌悪客</string> </voice>
-    </VymVoiceInfo>
-  </vymKissVoiceSet>
-  <vymFaceMotion>
-    <VymFaceMotionInfo>
-      <face>通常</face>
-      <blend>頬０涙０</blend>
-      <voice> <string>普通の顔</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <face>微笑み</face>
-      <blend>頬０涙０</blend>
-      <voice> <string>微笑み</string><string>微笑んで</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <face>優しさ</face>
-      <blend>頬０涙０</blend>
-      <voice> <string>優しさ</string><string>優しい顔</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <face>にっこり</face>
-      <blend>頬０涙０</blend>
-      <voice> <string>にっこり</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <face>笑顔</face>
-      <blend>頬０涙０</blend>
-      <voice> <string>笑って</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <face>少し怒り</face>
-      <blend>頬０涙０</blend>
-      <voice> <string>怒って</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <face>泣き</face>
-      <blend>頬０涙１</blend>
-      <voice> <string>泣いて</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <face>拗ね</face>
-      <blend>頬０涙０</blend>
-      <voice> <string>拗ねて</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <face>ダンスジト目</face>
-      <blend>頬０涙０</blend>
-      <voice> <string>ジト目</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <face>接吻</face>
-      <blend>頬１涙０</blend>
-      <voice> <string>キス顔</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <face>閉じ目</face>
-      <blend>頬０涙０</blend>
-      <voice> <string>閉じ目</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <face>困った</face>
-      <blend>頬０涙０</blend>
-      <voice> <string>困った顔</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <face>びっくり</face>
-      <blend>頬０涙０</blend>
-      <voice> <string>びっくり顔</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <face>恥ずかしい</face>
-      <blend>頬１涙０</blend>
-      <voice> <string>恥ずかしい顔</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <face>発情</face>
-      <blend>頬２涙０</blend>
-      <voice> <string>発情顔</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <face>エロ通常２</face>
-      <voice> <string>エロ顔</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <face>エロ興奮３</face>
-      <voice> <string>エロ興奮</string><string>興奮顔</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <face>エロ羞恥１</face>
-      <voice> <string>エロ羞恥</string><string>羞恥顔</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <face>エロ期待</face>
-      <voice> <string>エロ期待</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <face>エロ怯え</face>
-      <voice> <string>エロ怯え</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <face>エロ舐め愛情</face>
-      <voice> <string>エロ舐め</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <blend>頬１</blend>
-      <voice> <string>頬染める</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <blend>頬０</blend>
-      <voice> <string>頬染めない</string><string>頬戻す</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <blend>涙１</blend>
-      <voice> <string>涙出す</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <blend>涙０</blend>
-      <voice> <string>涙拭く</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <blend>よだれ</blend>
-      <voice> <string>よだれ</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <blend />
-      <voice> <string>よだれ拭く</string><string>よだれ無し</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <tags> <string>eyeclose:0</string><string>eyeclose2:0</string><string>eyeclose3:0</string><string>eyeclose6:0</string><string>eyebig:0</string><string>hitomis:0</string><string>hitomih:0</string> </tags>
-      <voice> <string>普通の目</string><string>目戻して</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <tags> <string>eyeclose:0</string><string>eyeclose2:0</string><string>eyeclose3:0</string><string>eyeclose6:0</string><string>eyebig:0</string> </tags>
-      <voice> <string>目を開けて</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <tags> <string>eyeclose:0</string><string>eyeclose2:0</string><string>eyebig:100</string> </tags>
-      <voice> <string>見開いて</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <tags> <string>eyeclose:100</string><string>eyeclose2:0</string><string>eyeclose3:0</string><string>eyeclose6:0</string><string>eyebig:0</string> </tags>
-      <voice> <string>目を閉じて</string><string>目をつぶって</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <tags> <string>eyeclose:0</string><string>eyeclose2:100</string><string>eyebig:0</string> </tags>
-      <voice> <string>目をにっこり</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <tags> <string>eyeclose:-10</string><string>eyeclose2:-10</string> </tags>
-      <voice> <string>少し目を開けて</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <tags> <string>eyeclose:+10</string><string>eyeclose2:-10</string><string>eyebig:0</string> </tags>
-      <voice> <string>少し目を閉じて</string><string>目を細めて</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <tags> <string>eyeclose:-10</string><string>eyeclose2:+10</string><string>eyebig:0</string> </tags>
-      <voice> <string>少しにっこり</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <tags> <string>eyeclose:0</string><string>eyeclose2:0</string><string>eyeclose3:0</string><string>eyeclose6:100</string><string>eyebig:0</string> </tags>
-      <voice> <string>ウインク</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <tags> <string>mouthup:25</string><string>moutha:0</string><string>mouthi:0</string><string>mouthc:0</string><string>mouthdw:0</string><string>mouthhe:0</string><string>mouths:0</string><string>mouthuphalf:0</string><string>toothoff:0</string><string>tangopen:0</string><string>tangout:0</string> </tags>
-      <voice> <string>口を閉じて</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <tags> <string>mouthup:0</string><string>moutha:100</string><string>mouthi:0</string><string>mouthc:0</string><string>mouthdw:0</string><string>mouthhe:0</string><string>mouths:0</string><string>mouthuphalf:0</string><string>toothoff:0</string><string>tangopen:0</string><string>tangout:0</string> </tags>
-      <voice> <string>口を開けて</string><string>口をひらいて</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <tags> <string>moutha:+10</string> </tags>
-      <voice> <string>少し口を開けて</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <tags> <string>moutha:-10</string> </tags>
-      <voice> <string>少し口を閉じて</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <tags> <string>mouthup:+25</string> </tags>
-      <voice> <string>口角上げて</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <tags> <string>mouthup:-25</string> </tags>
-      <voice> <string>口角下げて</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <tags> <string>mouthup:0</string> </tags>
-      <voice> <string>口角戻して</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <tags> <string>mouthc:+25</string> </tags>
-      <voice> <string>口細めて</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <tags> <string>mouthc:-25</string> </tags>
-      <voice> <string>口広げて</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <tags> <string>mouthhe:+50</string><string>mouthdw:0</string> </tags>
-      <voice> <string>への字口</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <tags> <string>mouthdw:+50</string><string>mouthhe:0</string> </tags>
-      <voice> <string>困った口</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <tags> <string>mayuup:0</string><string>mayuha:0</string><string>mayuv:0</string><string>mayuw:0</string><string>mayuvhalf:0</string> </tags>
-      <voice> <string>普通の眉</string><string>眉戻して</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <tags> <string>mayuup:+25</string> </tags>
-      <voice> <string>眉上げて</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <tags> <string>mayuup:-25</string> </tags>
-      <voice> <string>眉下げて</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <tags> <string>mayuha:+50</string> </tags>
-      <voice> <string>ハの字眉</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <tags> <string>mayuw:+50</string> </tags>
-      <voice> <string>困った眉</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <tags> <string>tangopen:+25</string><string>tangout:100</string><string>tangup:0</string> </tags>
-      <voice> <string>舌出して</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <tags> <string>tangopen:0</string><string>tangout:0</string><string>tangup:0</string> </tags>
-      <voice> <string>舌戻して</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <motion> <string>maid_stand01</string> </motion>
-      <loop>true</loop>
-      <voice> <string>基本立ち</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <motion> <string>edit_pose21_mune_tate_f_once_</string> </motion>
-      <loop>true</loop>
-      <voice> <string>ぽよんぽよん</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <motion> <string>edit_pose21_mune_yoko_f_once_</string> </motion>
-      <loop>true</loop>
-      <voice> <string>ぷるんぷるん</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <motion> <string>kaiwa_sofa_1_f</string> </motion>
-      <loop>true</loop>
-      <voice> <string>ソファ座り</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <motion> <string>pose_02_f</string> </motion>
-      <loop>true</loop>
-      <voice> <string>膝立ち</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <motion> <string>pillow_talk_f</string> </motion>
-      <loop>true</loop>
-      <voice> <string>ピロートーク</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <motion> <string>pillow_talk_dakituki_kiss_f</string> </motion>
-      <loop>true</loop>
-      <voice> <string>ピロートークキス</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <motion> <string>hanyou_kizetu_f</string> </motion>
-      <loop>true</loop>
-      <voice> <string>気絶</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <motion> <string>inu_pose_f</string> </motion>
-      <loop>true</loop>
-      <voice> <string>犬ポーズ</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <motion> <string>momi_momi_f</string> </motion>
-      <loop>true</loop>
-      <voice> <string>もみもみ</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <motion> <string>turn01</string> </motion>
-      <loop>true</loop>
-      <voice> <string>くるっと回る</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <face>恥ずかしい</face>
-      <blend>頬０涙０</blend>
-      <motion> <string>sys_munehide</string> </motion>
-      <loop>true</loop>
-      <voice> <string>体を隠す</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <motion> <string>kaiwa_tati_ozigi_n_f_once_</string> </motion>
-      <loop>true</loop>
-      <voice> <string>お辞儀する</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <motion> <string>kaiwa_tati_teofuru_taiki_f</string> </motion>
-      <loop>true</loop>
-      <voice> <string>バイバイ</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <motion> <string>kaiwa_tati_ozigi_n_f_ONCE_</string><string>kaiwa_tati_taiki_f</string> </motion>
-      <loop>true</loop>
-      <voice> <string>お辞儀</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <motion> <string>kaiwa_tati_keirei_f_ONCE_</string><string>kaiwa_tati_keirei_taiki_f</string> </motion>
-      <loop>true</loop>
-      <voice> <string>敬礼</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <motion> <string>kaiwa_tati_ayamaru_f_ONCE_</string><string>kaiwa_tati_ayamaru_taiki_f</string> </motion>
-      <loop>true</loop>
-      <voice> <string>ごめんね</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <motion> <string>kaiwa_tati_orz_f_once_</string><string>kaiwa_tati_orz_taiki_f</string><string>kaiwa_tati_orz_tatiagaru_f_ONCE_</string><string>maid_stand01</string> </motion>
-      <loop>true</loop>
-      <voice> <string>がっくり</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <motion> <string>kaiwa_sofa_teawase_f_ONCE_</string><string>kaiwa_sofa_teawase_taiki_f</string><string>kaiwa_sofa_teawase_end_f_ONCE_</string><string>kaiwa_sofa_1_f</string> </motion>
-      <loop>true</loop>
-      <voice> <string>ソファ手合わせ</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <face>恥ずかしい</face>
-      <blend>頬０涙０</blend>
-      <motion> <string>rosyutu_hounyou_f_once_</string><string>rosyutu_hounyou_taiki_f</string> </motion>
-      <loop>true</loop>
-      <voice> <string>露出放尿</string><string>おしっこポーズ</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <face>恥ずかしい</face>
-      <blend>頬０涙０</blend>
-      <motion> <string>inu_hounyou_f_once_</string><string>inu_taiki_f</string> </motion>
-      <loop>true</loop>
-      <voice> <string>犬放尿</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <face>恥ずかしい</face>
-      <blend>頬０涙０</blend>
-      <motion> <string>hentai_pose_hounyou_f_once_</string><string>hentai_pose_03_f</string> </motion>
-      <loop>true</loop>
-      <voice> <string>変態放尿</string> </voice>
-    </VymFaceMotionInfo>
-    <VymFaceMotionInfo>
-      <motion> <string>aruki_1_idou_f_once_</string> </motion>
-      <loop>false</loop>
-      <voice> <string>前に歩く</string> </voice>
-    </VymFaceMotionInfo>
-  </vymFaceMotion>
+    <vymConfig>
+        <VymConfigInfo>
+            <name>mainGuiFlag</name>
+            <value>1</value> <init>false</init>
+            <voice>
+                <string>リモコン表示</string>
+            </voice>
+        </VymConfigInfo>
+        <VymConfigInfo>
+            <name>mainGuiFlag</name>
+            <value>0</value> <init>false</init>
+            <voice>
+                <string>リモコン非表示</string>
+            </voice>
+        </VymConfigInfo>
+        <VymConfigInfo>
+            <name>osawariEnabled</name>
+            <value>true</value> <init>false</init>
+            <voice>
+                <string>おさわり開始</string><string>おさわり有効</string>
+            </voice>
+        </VymConfigInfo>
+        <VymConfigInfo>
+            <name>osawariEnabled</name>
+            <value>false</value> <init>false</init>
+            <voice>
+                <string>おさわり終了</string><string>おさわり無効</string>
+            </voice>
+        </VymConfigInfo>
+        <VymConfigInfo>
+            <name>vrCameraMoveLimit</name>
+            <value>true</value> <init>false</init>
+            <voice>
+                <string>最短制限</string>
+            </voice>
+        </VymConfigInfo>
+        <VymConfigInfo>
+            <name>vrCameraMoveLimit</name>
+            <value>false</value> <init>false</init>
+            <voice>
+                <string>最短制限解除</string>
+            </voice>
+        </VymConfigInfo>
+    </vymConfig>
+    <vymSelectFrontMaid>
+        <string>正面のメイド</string>
+    </vymSelectFrontMaid>
+    <vymSelectMaidName>
+        <VymVoiceInfo>
+            <value>聖道 まりあ</value>
+            <voice>
+                <string>無垢ちゃん</string>
+            </voice>
+        </VymVoiceInfo>
+    </vymSelectMaidName>
+    <vymPrevMaid>
+        <string>前のメイド</string>
+    </vymPrevMaid>
+    <vymNextMaid>
+        <string>次のメイド</string>
+    </vymNextMaid>
+    <vymLeftMaid>
+        <string>左のメイド</string>
+    </vymLeftMaid>
+    <vymRightMaid>
+        <string>右のメイド</string>
+    </vymRightMaid>
+    <vymMaidLink>
+        <VymVoiceInfo>
+            <value>all</value>
+            <voice>
+                <string>全リンク</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>null</value>
+            <voice>
+                <string>リンク解除</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>left</value>
+            <voice>
+                <string>左とリンク</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>right</value>
+            <voice>
+                <string>右とリンク</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>sync</value>
+            <voice>
+                <string>モーション同期</string><string>同期する</string>
+            </voice>
+        </VymVoiceInfo>
+    </vymMaidLink>
+    <vymCamMove>
+        <VymMoveInfo>
+            <move>
+                <x>1</x>
+                <y>0</y>
+                <z>0</z>
+            </move>
+            <useMoveValue>true</useMoveValue>
+            <voice>
+                <string>右に移動</string>
+            </voice>
+        </VymMoveInfo>
+        <VymMoveInfo>
+            <move>
+                <x>-1</x>
+                <y>0</y>
+                <z>0</z>
+            </move>
+            <useMoveValue>true</useMoveValue>
+            <voice>
+                <string>左に移動</string>
+            </voice>
+        </VymMoveInfo>
+        <VymMoveInfo>
+            <move>
+                <x>0</x>
+                <y>1</y>
+                <z>0</z>
+            </move>
+            <useMoveValue>true</useMoveValue>
+            <voice>
+                <string>上に移動</string>
+            </voice>
+        </VymMoveInfo>
+        <VymMoveInfo>
+            <move>
+                <x>0</x>
+                <y>-1</y>
+                <z>0</z>
+            </move>
+            <useMoveValue>true</useMoveValue>
+            <voice>
+                <string>下に移動</string>
+            </voice>
+        </VymMoveInfo>
+        <VymMoveInfo>
+            <move>
+                <x>0</x>
+                <y>0</y>
+                <z>1</z>
+            </move>
+            <useMoveValue>true</useMoveValue>
+            <voice>
+                <string>前に移動</string>
+            </voice>
+        </VymMoveInfo>
+        <VymMoveInfo>
+            <move>
+                <x>0</x>
+                <y>0</y>
+                <z>-1</z>
+            </move>
+            <useMoveValue>true</useMoveValue>
+            <voice>
+                <string>後ろに移動</string>
+            </voice>
+        </VymMoveInfo>
+        <VymMoveInfo>
+            <move>
+                <x>0.05</x>
+                <y>0</y>
+                <z>0</z>
+            </move>
+            <useMoveValue>false</useMoveValue>
+            <voice>
+                <string>5センチ右</string>
+            </voice>
+        </VymMoveInfo>
+        <VymMoveInfo>
+            <move>
+                <x>-0.05</x>
+                <y>0</y>
+                <z>0</z>
+            </move>
+            <useMoveValue>false</useMoveValue>
+            <voice>
+                <string>5センチ左</string>
+            </voice>
+        </VymMoveInfo>
+        <VymMoveInfo>
+            <move>
+                <x>0</x>
+                <y>0.05</y>
+                <z>0</z>
+            </move>
+            <useMoveValue>false</useMoveValue>
+            <voice>
+                <string>5センチ上</string>
+            </voice>
+        </VymMoveInfo>
+        <VymMoveInfo>
+            <move>
+                <x>0</x>
+                <y>-0.05</y>
+                <z>0</z>
+            </move>
+            <useMoveValue>false</useMoveValue>
+            <voice>
+                <string>5センチ下</string>
+            </voice>
+        </VymMoveInfo>
+        <VymMoveInfo>
+            <move>
+                <x>0</x>
+                <y>0</y>
+                <z>0.05</z>
+            </move>
+            <useMoveValue>false</useMoveValue>
+            <voice>
+                <string>5センチ前</string>
+            </voice>
+        </VymMoveInfo>
+        <VymMoveInfo>
+            <move>
+                <x>0</x>
+                <y>0</y>
+                <z>-0.05</z>
+            </move>
+            <useMoveValue>false</useMoveValue>
+            <voice>
+                <string>5センチ後ろ</string>
+            </voice>
+        </VymMoveInfo>
+    </vymCamMove>
+    <vymCamDistance>
+        <VymVoiceInfo>
+            <value>-25%</value>
+            <voice>
+                <string>近づく</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>+25%</value>
+            <voice>
+                <string>離れる</string>
+            </voice>
+        </VymVoiceInfo>
+    </vymCamDistance>
+    <vymCamFront>
+        <string>メイド正面</string>
+    </vymCamFront>
+    <vymCamBack>
+        <string>メイド背面</string><string>メイドの後ろ</string>
+    </vymCamBack>
+    <vymCamTarget>
+        <VymVoiceInfo>
+            <value>0.3</value>
+            <value2>1</value2>
+            <voice>
+                <string>顔の前</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>0.3</value>
+            <value2>-1</value2>
+            <voice>
+                <string>顔の後ろ</string><string>頭の後ろ</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>0.4</value>
+            <value2>2</value2>
+            <voice>
+                <string>胸の前</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>0.4</value>
+            <value2>-2</value2>
+            <voice>
+                <string>胸の後ろ</string><string>背中の前</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>0.3</value>
+            <value2>3</value2>
+            <voice>
+                <string>腰の前</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>0.3</value>
+            <value2>-3</value2>
+            <voice>
+                <string>腰の後ろ</string><string>尻の前</string>
+            </voice>
+        </VymVoiceInfo>
+    </vymCamTarget>
+    <vymCamManHead>
+        <VymVoiceInfo>
+            <value>-1</value>
+            <value2>1</value2>
+            <voice>
+                <string>男に移動</string><string>男の位置</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>-1</value>
+            <value2>0</value2>
+            <voice>
+                <string>男視点</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>0</value>
+            <value2>0</value2>
+            <voice>
+                <string>ご主人様視点</string>
+            </voice>
+        </VymVoiceInfo>
+    </vymCamManHead>
+    <vymFps>
+        <VymVoiceInfo>
+            <value>0</value>
+            <voice>
+                <string>一人称解除</string><string>一人称終了</string><string>FPS解除</string><string>FPS終了</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>1</value>
+            <voice>
+                <string>一人称開始</string><string>FPS開始</string>
+            </voice>
+        </VymVoiceInfo>
+    </vymFps>
+    <vymFollow>
+        <VymVoiceInfo>
+            <value>0</value>
+            <voice>
+                <string>メイド固定解除</string><string>固定解除</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>1</value>
+            <voice>
+                <string>メイド固定</string>
+            </voice>
+        </VymVoiceInfo>
+    </vymFollow>
+    <vymLookPoint>
+        <VymVoiceInfo>
+            <value>0</value>
+            <voice>
+                <string>胸に固定</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>1</value>
+            <voice>
+                <string>顔に固定</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>2</value>
+            <voice>
+                <string>腰に固定</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>10</value>
+            <voice>
+                <string>アングル固定</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>-10</value>
+            <voice>
+                <string>アングル解除</string>
+            </voice>
+        </VymVoiceInfo>
+    </vymLookPoint>
+    <vymBoneHitHeight>
+        <VymVoiceInfo>
+            <value>-1</value>
+            <voice>
+                <string>地面下げる</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>+1</value>
+            <voice>
+                <string>地面上げる</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>0</value>
+            <voice>
+                <string>地面ゼロ</string>
+            </voice>
+        </VymVoiceInfo>
+    </vymBoneHitHeight>
+    <vymExcite>
+        <VymVoiceInfo>
+            <value>-50</value>
+            <voice>
+                <string>興奮下げる</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>+50</value>
+            <voice>
+                <string>興奮上げる</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>0</value>
+            <voice>
+                <string>興奮なし</string>
+            </voice>
+        </VymVoiceInfo>
+    </vymExcite>
+    <vymManVisible>
+        <VymVoiceInfo>
+            <value>1</value>
+            <voice>
+                <string>ご主人様表示</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>-1</value>
+            <voice>
+                <string>ご主人様非表示</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>2</value>
+            <voice>
+                <string>モブ表示</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>-255</value>
+            <voice>
+                <string>男非表示</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>-254</value>
+            <voice>
+                <string>モブ非表示</string>
+            </voice>
+        </VymVoiceInfo>
+    </vymManVisible>
+    <vymSyasei>
+        <VymVoiceInfo>
+            <value>1</value>
+            <voice>
+                <string>射精する</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>2</value>
+            <voice>
+                <string>モブ射精</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>255</value>
+            <voice>
+                <string>全員射精</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>+255</value>
+            <voice>
+                <string>射精ロック</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>-255</value>
+            <voice>
+                <string>射精ロック解除</string>
+            </voice>
+        </VymVoiceInfo>
+    </vymSyasei>
+    <vymFukitori>
+        <VymVoiceInfo>
+            <value>0</value>
+            <voice>
+                <string>拭き取り</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>1</value>
+            <voice>
+                <string>顔拭き取り</string><string>顔を拭く</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>2</value>
+            <voice>
+                <string>体拭き取り</string><string>体を拭く</string>
+            </voice>
+        </VymVoiceInfo>
+    </vymFukitori>
+    <vymStartNyo>
+        <VymVoiceInfo>
+            <value>0</value>
+            <voice>
+                <string>おしっこして</string><string>おしっこかけて</string><string>漏らして</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>1</value>
+            <voice>
+                <string>全員おしっこ</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>2</value>
+            <voice>
+                <string>同時におしっこ</string>
+            </voice>
+        </VymVoiceInfo>
+    </vymStartNyo>
+    <vymStartSio>
+        <VymVoiceInfo>
+            <value>0</value>
+            <voice>
+                <string>潮吹き</string><string>潮吹いて</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>1</value>
+            <voice>
+                <string>全員潮吹き</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>2</value>
+            <voice>
+                <string>同時に潮吹き</string>
+            </voice>
+        </VymVoiceInfo>
+    </vymStartSio>
+    <vymVibe>
+        <VymVoiceInfo>
+            <value>0</value>
+            <voice>
+                <string>バイブOFF</string><string>バイブ停止</string><string>停止</string><string>バイブ抜く</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>1</value>
+            <voice>
+                <string>バイブON</string><string>バイブ入れる</string><string>バイブ弱</string><string>バイブ弱く</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>2</value>
+            <voice>
+                <string>バイブ強</string><string>バイブ強く</string>
+            </voice>
+        </VymVoiceInfo>
+    </vymVibe>
+    <vymVibeAuto>
+        <VymVoiceInfo>
+            <value>+1</value>
+            <voice>
+                <string>バイブオート</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>1</value>
+            <voice>
+                <string>バイブじっくり</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>2</value>
+            <voice>
+                <string>バイブ激しく</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>3</value>
+            <voice>
+                <string>バイブほどほど</string>
+            </voice>
+        </VymVoiceInfo>
+    </vymVibeAuto>
+    <vymKupa>
+        <VymVoiceInfo>
+            <value>0</value>
+            <voice>
+                <string>あそこ閉じる</string><string>おまんこ閉じる</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>60</value>
+            <voice>
+                <string>くぱぁ</string><string>くぱぁする</string><string>くぱぁして</string><string>あそこひらく</string>
+                <string>おまんこひらく</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>+20</value>
+            <voice>
+                <string>あそこ拡げる</string><string>おまんこ拡げる</string><string>あそこ拡げて</string><string>おまんこ拡げて</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>-20</value>
+            <voice>
+                <string>あそこ閉める</string><string>おまんこ閉める</string><string>あそこ締めて</string><string>おまんこ締めて</string>
+            </voice>
+        </VymVoiceInfo>
+    </vymKupa>
+    <vymAnal>
+        <VymVoiceInfo>
+            <value>0</value>
+            <voice>
+                <string>アナル閉じる</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>60</value>
+            <voice>
+                <string>アナルくぱぁ</string><string>アナルひらく</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>+20</value>
+            <voice>
+                <string>アナル拡げる</string><string>アナル拡げて</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>-20</value>
+            <voice>
+                <string>アナル閉める</string><string>アナル締めて</string>
+            </voice>
+        </VymVoiceInfo>
+    </vymAnal>
+    <vymBokki>
+        <VymVoiceInfo>
+            <value>0</value>
+            <voice>
+                <string>クリ最小</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>100</value>
+            <voice>
+                <string>クリ最大</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>+30</value>
+            <voice>
+                <string>クリ大きく</string><string>クリ拡大</string><string>クリぼっき</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>-30</value>
+            <voice>
+                <string>クリ小さく</string><string>クリ縮小</string>
+            </voice>
+        </VymVoiceInfo>
+    </vymBokki>
+    <vymUnzip>
+        <VymVoiceInfo>
+            <value>om_aibu_hibu_1_f</value>
+            <voice>
+                <string>愛撫</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>om_seijyoui_1_f</value>
+            <voice>
+                <string>正常位</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>manguri_1_f</value>
+            <voice>
+                <string>まんぐり</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>om_taimenkijyoui_1_f</value>
+            <voice>
+                <string>対面騎乗位</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>kijyoui_sumata_1_f</value>
+            <voice>
+                <string>騎乗位素股</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>om_taimenzai_1_f</value>
+            <voice>
+                <string>対面座位</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>om_kouhaii_1_f</value>
+            <voice>
+                <string>こうはいい</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>ritui_1_f</value>
+            <voice>
+                <string>りつい</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>haimenritui_1_f</value>
+            <voice>
+                <string>背面立位</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>sokui_1_f</value>
+            <voice>
+                <string>そくい</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>haimen_kijyoui_1_f</value>
+            <voice>
+                <string>背面騎乗位</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>haimenzai2_1_f</value>
+            <voice>
+                <string>背面座位</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>ekiben_1_f</value>
+            <voice>
+                <string>駅弁</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>haimenekiben_1_f</value>
+            <voice>
+                <string>背面駅弁</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>sukebeisu_sex_1_f</value>
+            <voice>
+                <string>スケベ椅子</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>tikan_aibu_1_f</value>
+            <voice>
+                <string>痴漢</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>tikan_sex_1_f</value>
+            <voice>
+                <string>痴漢挿入</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>ganmenkijyoui_1_f</value>
+            <voice>
+                <string>顔面騎乗位</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>sixnine_1_f</value>
+            <voice>
+                <string>シックスナイン</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>fera_mzi_1_f</value>
+            <voice>
+                <string>フェラえむじ</string><string>しゃがみフェラ</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>om_fera_ir_1_f</value>
+            <voice>
+                <string>フェライラマ</string><string>イラマチオ</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>asikoki_1_f</value>
+            <voice>
+                <string>足こき</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>paizuri_1_f</value>
+            <voice>
+                <string>パイズリ</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>paizuri_fera_1_f</value>
+            <voice>
+                <string>パイズリフェラ</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>om_onani_1_f</value>
+            <voice>
+                <string>オナニー</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>om_fera_onani_1_f</value>
+            <voice>
+                <string>フェラオナニー</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>wfera_1_f</value>
+            <voice>
+                <string>ダブルフェラ</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>wasikoki_1_f</value>
+            <voice>
+                <string>ダブル足こき</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>harem_housi_1_f</value>
+            <voice>
+                <string>ハーレム奉仕</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>ran3p_seijyoui_kuti_1_f</value>
+            <voice>
+                <string>乱交3P</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>ran3p_2ana_1_f</value>
+            <voice>
+                <string>乱交にけつ</string><string>乱交にあな</string>
+            </voice>
+        </VymVoiceInfo>
+    </vymUnzip>
+    <vymUnzipDerive>
+        <VymVoiceInfo>
+            <voice>
+                <string>基本体位</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>_gr</value>
+            <voice>
+                <string>グラインドに変更</string><string>グラインドして</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>_daki,_kakae</value>
+            <voice>
+                <string>抱きに変更</string><string>抱える</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>_hold</value>
+            <voice>
+                <string>ホールドに変更</string><string>ホールドして</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>_69</value>
+            <voice>
+                <string>シックスナインに変更</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>_kiss</value>
+            <voice>
+                <string>キスに変更</string><string>キスする</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>_aibu,_hibu_aibu</value>
+            <voice>
+                <string>愛撫に変更</string><string>愛撫する</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>_momi,_ryoumomi</value>
+            <voice>
+                <string>揉みに変更</string><string>おっぱい揉む</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>_kuti,_kutiosae,_kutifusagu</value>
+            <voice>
+                <string>口に変更</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>_cli</value>
+            <voice>
+                <string>クリに変更</string><string>クリさわる</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>_hibu,_maeyubi,_hibuhiraki</value>
+            <voice>
+                <string>秘部に変更</string><string>あそこさわる</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>_siri,_siriyubi</value>
+            <voice>
+                <string>尻に変更</string><string>尻さわる</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>_name</value>
+            <voice>
+                <string>舐めに変更</string><string>舐めて</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>_fera</value>
+            <voice>
+                <string>フェラに変更</string><string>フェラして</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>_tekoki</value>
+            <voice>
+                <string>手こきに変更</string><string>手こきして</string>
+            </voice>
+        </VymVoiceInfo>
+    </vymUnzipDerive>
+    <vymUnzipRandom>
+        <VymVoiceInfo>
+            <value>ems_オナニーセット</value>
+            <voice>
+                <string>オナニーセット</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>ems_正常位セット</value>
+            <voice>
+                <string>正常位セット</string>
+            </voice>
+        </VymVoiceInfo>
+    </vymUnzipRandom>
+    <vymUnzipChange>
+        <VymVoiceInfo>
+            <value>-1</value>
+            <voice>
+                <string>前のモーション</string><string>前の体位</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>1</value>
+            <voice>
+                <string>次のモーション</string><string>次の体位</string><string>体位変更</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>2</value>
+            <voice>
+                <string>カテゴリ変更</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>-3</value>
+            <voice>
+                <string>前のモーションセット</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>3</value>
+            <voice>
+                <string>次のモーションセット</string><string>モーションセット変更</string>
+            </voice>
+        </VymVoiceInfo>
+    </vymUnzipChange>
+    <vymRemoveMotion>
+        <VymVoiceInfo>
+            <value>false</value>
+            <voice>
+                <string>抜く</string><string>ちんこ抜く</string><string>待機</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>true</value>
+            <voice>
+                <string>抜いて射精</string><string>抜いて出す</string><string>抜いてかける</string>
+            </voice>
+        </VymVoiceInfo>
+    </vymRemoveMotion>
+    <vymInsertMotion>
+        <string>入れる</string><string>ちんこ入れる</string><string>挿入</string><string>再挿入</string>
+    </vymInsertMotion>
+    <vymSumataMotion>
+        <string>素股</string><string>素股して</string>
+    </vymSumataMotion>
+    <vymAnalMode>
+        <VymVoiceInfo>
+            <value>false</value>
+            <voice>
+                <string>前を使う</string><string>前に入れる</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>true</value>
+            <voice>
+                <string>後ろを使う</string><string>後ろに入れる</string>
+            </voice>
+        </VymVoiceInfo>
+    </vymAnalMode>
+    <vymVoiceSet>
+        <VymVoiceInfo>
+            <voice>
+                <string>ボイスセット解除</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>evs_オナニー(初々)_連動</value>
+            <voice>
+                <string>オナニーボイス</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>evs_オナニー(慣れ)_連動</value>
+            <voice>
+                <string>オナニーボイス慣れ</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>evs_オナニー(結婚)_連動</value>
+            <voice>
+                <string>オナニーボイス結婚</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>evs_愛撫(初々)_連動</value>
+            <voice>
+                <string>愛撫ボイス</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>evs_愛撫(慣れ)_連動</value>
+            <voice>
+                <string>愛撫ボイス慣れ</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>evs_愛撫(結婚)_連動</value>
+            <voice>
+                <string>愛撫ボイス結婚</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>evs_素股(初々)_連動</value>
+            <voice>
+                <string>素股ボイス</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>evs_素股(慣れ)_連動</value>
+            <voice>
+                <string>素股ボイス慣れ</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>evs_素股(結婚)_連動</value>
+            <voice>
+                <string>素股ボイス結婚</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>evs_挿入(初々)_連動</value>
+            <voice>
+                <string>挿入ボイス</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>evs_挿入(慣れ)_連動</value>
+            <voice>
+                <string>挿入ボイス慣れ</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>evs_挿入(結婚)_連動</value>
+            <voice>
+                <string>挿入ボイス結婚</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>evs_挿入事後(中出し)</value>
+            <voice>
+                <string>事後中出しボイス</string><string>中出しボイス</string>
+            </voice>
+        </VymVoiceInfo>
+    </vymVoiceSet>
+    <vymKissVoiceSet>
+        <VymVoiceInfo>
+            <voice>
+                <string>キスボイス解除</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>evs_キス(初々)</value>
+            <voice>
+                <string>キスボイス</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>evs_キス(慣れ)</value>
+            <voice>
+                <string>キスボイス慣れ</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>evs_キス(結婚)</value>
+            <voice>
+                <string>キスボイス結婚</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>evs_キス(嫌悪)</value>
+            <voice>
+                <string>キスボイス嫌悪</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>evs_キス(初々)_客</value>
+            <voice>
+                <string>キスボイス客</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>evs_キス(慣れ)_客</value>
+            <voice>
+                <string>キスボイス慣れ客</string>
+            </voice>
+        </VymVoiceInfo>
+        <VymVoiceInfo>
+            <value>evs_キス(嫌悪)_客</value>
+            <voice>
+                <string>キスボイス嫌悪客</string>
+            </voice>
+        </VymVoiceInfo>
+    </vymKissVoiceSet>
+    <vymFaceMotion>
+        <VymFaceMotionInfo>
+            <face>通常</face>
+            <blend>頬０涙０</blend>
+            <voice>
+                <string>普通の顔</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <face>微笑み</face>
+            <blend>頬０涙０</blend>
+            <voice>
+                <string>微笑み</string><string>微笑んで</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <face>優しさ</face>
+            <blend>頬０涙０</blend>
+            <voice>
+                <string>優しさ</string><string>優しい顔</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <face>にっこり</face>
+            <blend>頬０涙０</blend>
+            <voice>
+                <string>にっこり</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <face>笑顔</face>
+            <blend>頬０涙０</blend>
+            <voice>
+                <string>笑って</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <face>少し怒り</face>
+            <blend>頬０涙０</blend>
+            <voice>
+                <string>怒って</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <face>泣き</face>
+            <blend>頬０涙１</blend>
+            <voice>
+                <string>泣いて</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <face>拗ね</face>
+            <blend>頬０涙０</blend>
+            <voice>
+                <string>拗ねて</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <face>ダンスジト目</face>
+            <blend>頬０涙０</blend>
+            <voice>
+                <string>ジト目</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <face>接吻</face>
+            <blend>頬１涙０</blend>
+            <voice>
+                <string>キス顔</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <face>閉じ目</face>
+            <blend>頬０涙０</blend>
+            <voice>
+                <string>閉じ目</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <face>困った</face>
+            <blend>頬０涙０</blend>
+            <voice>
+                <string>困った顔</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <face>びっくり</face>
+            <blend>頬０涙０</blend>
+            <voice>
+                <string>びっくり顔</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <face>恥ずかしい</face>
+            <blend>頬１涙０</blend>
+            <voice>
+                <string>恥ずかしい顔</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <face>発情</face>
+            <blend>頬２涙０</blend>
+            <voice>
+                <string>発情顔</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <face>エロ通常２</face>
+            <voice>
+                <string>エロ顔</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <face>エロ興奮３</face>
+            <voice>
+                <string>エロ興奮</string><string>興奮顔</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <face>エロ羞恥１</face>
+            <voice>
+                <string>エロ羞恥</string><string>羞恥顔</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <face>エロ期待</face>
+            <voice>
+                <string>エロ期待</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <face>エロ怯え</face>
+            <voice>
+                <string>エロ怯え</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <face>エロ舐め愛情</face>
+            <voice>
+                <string>エロ舐め</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <blend>頬１</blend>
+            <voice>
+                <string>頬染める</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <blend>頬０</blend>
+            <voice>
+                <string>頬染めない</string><string>頬戻す</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <blend>涙１</blend>
+            <voice>
+                <string>涙出す</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <blend>涙０</blend>
+            <voice>
+                <string>涙拭く</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <blend>よだれ</blend>
+            <voice>
+                <string>よだれ</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <blend />
+            <voice>
+                <string>よだれ拭く</string><string>よだれ無し</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <tags>
+                <string>eyeclose:0</string><string>eyeclose2:0</string><string>eyeclose3:0</string>
+                <string>eyeclose6:0</string><string>eyebig:0</string><string>hitomis:0</string>
+                <string>hitomih:0</string>
+            </tags>
+            <voice>
+                <string>普通の目</string><string>目戻して</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <tags>
+                <string>eyeclose:0</string><string>eyeclose2:0</string><string>eyeclose3:0</string>
+                <string>eyeclose6:0</string><string>eyebig:0</string>
+            </tags>
+            <voice>
+                <string>目を開けて</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <tags>
+                <string>eyeclose:0</string><string>eyeclose2:0</string><string>eyebig:100</string>
+            </tags>
+            <voice>
+                <string>見開いて</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <tags>
+                <string>eyeclose:100</string><string>eyeclose2:0</string><string>eyeclose3:0</string>
+                <string>eyeclose6:0</string><string>eyebig:0</string>
+            </tags>
+            <voice>
+                <string>目を閉じて</string><string>目をつぶって</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <tags>
+                <string>eyeclose:0</string><string>eyeclose2:100</string><string>eyebig:0</string>
+            </tags>
+            <voice>
+                <string>目をにっこり</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <tags>
+                <string>eyeclose:-10</string><string>eyeclose2:-10</string>
+            </tags>
+            <voice>
+                <string>少し目を開けて</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <tags>
+                <string>eyeclose:+10</string><string>eyeclose2:-10</string><string>eyebig:0</string>
+            </tags>
+            <voice>
+                <string>少し目を閉じて</string><string>目を細めて</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <tags>
+                <string>eyeclose:-10</string><string>eyeclose2:+10</string><string>eyebig:0</string>
+            </tags>
+            <voice>
+                <string>少しにっこり</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <tags>
+                <string>eyeclose:0</string><string>eyeclose2:0</string><string>eyeclose3:0</string>
+                <string>eyeclose6:100</string><string>eyebig:0</string>
+            </tags>
+            <voice>
+                <string>ウインク</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <tags>
+                <string>mouthup:25</string><string>moutha:0</string><string>mouthi:0</string><string>mouthc:0</string>
+                <string>mouthdw:0</string><string>mouthhe:0</string><string>mouths:0</string>
+                <string>mouthuphalf:0</string><string>toothoff:0</string><string>tangopen:0</string>
+                <string>tangout:0</string>
+            </tags>
+            <voice>
+                <string>口を閉じて</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <tags>
+                <string>mouthup:0</string><string>moutha:100</string><string>mouthi:0</string><string>mouthc:0</string>
+                <string>mouthdw:0</string><string>mouthhe:0</string><string>mouths:0</string>
+                <string>mouthuphalf:0</string><string>toothoff:0</string><string>tangopen:0</string>
+                <string>tangout:0</string>
+            </tags>
+            <voice>
+                <string>口を開けて</string><string>口をひらいて</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <tags>
+                <string>moutha:+10</string>
+            </tags>
+            <voice>
+                <string>少し口を開けて</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <tags>
+                <string>moutha:-10</string>
+            </tags>
+            <voice>
+                <string>少し口を閉じて</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <tags>
+                <string>mouthup:+25</string>
+            </tags>
+            <voice>
+                <string>口角上げて</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <tags>
+                <string>mouthup:-25</string>
+            </tags>
+            <voice>
+                <string>口角下げて</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <tags>
+                <string>mouthup:0</string>
+            </tags>
+            <voice>
+                <string>口角戻して</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <tags>
+                <string>mouthc:+25</string>
+            </tags>
+            <voice>
+                <string>口細めて</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <tags>
+                <string>mouthc:-25</string>
+            </tags>
+            <voice>
+                <string>口広げて</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <tags>
+                <string>mouthhe:+50</string><string>mouthdw:0</string>
+            </tags>
+            <voice>
+                <string>への字口</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <tags>
+                <string>mouthdw:+50</string><string>mouthhe:0</string>
+            </tags>
+            <voice>
+                <string>困った口</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <tags>
+                <string>mayuup:0</string><string>mayuha:0</string><string>mayuv:0</string><string>mayuw:0</string>
+                <string>mayuvhalf:0</string>
+            </tags>
+            <voice>
+                <string>普通の眉</string><string>眉戻して</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <tags>
+                <string>mayuup:+25</string>
+            </tags>
+            <voice>
+                <string>眉上げて</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <tags>
+                <string>mayuup:-25</string>
+            </tags>
+            <voice>
+                <string>眉下げて</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <tags>
+                <string>mayuha:+50</string>
+            </tags>
+            <voice>
+                <string>ハの字眉</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <tags>
+                <string>mayuw:+50</string>
+            </tags>
+            <voice>
+                <string>困った眉</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <tags>
+                <string>tangopen:+25</string><string>tangout:100</string><string>tangup:0</string>
+            </tags>
+            <voice>
+                <string>舌出して</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <tags>
+                <string>tangopen:0</string><string>tangout:0</string><string>tangup:0</string>
+            </tags>
+            <voice>
+                <string>舌戻して</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <motion>
+                <string>maid_stand01</string>
+            </motion>
+            <loop>true</loop>
+            <voice>
+                <string>基本立ち</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <motion>
+                <string>edit_pose21_mune_tate_f_once_</string>
+            </motion>
+            <loop>true</loop>
+            <voice>
+                <string>ぽよんぽよん</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <motion>
+                <string>edit_pose21_mune_yoko_f_once_</string>
+            </motion>
+            <loop>true</loop>
+            <voice>
+                <string>ぷるんぷるん</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <motion>
+                <string>kaiwa_sofa_1_f</string>
+            </motion>
+            <loop>true</loop>
+            <voice>
+                <string>ソファ座り</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <motion>
+                <string>pose_02_f</string>
+            </motion>
+            <loop>true</loop>
+            <voice>
+                <string>膝立ち</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <motion>
+                <string>pillow_talk_f</string>
+            </motion>
+            <loop>true</loop>
+            <voice>
+                <string>ピロートーク</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <motion>
+                <string>pillow_talk_dakituki_kiss_f</string>
+            </motion>
+            <loop>true</loop>
+            <voice>
+                <string>ピロートークキス</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <motion>
+                <string>hanyou_kizetu_f</string>
+            </motion>
+            <loop>true</loop>
+            <voice>
+                <string>気絶</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <motion>
+                <string>inu_pose_f</string>
+            </motion>
+            <loop>true</loop>
+            <voice>
+                <string>犬ポーズ</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <motion>
+                <string>momi_momi_f</string>
+            </motion>
+            <loop>true</loop>
+            <voice>
+                <string>もみもみ</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <motion>
+                <string>turn01</string>
+            </motion>
+            <loop>true</loop>
+            <voice>
+                <string>くるっと回る</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <face>恥ずかしい</face>
+            <blend>頬０涙０</blend>
+            <motion>
+                <string>sys_munehide</string>
+            </motion>
+            <loop>true</loop>
+            <voice>
+                <string>体を隠す</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <motion>
+                <string>kaiwa_tati_ozigi_n_f_once_</string>
+            </motion>
+            <loop>true</loop>
+            <voice>
+                <string>お辞儀する</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <motion>
+                <string>kaiwa_tati_teofuru_taiki_f</string>
+            </motion>
+            <loop>true</loop>
+            <voice>
+                <string>バイバイ</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <motion>
+                <string>kaiwa_tati_ozigi_n_f_ONCE_</string><string>kaiwa_tati_taiki_f</string>
+            </motion>
+            <loop>true</loop>
+            <voice>
+                <string>お辞儀</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <motion>
+                <string>kaiwa_tati_keirei_f_ONCE_</string><string>kaiwa_tati_keirei_taiki_f</string>
+            </motion>
+            <loop>true</loop>
+            <voice>
+                <string>敬礼</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <motion>
+                <string>kaiwa_tati_ayamaru_f_ONCE_</string><string>kaiwa_tati_ayamaru_taiki_f</string>
+            </motion>
+            <loop>true</loop>
+            <voice>
+                <string>ごめんね</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <motion>
+                <string>kaiwa_tati_orz_f_once_</string><string>kaiwa_tati_orz_taiki_f</string>
+                <string>kaiwa_tati_orz_tatiagaru_f_ONCE_</string><string>maid_stand01</string>
+            </motion>
+            <loop>true</loop>
+            <voice>
+                <string>がっくり</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <motion>
+                <string>kaiwa_sofa_teawase_f_ONCE_</string><string>kaiwa_sofa_teawase_taiki_f</string>
+                <string>kaiwa_sofa_teawase_end_f_ONCE_</string><string>kaiwa_sofa_1_f</string>
+            </motion>
+            <loop>true</loop>
+            <voice>
+                <string>ソファ手合わせ</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <face>恥ずかしい</face>
+            <blend>頬０涙０</blend>
+            <motion>
+                <string>rosyutu_hounyou_f_once_</string><string>rosyutu_hounyou_taiki_f</string>
+            </motion>
+            <loop>true</loop>
+            <voice>
+                <string>露出放尿</string><string>おしっこポーズ</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <face>恥ずかしい</face>
+            <blend>頬０涙０</blend>
+            <motion>
+                <string>inu_hounyou_f_once_</string><string>inu_taiki_f</string>
+            </motion>
+            <loop>true</loop>
+            <voice>
+                <string>犬放尿</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <face>恥ずかしい</face>
+            <blend>頬０涙０</blend>
+            <motion>
+                <string>hentai_pose_hounyou_f_once_</string><string>hentai_pose_03_f</string>
+            </motion>
+            <loop>true</loop>
+            <voice>
+                <string>変態放尿</string>
+            </voice>
+        </VymFaceMotionInfo>
+        <VymFaceMotionInfo>
+            <motion>
+                <string>aruki_1_idou_f_once_</string>
+            </motion>
+            <loop>false</loop>
+            <voice>
+                <string>前に歩く</string>
+            </voice>
+        </VymFaceMotionInfo>
+    </vymFaceMotion>
 </VymConfig>

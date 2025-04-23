@@ -15,27 +15,29 @@ using UnityInjector.Attributes;
 音声認識で夜伽コマンド等を制御 ＋ ギアメニューにショートカットキーボタン配置 ＋ テンキー表示
 
 com3d2.vibeyourmaid.plugin.dll (ver2.1.0.0以降) が必要
-build :
-C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe /t:library /lib:"..\COM3D2\Sybaris" /lib:"..\COM3D2\Sybaris\UnityInjector" /lib:"..\COM3D2\COM3D2x64_Data\Managed" /r:UnityEngine.dll /r:UnityEngine.VR.dll /r:UnityInjector.dll /r:Assembly-CSharp.dll /r:Assembly-CSharp-firstpass.dll /r:com3d2.vibeyourmaid.plugin.dll COM3D2.VoiceShortcutManager.Plugin.cs VoiceConfig.cs VymConfig.cs GearMenu.cs
 */
 
-#if COM3D2_5
+#if UNITY_2022_3
+#elif COM3D2_5
 [assembly: AssemblyTitle("VoiceShortcutManager COM3D2.5")]
 #else
 [assembly: AssemblyTitle("VoiceShortcutManager COM3D2")]
 #endif
-[assembly: AssemblyVersion("2.1.0.0")]
+
+#if !UNITY_2022_3
+[assembly: AssemblyVersion("2.2.0.0")]
+#endif
 
 namespace COM3D2.VoiceShortcutManager.Plugin
 {
     [
         PluginName("COM3D2.VoiceShortcutManager"),
-        PluginVersion("2.1"),
-        DefaultExecutionOrder(-10) //プラグインの実行順を他のプラグインより前にする
+        PluginVersion("2.2"),
+        DefaultExecutionOrder(-1)
     ]
     public class VoiceShortcutManager : PluginBase
     {
-        const string VERSION = "2.1";
+        const string VERSION = "2.2";
 
         private bool bVR = false;
 
@@ -66,16 +68,14 @@ namespace COM3D2.VoiceShortcutManager.Plugin
         private GameObject micButton;
         private GameObject[] gearMenuButton;
 
-        //Updateで送信するボタンに対応したキー
-        MenuInfo sendMenu = null;
-
         //アイコン画像キャッシュ
         private Dictionary<string, byte[]> icons = new Dictionary<string, byte[]>();
 
         //音声認識
         KeywordRecognizer keywordRecognizer;
-
         Dictionary<string, System.Action> keywords = new Dictionary<string, System.Action>();
+
+        string[] currentKeywords = { };
 
         //音声別名 スキル種別毎に配列で格納
         Dictionary<string, List<YotogiVoiceInfo>>
@@ -103,6 +103,22 @@ namespace COM3D2.VoiceShortcutManager.Plugin
         //VibeYourMaidのクラス メソッド確認に利用 nullなら無効判定
         Type vymType = null;
 
+
+
+        //# inory modified
+        // for ShapeKey animation
+        private struct AnimationState
+        {
+            public float current;
+            public float target;
+            public float speed;
+        }
+
+        private Dictionary<string, AnimationState> shapeKeyAnimations = new Dictionary<string, AnimationState>();
+
+        private Coroutine animationCoroutine;
+        //# inory modified
+
         //設定ファイル
         public class Config
         {
@@ -126,11 +142,19 @@ namespace COM3D2.VoiceShortcutManager.Plugin
             public string keyboardLabelON = "テンキー表示 ON";
             public string keyboardLabelOFF = "テンキー表示";
 
+            public float menuKeyDownDeley = 0f;
+            public float menuKeyUpDeley = 0.1f;
+
+            public float keyUpDeley = 0.01f;
+
             //テンキーのサイズと色
             public int keybordOffsetY = 60; //テンキーの表示位置 マウス位置からのオフセット
             public int buttonSize = 32;
             public int fontSize = 16;
             public Color32 color = new Color32(96, 96, 96, 240);
+
+            //キーワードの更新と再設定を行わないシーンID
+            public int[] keywordUpdateSkipSceneId = { 15 };
 
             //夜伽コマンドボタンが無効状態でも音声で実行する
             public bool forceVoiceYotogiCommand = false;
@@ -142,6 +166,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
             public bool keepExplanation = false;
 
             public bool useUndressManager = true; //夜伽シーンでは脱衣UIを利用 対象メイド設定は無視される
+            public bool useMekureController = true; //CRCボディならpororiTopでmekureContorollerを利用してはだけを実行する
             public bool playVoiceMaidPos = true; //ボイス再生時にメイドの位置から再生
 
             //VibeYourMaid連携有効
@@ -162,8 +187,6 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 
             //ショートカットボタンリスト
             public List<MenuInfo> menuList = new List<MenuInfo>();
-
-            public bool playVoicceMaidPos = false; // the maker missing this
         }
 
         //ギアメニューに配置するボタンの情報
@@ -222,8 +245,22 @@ namespace COM3D2.VoiceShortcutManager.Plugin
             //設定ファイル読み込み
             loadConfig();
 
+            this.gui = new GUIInfo();
+
+            int buttonSize = cfg.buttonSize;
+            int buttonMargin = cfg.buttonSize + 4;
+
+            //パネル原点 位置 サイズ
+            //rect = new Rect(-50, 50, 540, 28);
+            gui.rect = new Rect(-50, 50, 2 + buttonMargin * 3 + 4 + buttonSize + 4 + 2, buttonMargin * 5);
+            gui.rect.x = UnityEngine.Screen.width - gui.rect.width + gui.rect.x; //右から
+            gui.rect.x = Math.Min(Math.Max(0, gui.rect.x), UnityEngine.Screen.width - gui.rect.width);
+            gui.rect.y = Math.Min(Math.Max(0, gui.rect.y), UnityEngine.Screen.height - gui.rect.height);
+
+#if !UNITY_2022_3
             //GUI初期化
             initGUI();
+#endif
 
             //音声設定ファイル読み込み
             if (System.IO.File.Exists(voiceConfigFile))
@@ -239,6 +276,9 @@ namespace COM3D2.VoiceShortcutManager.Plugin
                 saveVoiceConfig();
             }
 
+            //キャッシュ生成
+            createYotogiVoiceCache();
+
             //VibeYourMaid設定ファイル読み込み
             if (System.IO.File.Exists(vymConfigFile))
             {
@@ -250,10 +290,14 @@ namespace COM3D2.VoiceShortcutManager.Plugin
                 saveVymConfig();
             }
 
-            //キャッシュ更新
-            createVoiceCache();
+            //VibeYourMaidクラスチェック
+            checkVymLink();
+        }
 
-            //VibeYourMaidクラスチェック  cfg.vymEnabled=trueならチェック時のエラーを表示
+        void checkVymLink()
+        {
+            if (vymType != null) return; //取得済みなら終了
+            //VibeYourMaidクラスチェック  cfg.vymEnabled=trueならログを表示 設定ファイルで有効に変更できるように vymType は設定しておく
             try
             {
                 vymType = Type.GetType("CM3D2.VibeYourMaid.Plugin.API, com3d2.vibeyourmaid.plugin");
@@ -269,7 +313,8 @@ namespace COM3D2.VoiceShortcutManager.Plugin
                 }
                 else
                 {
-                    Debug.Log("[" + GetType().Name + "] VibeYourMaid (" + vymGetVersion() + ") found");
+                    if (cfg.vymEnabled)
+                        Debug.Log("[" + GetType().Name + "] VibeYourMaid (" + vymGetVersion() + ") found");
                 }
             }
             catch (Exception e)
@@ -287,13 +332,15 @@ namespace COM3D2.VoiceShortcutManager.Plugin
             //ラベルを閉じて初期化
             if (GearMenu.Buttons.keepExplanation)
             {
-                GearMenu.Buttons.VisibleExplanation(null, false);
                 if (micButton) GearMenu.Buttons.SetText(micButton, micON ? cfg.micLabelON : cfg.micLabelOFF);
             }
 
             //夜伽シーンなら終了チェック用コルーチン開始
             if (YotogiManager.instans || YotogiOldManager.instans)
             {
+                //経営切替でコマンドボタンの数が変わったかのチェック用
+                this.yotogiCommandCount = 0;
+                this.yotogiCommandButton = null;
                 //コルーチン開始
                 if (this.yotogiCheckCoroutine == null) this.yotogiCheckCoroutine = StartCoroutine(yotogiCheck());
 
@@ -311,6 +358,8 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 
                 //GearMenuのポップアップ設定 夜伽以外
                 GearMenu.Buttons.keepExplanation = cfg.keepExplanation;
+                //ポップアップは一旦非表示にして高さを戻す
+                GearMenu.Buttons.VisibleExplanation(null, false);
             }
 
             //キーボード表示ボタン
@@ -325,21 +374,24 @@ namespace COM3D2.VoiceShortcutManager.Plugin
             //マイクボタン追加
             if (cfg.micEnabled && !this.micButton)
             {
-                //初回追加時に有効にする
+                //初回追加時に有効にする → タイトル画面のOnLoadで有効になる
                 this.micON = cfg.micActivateOnStart;
 
                 this.micButton = GearMenu.Buttons.Add("Mic", "", null, (go) => toggleMic());
                 //無効状態にボタンを変更
-                if (this.micON) enableMic();
-                else disableMic();
+                disableMic();
             }
             else
             {
                 //音声認識が有効だったらキーワードを再設定
                 if (this.micON)
                 {
-                    disableMic();
-                    enableMic();
+                    //キーワード更新が無効なシーンではスキップ 起動画面:13とフェード中:15
+                    if (!cfg.keywordUpdateSkipSceneId.Contains(level))
+                    {
+                        disableMic();
+                        enableMic();
+                    }
                 }
             }
 
@@ -351,25 +403,44 @@ namespace COM3D2.VoiceShortcutManager.Plugin
             }
         }
 
-        //fpsに関係なく一定時間間隔で実行される
-        /*public void FixedUpdate()
-        {
-            //他のプラグインが認識できるようにこのタイミングで実行
-            if (this.sendMenu != null) {
-                sendMenuKey(this.sendMenu);
-            }
-        }*/
+        //ボタンに対応したキー 遅延送信する
+        MenuInfo sendMenuDown = null;
 
-        //毎フレーム呼ばれる 更新処理
+        bool sendMenuKey = false;
+
+        //次のUpdateでキー送信を行う
+        private void setSendMenu(MenuInfo menu)
+        {
+            if (this.sendMenuDown == null)
+            {
+                //前のKeyUpが終わるまでは登録しない
+                this.sendMenuDown = menu;
+                this.sendMenuKey = true;
+            }
+        }
+
+        //毎フレーム呼ばれる
         void Update()
         {
-            //他のプラグインが認識できるようにこのタイミングで実行
-            if (this.sendMenu != null)
+            if (this.sendMenuKey)
             {
-                sendMenuKey(this.sendMenu);
+                this.sendMenuKey = false;
+                if (this.sendMenuDown.shift || this.sendMenuDown.ctrl || this.sendMenuDown.alt)
+                {
+                    scanDown(this.sendMenuDown.shift, this.sendMenuDown.ctrl, this.sendMenuDown.alt);
+                    keyDownUp((ushort)this.sendMenuDown.key, false);
+                    //同時押しのキーは遅延実行しないと反応しない
+                    StartCoroutine(delayScanUp(cfg.keyUpDeley, this.sendMenuDown.shift, this.sendMenuDown.ctrl,
+                        this.sendMenuDown.alt));
+                }
+                else
+                {
+                    sendKey((ushort)this.sendMenuDown.key);
+                    this.sendMenuDown = null;
+                }
             }
 
-            //パネル上のクリックは下に伝播させない ModsSlider用にEnterのみ無効化してから遅延実行する制御をおこなっている
+            //パネル上のクリックは下に伝播させない ModsSlider用にEnterのみ無効化してから遅延実行する場合に利用
             if (this.keyboardVisible && this.guiStopPropagation)
             {
                 Vector2 pos = new Vector2(Input.mousePosition.x,
@@ -378,11 +449,176 @@ namespace COM3D2.VoiceShortcutManager.Plugin
             }
         }
 
+        private IEnumerator delayScanUp(float delay, bool shift, bool ctrl, bool alt)
+        {
+            yield return new WaitForSeconds(delay);
+            //yield return new WaitForFixedUpdate();
+            scanUp(shift, ctrl, alt);
+            this.sendMenuDown = null;
+        }
+
         //GUI表示処理
         void OnGUI()
         {
-            if (keyboardVisible) this.gui.rect = GUI.Window(2024020301, gui.rect, drawGUI, "", gui.gsWin);
+            if (keyboardVisible)
+            {
+#if UNITY_2022_3
+				//GUI Style初期化
+				initGUI();
+#endif
+                this.gui.rect = GUI.Window(2024020301, gui.rect, drawGUI, "", gui.gsWin);
+            }
         }
+
+        ////////////////////////////////////////////////////////////////
+        // テンキーウィンドウ
+
+        #region GUI
+
+        //GUIのスタイル情報
+        class GUIInfo
+        {
+            public Rect rect;
+
+            public GUIStyle gsWin;
+            public GUIStyle gsLabel;
+            public GUIStyle gsButton;
+
+            public Texture2D bgTexture; //背景色
+            public Texture2D lineTexture;
+        }
+
+        //GUI初期化
+        private void initGUI()
+        {
+            //テクスチャ
+            gui.bgTexture = new Texture2D(1, 1);
+            gui.bgTexture.SetPixel(0, 0, cfg.color);
+            gui.bgTexture.Apply();
+            gui.lineTexture = new Texture2D(1, 1);
+            gui.lineTexture.SetPixel(0, 0, new Color32(255, 255, 255, 160));
+            gui.lineTexture.Apply();
+
+            //メインウィンドウ
+            gui.gsWin = new GUIStyle("box");
+            gui.gsWin.fontSize = cfg.fontSize;
+            gui.gsWin.alignment = TextAnchor.UpperLeft;
+
+            //背景色設定
+            gui.gsWin.onHover.background = gui.bgTexture;
+            gui.gsWin.hover.background = gui.bgTexture;
+            gui.gsWin.onFocused.background = gui.bgTexture;
+            gui.gsWin.focused.background = gui.bgTexture;
+            gui.gsWin.onHover.textColor = Color.white;
+            gui.gsWin.hover.textColor = Color.white;
+            gui.gsWin.onFocused.textColor = Color.white;
+            gui.gsWin.focused.textColor = Color.white;
+
+            gui.gsLabel = new GUIStyle("label");
+            gui.gsLabel.fontSize = cfg.fontSize;
+            gui.gsLabel.alignment = TextAnchor.MiddleLeft;
+
+            gui.gsButton = new GUIStyle("button");
+            gui.gsButton.fontSize = cfg.fontSize;
+            gui.gsButton.alignment = TextAnchor.MiddleCenter;
+        }
+
+        //UI生成
+        void drawGUI(int id)
+        {
+            int buttonSize = cfg.buttonSize;
+            int buttonMargin = cfg.buttonSize + 4;
+
+            //上にライン
+            GUI.DrawTexture(new Rect(2, 2, 8, buttonSize), gui.lineTexture, ScaleMode.StretchToFill, true, 0);
+
+            if (GUI.Button(new Rect(gui.rect.width - 21, 1, 20, 20), "×", gui.gsButton))
+            {
+                toggleKeyboard();
+                return;
+            }
+
+            int left = 2; //左余白
+            int top = 2; //上余白
+            int x = left;
+            int y = top;
+            //数字キー 0-9
+            x = left + buttonMargin; //0の位置
+            y = top + buttonMargin * 4;
+            for (int i = 0; i < 10; i++)
+            {
+                if (GUI.Button(new Rect(x, y, buttonSize, buttonSize), "" + i, gui.gsButton))
+                {
+                    sendKey((ushort)(0x30 + i));
+                }
+
+                if (i == 0 || i == 3 || i == 6)
+                {
+                    x = 2;
+                    y -= buttonMargin;
+                }
+                else x += buttonMargin;
+            }
+
+            //マイナス
+            x = left;
+            y = top + buttonMargin * 4;
+            if (GUI.Button(new Rect(x, y, buttonSize, buttonSize), "-", gui.gsButton))
+            {
+                sendKey((ushort)Keys.Subtract);
+            }
+
+            //.
+            x = left + buttonMargin * 2;
+            y = top + buttonMargin * 4;
+            if (GUI.Button(new Rect(x, y, buttonSize, buttonSize), ".", gui.gsButton))
+            {
+                sendKey((ushort)Keys.Decimal);
+            }
+
+            x = left + buttonMargin;
+            y = top;
+            if (GUI.Button(new Rect(x, y, buttonSize + 2, buttonSize), "←", gui.gsButton))
+            {
+                sendKey((ushort)Keys.Left);
+            }
+
+            x += buttonMargin;
+            if (GUI.Button(new Rect(x, y, buttonSize + 2, buttonSize), "→", gui.gsButton))
+            {
+                sendKey((ushort)Keys.Right);
+            }
+
+            x = left + buttonMargin * 3 + 4;
+            y = top + buttonMargin;
+            //BS
+            if (GUI.Button(new Rect(x, y, buttonSize + 6, buttonSize), "bs", gui.gsButton))
+            {
+                sendKey((ushort)Keys.Back);
+            }
+
+            y += buttonMargin;
+            //DEL
+            if (GUI.Button(new Rect(x, y, buttonSize + 6, buttonSize), "del", gui.gsButton))
+            {
+                guiStopPropagation = false;
+                Invoke("sendDelete", 0.1f);
+                //sendKey((ushort)Keys.Delete);
+            }
+
+            y += buttonMargin;
+            //Enter
+            if (GUI.Button(new Rect(x, y, buttonSize + 6, buttonSize * 2 + 4), "⏎", gui.gsButton))
+            {
+                //遅延呼び出し
+                guiStopPropagation = false;
+                Invoke("sendEnter", 0.1f);
+            }
+
+            GUI.DragWindow();
+        }
+
+        #endregion
 
         ////////////////////////////////////////////////////////////////
         //設定ファイル読み込みと設定からの各種初期化
@@ -558,22 +794,9 @@ namespace COM3D2.VoiceShortcutManager.Plugin
                     byte[] icon = null;
                     if (this.icons.ContainsKey(menu.name)) icon = this.icons[menu.name];
                     this.gearMenuButton[idx] =
-                        GearMenu.Buttons.Add(menu.name, menu.label, icon, (go) => sendMenuKey(menu));
+                        GearMenu.Buttons.Add(menu.name, menu.label, icon, (go) => setSendMenu(menu));
                 }
             }
-        }
-
-        //次フレームのUpdateでキー送信場合はここでセット
-        private void setSendMenu(MenuInfo menu)
-        {
-            this.sendMenu = menu;
-        }
-
-        //MenuInfoのキー情報を送信
-        private void sendMenuKey(MenuInfo menu)
-        {
-            sendKey(menu.key, menu.shift, menu.ctrl, menu.alt);
-            this.sendMenu = null;
         }
 
         ////////////////////////////////////////////////////////////////
@@ -622,7 +845,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
         }
 
         //夜伽用の音声設定からDictionary作成
-        private void createVoiceCache()
+        private void createYotogiVoiceCache()
         {
             //キャッシュクリア
             yotogiVoiceKeywoards.Clear();
@@ -652,6 +875,67 @@ namespace COM3D2.VoiceShortcutManager.Plugin
                 }
             }
         }
+
+        //# inory modified
+        // setup shapeKey
+        private void setShapeKeyKeywords()
+        {
+            foreach (ShapeKeyInfo shapeKeyInfo in voiceCfg.shapeKeyList)
+            {
+                string[] voices = shapeKeyInfo.voice;
+                foreach (string voice in voices)
+                {
+                    if (keywords.ContainsKey(voice)) continue;
+                    string k = voice; //スコープ対策
+                    keywords.Add(voice, () =>
+                    {
+                        Debug.Log("Voice setShapeKey : " + k + " -> " + shapeKeyInfo.shapeKey + " : " +
+                                  shapeKeyInfo.value);
+                        setShapeKey(shapeKeyInfo.shapeKey, shapeKeyInfo.value);
+                    });
+                }
+            }
+        }
+
+        private void setShapeKeyAnimationKeywords()
+        {
+        		foreach (ShapeKeyAnimationInfo shapeKeyAnimationInfo in voiceCfg.shapeKeyAnimationList)
+        		{
+                    // add shapeKey animation keywords
+                    if (shapeKeyAnimationInfo.animationSpeed > 0)
+                    {
+                        // animation start keywords
+                        foreach (string animStart in shapeKeyAnimationInfo.animationStartVoice)
+                        {
+                            if (keywords.ContainsKey(animStart)) continue;
+                            string k = animStart;
+                            keywords.Add(animStart, () =>
+                            {
+                                Debug.Log($"Voice start animation: {k} -> {shapeKeyAnimationInfo.shapeKey}");
+                                StartShapeKeyAnimation(shapeKeyAnimationInfo.shapeKey,
+                                    shapeKeyAnimationInfo.animationStartValue,
+                                    shapeKeyAnimationInfo.animationEndValue,
+                                    shapeKeyAnimationInfo.animationSpeed);
+                            });
+                        }
+
+                        // animation stop keywords
+                        foreach (string animStop in shapeKeyAnimationInfo.animationStopVoice)
+                        {
+                            if (keywords.ContainsKey(animStop)) continue;
+                            string k = animStop;
+                            keywords.Add(animStop, () =>
+                            {
+                                Debug.Log($"Voice stop animation: {k} -> {shapeKeyAnimationInfo.shapeKey}");
+                                StopShapeKeyAnimation(shapeKeyAnimationInfo.shapeKey);
+                            });
+                        }
+                    }
+        		}
+        }
+
+
+        //# inory modified
 
         //音声設定ファイル読み込み
         private void loadVymConfig()
@@ -693,7 +977,6 @@ namespace COM3D2.VoiceShortcutManager.Plugin
             Debug.Log("[VoiceShortcutManager] " + vymConfigFile + " Created");
         }
 
-
         //音声認識有効化
         private void enableMic()
         {
@@ -707,6 +990,10 @@ namespace COM3D2.VoiceShortcutManager.Plugin
                 if (voiceConfigFileTime < System.IO.File.GetLastWriteTime(voiceConfigFile))
                 {
                     loadVoiceConfig();
+                    //VibeYourMaidクラスチェック
+                    checkVymLink();
+                    //夜伽スキルのキャッシュ更新
+                    createYotogiVoiceCache();
                 }
             }
             else
@@ -715,10 +1002,9 @@ namespace COM3D2.VoiceShortcutManager.Plugin
                 voiceCfg = new VoiceConfig();
                 voiceCfg.initDefault();
                 saveVoiceConfig();
+                //夜伽スキルのキャッシュ更新
+                createYotogiVoiceCache();
             }
-
-            //キャッシュ更新
-            createVoiceCache();
 
             //VYM設定ファイル
             if (System.IO.File.Exists(vymConfigFile))
@@ -756,14 +1042,15 @@ namespace COM3D2.VoiceShortcutManager.Plugin
                 if (this.icons.ContainsKey("MicON")) GearMenu.Buttons.SetTexture(micButton, this.icons["MicON"]);
 
                 //キーワードを認識対象にセット
-                keywordRecognizer = new KeywordRecognizer(keywords.Keys.ToArray());
+                currentKeywords = keywords.Keys.ToArray(); //キーワード配列
+                keywordRecognizer = new KeywordRecognizer(currentKeywords);
                 //コールバック設定
                 keywordRecognizer.OnPhraseRecognized += KeywordRecognizer_OnPhraseRecognized;
 
                 //開始
                 keywordRecognizer.Start();
 
-                Debug.Log("音声認識開始 : " + keywords.Count() + " keywords");
+                Debug.Log("音声認識開始 (scene:" + this.sceneLevel + ") " + keywords.Count() + " keywords");
             }
         }
 
@@ -786,35 +1073,48 @@ namespace COM3D2.VoiceShortcutManager.Plugin
         //夜伽コマンドの変更を1秒おきにチェック
         private IEnumerator yotogiCheck()
         {
+            //YotogiOldManager.PlayingSkillData playing_skill_;
+            FieldInfo playingSkillInfo = typeof(YotogiOldPlayManager).GetField("playing_skill_",
+                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.GetField);
             while (true)
             {
-                yield return new WaitForSeconds(1f); //1秒待機
+                yield return new WaitForSeconds(2f); //2秒待機
                 if (this.micON)
                 {
                     //夜伽が切り替わってボタンが破棄されていたら音声認識再設定
-                    if (YotogiManager.instans && YotogiManager.instans.play_mgr &&
-                        YotogiManager.instans.play_mgr.playingSkill != null)
+                    if (YotogiManager.instans && YotogiManager.instans.playing_skill != null)
                     {
                         if (!this.yotogiCommandButton)
                         {
                             disableMic();
                             enableMic();
+                        }
+
+                        //夜伽はボタンが非表示になったらポップアップも非表示
+                        if (!YotogiManager.instans.uiVisible)
+                        {
+                            GearMenu.Buttons.SetText(micButton, micON ? cfg.micLabelON : cfg.micLabelOFF);
                         }
                     }
                     //経営切替の夜伽  ※無効なコマンドは非表示になっている
-                    else if (YotogiOldManager.instans && YotogiOldManager.instans.play_mgr)
+                    else if (YotogiOldManager.instans && YotogiOldManager.instans.play_mgr &&
+                             playingSkillInfo.GetValue(YotogiOldManager.instans.play_mgr) != null)
                     {
                         if (!this.yotogiCommandButton)
                         {
                             disableMic();
                             enableMic();
                         }
-                        //ボタンリストがあれば数を比較
-                        else if (this.yotogiCommandUnit &&
-                                 this.yotogiCommandCount != this.yotogiCommandUnit.transform.childCount)
+                        else
                         {
-                            disableMic();
-                            enableMic();
+                            //ボタンリストがあれば数を比較
+                            if (this.yotogiCommandUnit &&
+                                this.yotogiCommandCount != this.yotogiCommandUnit.transform.childCount)
+                            {
+                                this.yotogiCommandCount = this.yotogiCommandUnit.transform.childCount;
+                                disableMic();
+                                enableMic();
+                            }
                         }
                     }
                 }
@@ -834,7 +1134,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
         //音声認識キーワードを設定
         private void setVoiceKeywords()
         {
-            //キーワードは空に
+            //音声認識対象のキーワードをクリア
             keywords.Clear();
 
             //ショートカットキー呼び出し
@@ -859,8 +1159,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
                             if (isSceneValid(menu, sceneName, sceneLevel))
                             {
                                 Debug.Log("Voice sendKey : " + k + " → " + menu.name);
-                                //sendMenuKey(menu);
-                                setSendMenu(menu);
+                                setSendMenu(menu); //次フレームのUpdateで実行
                             }
                             else
                             {
@@ -885,6 +1184,14 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 
             //VYM連携
             setVymKeywoards();
+
+            //# inory modified
+            // shapeKey
+            setShapeKeyKeywords();
+
+            // shapeKey animation
+            setShapeKeyAnimationKeywords();
+            //# inory modified
 
             //DEBUG
             if (!keywords.ContainsKey("テスト"))
@@ -1112,6 +1419,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
                 });
             }
 
+            //音声再生
             foreach (string keyword in voiceCfg.playVoice)
             {
                 if (keywords.ContainsKey(keyword)) continue;
@@ -1131,6 +1439,18 @@ namespace COM3D2.VoiceShortcutManager.Plugin
                 {
                     Debug.Log("Voice playVoiceBefore : " + k);
                     playVoice(1);
+                });
+            }
+
+            //夜伽パラメータ
+            foreach (string keyword in voiceCfg.yotogiParamMind)
+            {
+                if (keywords.ContainsKey(keyword)) continue;
+                string k = keyword; //スコープ対策
+                keywords.Add(keyword, () =>
+                {
+                    Debug.Log("Voice yotogiParamMind : " + k);
+                    yotogiParamMind(100);
                 });
             }
 
@@ -1191,12 +1511,29 @@ namespace COM3D2.VoiceShortcutManager.Plugin
                     }
                     else
                     {
-                        if (cfg.playVoicceMaidPos)
+                        if (cfg.playVoiceMaidPos)
                         {
                             //名前からメイドを特定できたら再生
                             for (int j = 0; j < GameMain.Instance.CharacterMgr.GetStockMaidCount(); j++)
                             {
                                 Maid maid = GameMain.Instance.CharacterMgr.GetStockMaid(j);
+                                if (maid.Visible && (maid.status.firstName == unit.m_speakerName ||
+                                                     maid.status.lastName == unit.m_speakerName))
+                                {
+                                    Debug.Log("playVoice : " + unit.m_speakerName + " : " + unit.m_voiceId);
+                                    maid.AudioMan.LoadPlay(unit.m_voiceId, 0f, false, false);
+                                    return;
+                                }
+                            }
+
+                            //NPCメイドもチェック
+                            FieldInfo npcMaidListField = typeof(CharacterMgr).GetField("m_listStockNpcMaid",
+                                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.GetField);
+                            List<Maid> npcMaidList =
+                                (List<Maid>)npcMaidListField.GetValue(GameMain.Instance.CharacterMgr);
+                            for (int j = 0; j < npcMaidList.Count; j++)
+                            {
+                                Maid maid = GameMain.Instance.CharacterMgr.GetStockNpcMaid(j);
                                 if (maid.Visible && (maid.status.firstName == unit.m_speakerName ||
                                                      maid.status.lastName == unit.m_speakerName))
                                 {
@@ -1216,6 +1553,41 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 
                 //再生されなかったら通常の再生処理実行
                 GameMain.Instance.MsgWnd.CallEvent(MessageWindowMgr.MessageWindowUnderButton.Voice);
+            }
+        }
+
+        //夜伽の精神・時間を回復 コマンドも再表示
+        public void yotogiParamMind(int value)
+        {
+            if (YotogiManager.instans && YotogiManager.instans.maid)
+            {
+                YotogiParamBasicBar yotogiParamBasicBar =
+                    UnityEngine.Object.FindObjectOfType(typeof(YotogiParamBasicBar)) as YotogiParamBasicBar;
+                if (yotogiParamBasicBar)
+                {
+                    Maid maid = YotogiManager.instans.maid;
+                    maid.status.currentMind = Math.Min(maid.status.maxMind, maid.status.currentMind + value);
+                    yotogiParamBasicBar.SetMaxMind(maid.status.maxMind);
+                    yotogiParamBasicBar.SetCurrentMind(maid.status.currentMind, false);
+                    YotogiManager.instans.play_mgr.UpdateCommand();
+                }
+            }
+            //経営切り替え時
+            else if (YotogiOldManager.instans && YotogiOldManager.instans.maid)
+            {
+                YotogiOldParamBasicBar yotogiOldParamBasicBar =
+                    UnityEngine.Object.FindObjectOfType(typeof(YotogiOldParamBasicBar)) as YotogiOldParamBasicBar;
+                if (yotogiOldParamBasicBar)
+                {
+                    Maid maid = YotogiOldManager.instans.maid;
+                    maid.status.currentMind = Math.Min(maid.status.maxMind, maid.status.currentMind + value);
+                    yotogiOldParamBasicBar.SetMaxMind(maid.status.maxMind);
+                    yotogiOldParamBasicBar.SetCurrentMind(maid.status.currentMind, false);
+                    MethodInfo updateCommandMethod = typeof(YotogiOldPlayManager).GetMethod("UpdateCommand",
+                        BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance);
+                    if (updateCommandMethod != null)
+                        updateCommandMethod.Invoke(YotogiOldManager.instans.play_mgr, new object[1] { maid });
+                }
             }
         }
 
@@ -1295,8 +1667,11 @@ namespace COM3D2.VoiceShortcutManager.Plugin
         //キーワード登録
         private void setVymKeywoards()
         {
-            //リンク設定が無効かdllがなければキーワードは登録しない
-            if (!cfg.vymEnabled || vymType == null) return;
+            //リンク設定が無効かdllがなければキーワード設定しない
+            if (!cfg.vymEnabled || vymType == null)
+            {
+                return;
+            }
 
             //正面のメイドをメインメイドにする
             setVymKeywordInvoke(vymCfg.vymSelectFrontMaid, "vymSelectFrontMaid", null);
@@ -1397,6 +1772,14 @@ namespace COM3D2.VoiceShortcutManager.Plugin
                 float value = float.Parse(info.value);
                 bool offset = info.value.StartsWith("+") || info.value.StartsWith("-");
                 setVymKeywordInvoke(info.voice, "vymBoneHitHeight", info.value, new object[] { value, offset });
+            }
+
+            //コライダー
+            foreach (VymVoiceInfo info in vymCfg.vymCollider)
+            {
+                string[] slots = info.value.Split(',');
+                bool enabled = bool.Parse(info.value2);
+                setVymKeywordInvoke(info.voice, "vymCollider", info.value, new object[] { slots, enabled });
             }
 
             //興奮値
@@ -1706,6 +2089,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
             }
         }
 
+#if DEBUG
         //Invokeで呼んでいるので未使用 API変更チェック用に残している
         private void vymSelectFrontMaid()
         {
@@ -1780,6 +2164,11 @@ namespace COM3D2.VoiceShortcutManager.Plugin
         private void vymBoneHitHeight(float height, bool offset)
         {
             CM3D2.VibeYourMaid.Plugin.API.vymBoneHitHeight(height, offset);
+        }
+
+        private void vymCollider(string[] slots, bool enabled)
+        {
+            CM3D2.VibeYourMaid.Plugin.API.vymCollider(slots, enabled);
         }
 
         private void vymExcite(int excite, bool offset)
@@ -1876,8 +2265,22 @@ namespace COM3D2.VoiceShortcutManager.Plugin
         {
             CM3D2.VibeYourMaid.Plugin.API.vymKissVoiceSet(voiceFile);
         }
+#endif
 
         #endregion
+
+        ////////////////////////////////////////////////////////////////
+        // メイド取得 NPC含む
+        private List<Maid> getMaidList()
+        {
+            List<Maid> list = GameMain.Instance.CharacterMgr.GetStockMaidList();
+            //NPCも追加
+            FieldInfo npcMaidListField = typeof(CharacterMgr).GetField("m_listStockNpcMaid",
+                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.GetField);
+            List<Maid> npcMaidList = (List<Maid>)npcMaidListField.GetValue(GameMain.Instance.CharacterMgr);
+            list.AddRange(npcMaidList);
+            return list;
+        }
 
         ////////////////////////////////////////////////////////////////
         // 目線 顔向き
@@ -1887,12 +2290,12 @@ namespace COM3D2.VoiceShortcutManager.Plugin
         //対象になるメイドを取得 顔向き用
         private List<Maid> getFaceMaidList()
         {
-            if (vymType != null)
+            if (cfg.vymEnabled && vymType != null)
             {
                 return vymGetMaidList(cfg.vymEyeFaceLinkType);
             }
 
-            return GameMain.Instance.CharacterMgr.GetStockMaidList();
+            return getMaidList();
         }
 
         private void setFaceKeywoards()
@@ -2041,12 +2444,12 @@ namespace COM3D2.VoiceShortcutManager.Plugin
         //対象になるメイドを取得 脱衣用
         private List<Maid> getUndressMaidList()
         {
-            if (vymType != null)
+            if (cfg.vymEnabled && vymType != null)
             {
                 return vymGetMaidList(cfg.vymUndressLinkType);
             }
 
-            return GameMain.Instance.CharacterMgr.GetStockMaidList();
+            return getMaidList();
         }
 
         //音声キーワード設定
@@ -2087,6 +2490,17 @@ namespace COM3D2.VoiceShortcutManager.Plugin
                 {
                     Debug.Log("Voice undressWear : " + k);
                     undressWear();
+                });
+            }
+
+            foreach (string keyword in voiceCfg.dressTop)
+            {
+                if (keywords.ContainsKey(keyword)) continue;
+                string k = keyword; //スコープ対策
+                keywords.Add(keyword, () =>
+                {
+                    Debug.Log("Voice dressTop : " + k);
+                    dressTop();
                 });
             }
 
@@ -2208,6 +2622,28 @@ namespace COM3D2.VoiceShortcutManager.Plugin
                 {
                     Debug.Log("Voice undressPants : " + k);
                     undressPants();
+                });
+            }
+
+            foreach (string keyword in voiceCfg.dressStkg)
+            {
+                if (keywords.ContainsKey(keyword)) continue;
+                string k = keyword; //スコープ対策
+                keywords.Add(keyword, () =>
+                {
+                    Debug.Log("Voice dressStkg : " + k);
+                    dressStkg();
+                });
+            }
+
+            foreach (string keyword in voiceCfg.undressStkg)
+            {
+                if (keywords.ContainsKey(keyword)) continue;
+                string k = keyword; //スコープ対策
+                keywords.Add(keyword, () =>
+                {
+                    Debug.Log("Voice undressStkg : " + k);
+                    undressStkg();
                 });
             }
 
@@ -2378,7 +2814,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
                 });
             }
 
-            //#109 modified
+            //# inory modified
             foreach (string keyword in voiceCfg.dressAccXXX)
             {
                 if (keywords.ContainsKey(keyword)) continue;
@@ -2558,8 +2994,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
                     undressAccAshi();
                 });
             }
-            //#109 modified
-
+            //# inory modified
 
             //男脱衣
 #if COM3D2_5
@@ -2760,7 +3195,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
         }
 
         //服だけ脱がす
-        //#109 modified
+        //# inory modified
         public void undressWear()
         {
             UndressingManager undressManager = getUndressingManager();
@@ -2787,10 +3222,9 @@ namespace COM3D2.VoiceShortcutManager.Plugin
                 }
             }
         }
-        //#109 modified
+        //# inory modified
 
-
-        //#109 modified
+        //# inory modified
         public void dressAccXXX()
         {
             foreach (Maid maid in getUndressMaidList())
@@ -2966,8 +3400,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
                 }
             }
         }
-        //#109 modified
-
+        //# inory modified
 
         //服の上だけ着せる
         public void dressTop()
@@ -3215,6 +3648,46 @@ namespace COM3D2.VoiceShortcutManager.Plugin
             }
         }
 
+        //靴下履いて
+        public void dressStkg()
+        {
+            UndressingManager undressManager = getUndressingManager();
+            if (undressManager != null)
+            {
+                undressManager.SetMaskMode(UndressingManager.UnitType.ソックス, UndressingManager.MaskStatus.Off); //Offが表示
+            }
+            else
+            {
+                foreach (Maid maid in getUndressMaidList())
+                {
+                    if (maid.Visible)
+                    {
+                        maid.body0.SetMask(TBody.SlotID.stkg, true);
+                    }
+                }
+            }
+        }
+
+        //靴下脱いで
+        public void undressStkg()
+        {
+            UndressingManager undressManager = getUndressingManager();
+            if (undressManager != null)
+            {
+                undressManager.SetMaskMode(UndressingManager.UnitType.ソックス, UndressingManager.MaskStatus.On); //Onが非表示
+            }
+            else
+            {
+                foreach (Maid maid in getUndressMaidList())
+                {
+                    if (maid.Visible)
+                    {
+                        maid.body0.SetMask(TBody.SlotID.stkg, false);
+                    }
+                }
+            }
+        }
+
         //靴履いて
         public void dressShoes()
         {
@@ -3307,12 +3780,26 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 
         public void modoshiPants(Maid maid)
         {
-            if (maid.mekureController.IsSupportedCostumeType(MaidExtension.MaidCostumeChangeController.CostumeType
-                    .Zurasi))
+            MPN mpn;
+            if (maid.body0.GetSlotVisible(TBody.SlotID.panz)) mpn = MPN.panz;
+            else if (maid.body0.GetSlotVisible(TBody.SlotID.mizugi)) mpn = MPN.mizugi;
+            else return; //見えてなければ終了
+
+            MaidProp prop = maid.GetProp(mpn);
+            //仮衣装
+            if (prop.nTempFileNameRID != 0)
             {
-                maid.mekureController.SetEnabledCostumeType(
-                    MaidExtension.MaidCostumeChangeController.CostumeType.Zurasi, false, null);
+                //zurashiを除去した衣装に変更
+                maid.SetProp(mpn, maid.GetProp(mpn).strTempFileName.Replace("_zurashi", ""), 0, true, false);
             }
+            //本衣装
+            else if (prop.nFileNameRID != 0)
+            {
+                //本衣装に戻す
+                maid.ResetProp(mpn, false);
+            }
+
+            maid.AllProcPropSeqStart();
         }
 
         //パンツずらす
@@ -3326,12 +3813,49 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 
         public void zurashiPants(Maid maid)
         {
-            if (maid.mekureController.IsSupportedCostumeType(MaidExtension.MaidCostumeChangeController.CostumeType
-                    .Zurasi))
+            MPN mpn;
+            if (maid.body0.GetSlotVisible(TBody.SlotID.panz)) mpn = MPN.panz;
+            else if (maid.body0.GetSlotVisible(TBody.SlotID.mizugi)) mpn = MPN.mizugi;
+            else return; //見えてなければ終了
+
+            SortedDictionary<string, string> sortedDictionary;
+            //ずらしファイル名
+            string filename = "";
+            MaidProp prop = maid.GetProp(mpn);
+            //仮衣装状態
+            if (prop.nTempFileNameRID != 0)
             {
-                maid.mekureController.SetEnabledCostumeType(
-                    MaidExtension.MaidCostumeChangeController.CostumeType.Zurasi, true, null);
+                //衣装なし
+                if (prop.strTempFileName.Contains("del.menu")) return;
+                //すでにずれている
+                if (prop.strTempFileName.Contains("_zurashi")) return;
+                //仮衣装のずらしファイルを取得
+                if (Menu.m_dicResourceRef.TryGetValue(prop.nTempFileNameRID, out sortedDictionary) &&
+                    sortedDictionary.TryGetValue("パンツずらし", out filename))
+                {
+                    //仮衣装がすでにずれている
+                    if (filename.Equals(prop.strTempFileName)) return;
+                    //ずらし衣装に設定
+                    maid.SetProp(mpn, filename, 0, true, false);
+                }
             }
+            //本衣装 仮衣装状態でない
+            else if (prop.nFileNameRID != 0)
+            {
+                //すでにずれている
+                if (prop.strTempFileName.Contains("_zurashi")) return;
+                //本衣装のずらしファイルを取得
+                if (Menu.m_dicResourceRef.TryGetValue(prop.nFileNameRID, out sortedDictionary) &&
+                    sortedDictionary.TryGetValue("パンツずらし", out filename))
+                {
+                    //すでにずれている
+                    if (filename.Equals(prop.strTempFileName)) return;
+                    //ずらし衣装に設定
+                    maid.SetProp(mpn, filename, 0, true, false);
+                }
+            }
+
+            maid.AllProcPropSeqStart();
         }
 
         //めくれ戻す
@@ -3345,19 +3869,36 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 
         public void mekureReset(Maid maid)
         {
-            if (maid.mekureController.IsSupportedCostumeType(MaidExtension.MaidCostumeChangeController.CostumeType
-                    .MekureFront))
+            MPN mpn;
+            if (maid.body0.GetSlotVisible(TBody.SlotID.skirt)) mpn = MPN.skirt;
+            else if (maid.body0.GetSlotVisible(TBody.SlotID.onepiece)) mpn = MPN.onepiece;
+            else return; //見えてなければ終了
+
+            MaidProp prop = maid.GetProp(mpn);
+            //仮衣装
+            if (prop.nTempFileNameRID != 0)
             {
-                maid.mekureController.SetEnabledCostumeType(
-                    MaidExtension.MaidCostumeChangeController.CostumeType.MekureFront, false, null);
+                if (prop.strTempFileName.Contains("_mekure_back"))
+                {
+                    maid.SetProp(mpn, maid.GetProp(mpn).strTempFileName.Replace("_mekure_back", ""), 0, true, false);
+                }
+                else if (prop.strTempFileName.Contains("_mekure"))
+                {
+                    maid.SetProp(mpn, maid.GetProp(mpn).strTempFileName.Replace("_mekure", ""), 0, true, false);
+                }
+                else
+                {
+                    return;
+                }
+            }
+            //本衣装
+            else if (prop.nFileNameRID != 0)
+            {
+                //本衣装に戻す
+                maid.ResetProp(mpn, false);
             }
 
-            if (maid.mekureController.IsSupportedCostumeType(MaidExtension.MaidCostumeChangeController.CostumeType
-                    .MekureBack))
-            {
-                maid.mekureController.SetEnabledCostumeType(
-                    MaidExtension.MaidCostumeChangeController.CostumeType.MekureBack, false, null);
-            }
+            maid.AllProcPropSeqStart();
         }
 
         //めくれ
@@ -3365,7 +3906,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
         {
             foreach (Maid maid in getUndressMaidList())
             {
-                if (maid.Visible) mekureFront(maid);
+                if (maid.Visible) mekureChange(maid, true);
             }
         }
 
@@ -3373,42 +3914,64 @@ namespace COM3D2.VoiceShortcutManager.Plugin
         {
             foreach (Maid maid in getUndressMaidList())
             {
-                if (maid.Visible) mekureBack(maid);
+                if (maid.Visible) mekureChange(maid, false);
             }
         }
 
-        public void mekureFront(Maid maid)
+        public void mekureChange(Maid maid, bool front)
         {
-            if (maid.mekureController.IsSupportedCostumeType(MaidExtension.MaidCostumeChangeController.CostumeType
-                    .MekureFront))
-            {
-                bool flag = maid.mekureController.IsEnabledCostumeType(MaidExtension.MaidCostumeChangeController
-                    .CostumeType.MekureFront);
-                if (!flag)
-                {
-                    maid.mekureController.SetEnabledCostumeType(
-                        MaidExtension.MaidCostumeChangeController.CostumeType.MekureFront, true, null);
-                    maid.mekureController.SetEnabledCostumeType(
-                        MaidExtension.MaidCostumeChangeController.CostumeType.MekureBack, false, null);
-                }
-            }
-        }
+            MPN mpn;
+            if (maid.body0.GetSlotVisible(TBody.SlotID.skirt)) mpn = MPN.skirt;
+            else if (maid.body0.GetSlotVisible(TBody.SlotID.onepiece)) mpn = MPN.onepiece;
+            else return; //見えてなければ終了
 
-        public void mekureBack(Maid maid)
-        {
-            if (maid.mekureController.IsSupportedCostumeType(MaidExtension.MaidCostumeChangeController.CostumeType
-                    .MekureBack))
+            SortedDictionary<string, string> sortedDictionary;
+            string filename = "";
+            MaidProp prop = maid.GetProp(mpn);
+            //仮衣装状態
+            if (prop.nTempFileNameRID != 0)
             {
-                bool flag = maid.mekureController.IsEnabledCostumeType(MaidExtension.MaidCostumeChangeController
-                    .CostumeType.MekureBack);
-                if (!flag)
+                //衣装なし
+                if (prop.strTempFileName.Contains("del.menu")) return;
+                //後ろがめくれている
+                if (prop.strTempFileName.Contains("_mekure_back"))
                 {
-                    maid.mekureController.SetEnabledCostumeType(
-                        MaidExtension.MaidCostumeChangeController.CostumeType.MekureBack, true, null);
-                    maid.mekureController.SetEnabledCostumeType(
-                        MaidExtension.MaidCostumeChangeController.CostumeType.MekureFront, false, null);
+                    if (front)
+                    {
+                        maid.SetProp(mpn, prop.strTempFileName.Replace("_mekure_back", "_mekure"), 0, true, false);
+                    }
+                }
+                //前がめくれてる
+                else if (prop.strTempFileName.Contains("_mekure"))
+                {
+                    if (!front)
+                    {
+                        maid.SetProp(mpn, prop.strTempFileName.Replace("_mekure", "_mekure_back"), 0, true, false);
+                    }
+                }
+                else
+                {
+                    //仮衣装変更
+                    if (Menu.m_dicResourceRef.TryGetValue(prop.nTempFileNameRID, out sortedDictionary) &&
+                        sortedDictionary.TryGetValue(front ? "めくれスカート" : "めくれスカート後ろ", out filename))
+                    {
+                        Debug.Log(filename);
+                        maid.SetProp(mpn, filename, 0, true, false);
+                    }
                 }
             }
+            //本衣装 仮衣装状態でない
+            else if (prop.nFileNameRID != 0)
+            {
+                if (Menu.m_dicResourceRef.TryGetValue(prop.nFileNameRID, out sortedDictionary) &&
+                    sortedDictionary.TryGetValue(front ? "めくれスカート" : "めくれスカート後ろ", out filename))
+                {
+                    Debug.Log(filename);
+                    maid.SetProp(mpn, filename, 0, true, false);
+                }
+            }
+
+            maid.AllProcPropSeqStart();
         }
 
         //ぽろり上 CRCボディのはだけにも対応
@@ -3451,7 +4014,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
         {
 #if COM3D2_5
 			//はだけ
-			if (maid.IsCrcBody) {
+			if (maid.IsCrcBody && cfg.useMekureController) {
 				if (maid.mekureController.IsSupportedCostumeType(MaidExtension.MaidCostumeChangeController.CostumeType.Hadake)) {
 					maid.mekureController.SetEnabledCostumeType(MaidExtension.MaidCostumeChangeController.CostumeType.Hadake, true, null);
 				}
@@ -3466,7 +4029,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
         public void pororiTopReset(Maid maid)
         {
 #if COM3D2_5
-			if (maid.IsCrcBody) {
+			if (maid.IsCrcBody && cfg.useMekureController) {
 				if (maid.mekureController.IsSupportedCostumeType(MaidExtension.MaidCostumeChangeController.CostumeType.Hadake)) {
 					maid.mekureController.SetEnabledCostumeType(MaidExtension.MaidCostumeChangeController.CostumeType.Hadake, false, null);
 				}
@@ -3739,167 +4302,111 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 
         #endregion
 
+
         ////////////////////////////////////////////////////////////////
-        // テンキーウィンドウ
+        /// ShapeKey
+        /// //# inory modified
 
-        #region GUI
+        #region ShapeKey
 
-        //GUIのスタイル情報
-        class GUIInfo
+        // I don't know how to hook method in UnityInject, so I go this way.
+        public void setShapeKey(string shapeKey, float value)
         {
-            public Rect rect;
-
-            public GUIStyle gsWin;
-            public GUIStyle gsLabel;
-            public GUIStyle gsButton;
-
-            public Texture2D bgTexture; //背景色
-            public Texture2D lineTexture;
-        }
-
-        //GUI初期化
-        private void initGUI()
-        {
-            this.gui = new GUIInfo();
-
-            int buttonSize = cfg.buttonSize;
-            int buttonMargin = cfg.buttonSize + 4;
-
-            //パネル原点 位置 サイズ
-            //rect = new Rect(-50, 50, 540, 28);
-            gui.rect = new Rect(-50, 50, 2 + buttonMargin * 3 + 4 + buttonSize + 4 + 2, buttonMargin * 5);
-            gui.rect.x = UnityEngine.Screen.width - gui.rect.width + gui.rect.x; //右から
-            gui.rect.x = Math.Min(Math.Max(0, gui.rect.x), UnityEngine.Screen.width - gui.rect.width);
-            gui.rect.y = Math.Min(Math.Max(0, gui.rect.y), UnityEngine.Screen.height - gui.rect.height);
-
-            //メインウィンドウ
-            gui.gsWin = new GUIStyle("box");
-            gui.gsWin.fontSize = cfg.fontSize;
-            gui.gsWin.alignment = TextAnchor.UpperLeft;
-
-            //テクスチャ
-            gui.bgTexture = new Texture2D(1, 1);
-            gui.bgTexture.SetPixel(0, 0, cfg.color);
-            gui.bgTexture.Apply();
-            gui.lineTexture = new Texture2D(1, 1);
-            gui.lineTexture.SetPixel(0, 0, new Color32(255, 255, 255, 160));
-            gui.lineTexture.Apply();
-
-            //背景色設定
-            gui.gsWin.onHover.background = gui.bgTexture;
-            gui.gsWin.hover.background = gui.bgTexture;
-            gui.gsWin.onFocused.background = gui.bgTexture;
-            gui.gsWin.focused.background = gui.bgTexture;
-            gui.gsWin.onHover.textColor = Color.white;
-            gui.gsWin.hover.textColor = Color.white;
-            gui.gsWin.onFocused.textColor = Color.white;
-            gui.gsWin.focused.textColor = Color.white;
-
-            gui.gsLabel = new GUIStyle("label");
-            gui.gsLabel.fontSize = cfg.fontSize;
-            gui.gsLabel.alignment = TextAnchor.MiddleLeft;
-
-            gui.gsButton = new GUIStyle("button");
-            gui.gsButton.fontSize = cfg.fontSize;
-            gui.gsButton.alignment = TextAnchor.MiddleCenter;
-        }
-
-        //UI生成
-        void drawGUI(int id)
-        {
-            int buttonSize = cfg.buttonSize;
-            int buttonMargin = cfg.buttonSize + 4;
-
-            //上にライン
-            GUI.DrawTexture(new Rect(2, 2, 8, buttonSize), gui.lineTexture, ScaleMode.StretchToFill, true, 0);
-
-            if (GUI.Button(new Rect(gui.rect.width - 21, 1, 20, 20), "×", gui.gsButton))
+            if (shapeKeyAnimations.TryGetValue(shapeKey, out var anim))
             {
-                toggleKeyboard();
-                return;
+                value = anim.current;
             }
 
-            int left = 2; //左余白
-            int top = 2; //上余白
-            int x = left;
-            int y = top;
-            //数字キー 0-9
-            x = left + buttonMargin; //0の位置
-            y = top + buttonMargin * 4;
-            for (int i = 0; i < 10; i++)
+            foreach (Maid maid in getUndressMaidList())
             {
-                if (GUI.Button(new Rect(x, y, buttonSize, buttonSize), "" + i, gui.gsButton))
+                if (!maid.Visible) continue;
+
+                var body = maid.body0;
+                if (body is null) continue;
+
+                if (maid.Visible)
                 {
-                    sendKey((ushort)(0x30 + i));
+                    for (int i = 0; i < body.goSlot.Count; i++)
+                    {
+                        TMorph morph = body.goSlot[i].morph;
+                        if (morph?.hash == null) continue;
+
+                        if (morph.Contains(shapeKey))
+                        {
+                            if (morph.hash[shapeKey] is int hash)
+                            {
+                                morph.SetBlendValues(hash, value);
+                                morph.FixBlendValues();
+                            }
+                        }
+                    }
                 }
-
-                if (i == 0 || i == 3 || i == 6)
-                {
-                    x = 2;
-                    y -= buttonMargin;
-                }
-                else x += buttonMargin;
             }
-
-            //マイナス
-            x = left;
-            y = top + buttonMargin * 4;
-            if (GUI.Button(new Rect(x, y, buttonSize, buttonSize), "-", gui.gsButton))
-            {
-                sendKey(Keys.Subtract);
-            }
-
-            //.
-            x = left + buttonMargin * 2;
-            y = top + buttonMargin * 4;
-            if (GUI.Button(new Rect(x, y, buttonSize, buttonSize), ".", gui.gsButton))
-            {
-                sendKey(Keys.Decimal);
-            }
-
-            x = left + buttonMargin;
-            y = top;
-            if (GUI.Button(new Rect(x, y, buttonSize + 2, buttonSize), "←", gui.gsButton))
-            {
-                sendKey(Keys.Left);
-            }
-
-            x += buttonMargin;
-            if (GUI.Button(new Rect(x, y, buttonSize + 2, buttonSize), "→", gui.gsButton))
-            {
-                sendKey(Keys.Right);
-            }
-
-            x = left + buttonMargin * 3 + 4;
-            y = top + buttonMargin;
-            //BS
-            if (GUI.Button(new Rect(x, y, buttonSize + 6, buttonSize), "bs", gui.gsButton))
-            {
-                sendKey(Keys.Back);
-            }
-
-            y += buttonMargin;
-            //DEL
-            if (GUI.Button(new Rect(x, y, buttonSize + 6, buttonSize), "del", gui.gsButton))
-            {
-                guiStopPropagation = false;
-                Invoke("sendDelete", 0.1f);
-                //sendKey(Keys.Delete);
-            }
-
-            y += buttonMargin;
-            //Enter
-            if (GUI.Button(new Rect(x, y, buttonSize + 6, buttonSize * 2 + 4), "⏎", gui.gsButton))
-            {
-                //遅延呼び出し
-                guiStopPropagation = false;
-                Invoke("sendEnter", 0.1f);
-            }
-
-            GUI.DragWindow();
         }
+
+        // Add new animation methods
+        public void StartShapeKeyAnimation(string shapeKey, float startValue, float endValue, float animationSpeed)
+        {
+            if (!shapeKeyAnimations.ContainsKey(shapeKey))
+            {
+                shapeKeyAnimations[shapeKey] = new AnimationState
+                {
+                    current = startValue,
+                    target = endValue,
+                    speed = animationSpeed
+                };
+            }
+
+            if (animationCoroutine == null)
+            {
+                animationCoroutine = StartCoroutine(UpdateShapeKeyAnimations());
+            }
+        }
+
+        public void StopShapeKeyAnimation(string shapeKey)
+        {
+            if (shapeKeyAnimations.ContainsKey(shapeKey))
+            {
+                shapeKeyAnimations.Remove(shapeKey);
+
+                if (shapeKeyAnimations.Count == 0 && animationCoroutine != null)
+                {
+                    StopCoroutine(animationCoroutine);
+                    animationCoroutine = null;
+                }
+            }
+        }
+
+        private IEnumerator UpdateShapeKeyAnimations()
+        {
+            while (true)
+            {
+                foreach (var anim in shapeKeyAnimations.ToList())
+                {
+                    var state = anim.Value;
+                    // Update current value
+                    float newValue = Mathf.MoveTowards(state.current, state.target, state.speed * Time.deltaTime);
+
+                    // Apply shapekey to all maids
+                    setShapeKey(anim.Key, newValue);
+
+                    // Reverse direction when target is reached
+                    shapeKeyAnimations[anim.Key] = new AnimationState
+                    {
+                        current = newValue,
+                        target = Mathf.Approximately(newValue, state.target) ?
+                            (state.target == anim.Value.target ? anim.Value.current : anim.Value.target) :
+                            state.target,
+                        speed = state.speed
+                    };
+                }
+                yield return null;
+            }
+        }
+
 
         #endregion
+
 
         ////////////////////////////////////////////////////////////////
         // キー送信
@@ -3908,13 +4415,13 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 
         public void sendDelete()
         {
-            sendKey(Keys.Delete);
+            sendKey((ushort)Keys.Delete);
         }
 
         //遅延してクリックを下に通してからキー呼び出し ModsSliderでEnterが効かないためフォーカス対策
         public void sendEnter()
         {
-            sendKey(Keys.Enter);
+            sendKey((ushort)Keys.Enter);
             Invoke("endEnter", 0.1f);
         }
 
@@ -3924,41 +4431,52 @@ namespace COM3D2.VoiceShortcutManager.Plugin
         }
 
         //キー送信
-        public void sendKey(Keys key)
-        {
-            sendKey((ushort)key, false, false, false, false);
-        }
-
         public void sendKey(ushort key)
         {
-            sendKey(key, false, false, false, false);
+#if DEBUG
+            Debug.Log("sendKey : " + key);
+#endif
+
+            keyDownUp(key, false);
         }
 
-        public void sendKey(Keys key, bool shift, bool ctrl, bool alt)
+        private void keyDownUp(ushort key, bool extended)
         {
-            //Debug.Log("sendKey : "+key+(shift?" + shift":"")+(ctrl?" + ctrl":"")+(alt?" + alt":""));
-            sendKey((ushort)key, shift, ctrl, alt, false);
-        }
+#if DEBUG
+            Debug.Log("KeyDownUp : " + key);
+#endif
 
-        public void sendExtendedKey(Keys key, bool shift, bool ctrl, bool alt)
-        {
-            sendKey((ushort)key, shift, ctrl, alt, true);
-        }
+            INPUT[] inputs = new INPUT[2];
 
-        public void sendKey(ushort key, bool shift, bool ctrl, bool alt, bool extended)
-        {
-            if (alt) altDown();
-            if (ctrl) ctrlDown();
-            if (shift) shiftDown();
-            keyDown(key, extended);
-            keyUp(key, extended);
-            //StartCoroutine(DelayKeyUp(0.05f, key, extended));
-            //遅延実行しないと押したことにならない
-            StartCoroutine(DelayScanUp(0.1f, shift, ctrl, alt));
+            inputs[0].Type = 1; //INPUT_KEYBOARD
+            KEYBDINPUT ki = new KEYBDINPUT();
+            ki.Time = 0;
+            ki.ExtraInfo = GetMessageExtraInfo();
+            ki.Vk = key;
+            ki.Scan = 0;
+            ki.Flags = KEYEVENTF_KEYDOWN;
+            if (extended) ki.Flags |= KEYEVENTF_EXTENDEDKEY;
+            inputs[0].U.ki = ki;
+
+            inputs[1].Type = 1; //INPUT_KEYBOARD
+            ki = new KEYBDINPUT();
+            ki.Time = 0;
+            ki.ExtraInfo = GetMessageExtraInfo();
+            ki.Vk = key;
+            ki.Scan = 0;
+            ki.Flags = KEYEVENTF_KEYUP;
+            if (extended) ki.Flags |= KEYEVENTF_EXTENDEDKEY;
+            inputs[1].U.ki = ki;
+
+            SendInput((uint)2, inputs, Marshal.SizeOf(inputs[0]));
         }
 
         private void keyDown(ushort key, bool extended)
         {
+#if DEBUG
+            Debug.Log("KeyDown : " + key);
+#endif
+
             INPUT[] inputs = new INPUT[1];
             inputs[0].Type = 1; //INPUT_KEYBOARD
             KEYBDINPUT ki = new KEYBDINPUT();
@@ -3973,44 +4491,12 @@ namespace COM3D2.VoiceShortcutManager.Plugin
             SendInput((uint)1, inputs, Marshal.SizeOf(inputs[0]));
         }
 
-        private void shiftDown()
-        {
-            scanDown((ushort)Keys.ShiftKey);
-        }
-
-        private void ctrlDown()
-        {
-            scanDown((ushort)Keys.ControlKey);
-        }
-
-        private void altDown()
-        {
-            scanDown((ushort)Keys.Menu);
-        }
-
-        private void scanDown(ushort key)
-        {
-            INPUT[] inputs = new INPUT[1];
-            inputs[0].Type = 1; //INPUT_KEYBOARD
-            KEYBDINPUT ki = new KEYBDINPUT();
-            ki.Time = 0;
-            ki.ExtraInfo = GetMessageExtraInfo();
-            ki.Vk = key;
-            ki.Scan = (ushort)MapVirtualKey(key, 0);
-            ki.Flags = KEYEVENTF_SCANCODE;
-            inputs[0].U.ki = ki;
-
-            SendInput((uint)1, inputs, Marshal.SizeOf(inputs[0]));
-        }
-
-        private IEnumerator DelayKeyUp(float delay, ushort key, bool extended)
-        {
-            yield return new WaitForSeconds(delay);
-            keyUp(key, extended);
-        }
-
         private void keyUp(ushort key, bool extended)
         {
+#if DEBUG
+            Debug.Log("KeyUp : " + key);
+#endif
+
             INPUT[] inputs = new INPUT[1];
             inputs[0].Type = 1; //INPUT_KEYBOARD
             KEYBDINPUT ki = new KEYBDINPUT();
@@ -4025,42 +4511,91 @@ namespace COM3D2.VoiceShortcutManager.Plugin
             SendInput((uint)1, inputs, Marshal.SizeOf(inputs[0]));
         }
 
-        private IEnumerator DelayScanUp(float delay, bool shift, bool ctrl, bool alt)
+        private void scanDown(bool shift, bool ctrl, bool alt)
         {
-            yield return new WaitForSeconds(delay);
-            if (shift) shiftUp();
-            if (ctrl) ctrlUp();
-            if (alt) altUp();
+#if DEBUG
+            Debug.Log("ScanDown : " + (shift ? " + shift" : "") + (ctrl ? " + ctrl" : "") + (alt ? " + alt" : ""));
+#endif
+
+            int num = 0;
+            if (shift) num++;
+            if (ctrl) num++;
+            if (alt) num++;
+
+            INPUT[] inputs = new INPUT[num];
+            int idx = 0;
+
+            if (alt)
+            {
+                inputs[idx].Type = 1; //INPUT_KEYBOARD
+                inputs[idx].U.ki = getScanInput((ushort)Keys.LMenu, KEYEVENTF_SCANCODE | KEYEVENTF_KEYDOWN);
+                idx++;
+            }
+
+            if (shift)
+            {
+                inputs[idx].Type = 1; //INPUT_KEYBOARD
+                inputs[idx].U.ki = getScanInput((ushort)Keys.LShiftKey, KEYEVENTF_SCANCODE | KEYEVENTF_KEYDOWN);
+                idx++;
+            }
+
+            if (ctrl)
+            {
+                inputs[idx].Type = 1; //INPUT_KEYBOARD
+                inputs[idx].U.ki = getScanInput((ushort)Keys.LControlKey, KEYEVENTF_SCANCODE | KEYEVENTF_KEYDOWN);
+                idx++;
+            }
+
+            SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(inputs[0]));
         }
 
-        private void shiftUp()
+        private void scanUp(bool shift, bool ctrl, bool alt)
         {
-            scanUp((ushort)Keys.ShiftKey);
+#if DEBUG
+            Debug.Log("ScanUp : " + (shift ? " + shift" : "") + (ctrl ? " + ctrl" : "") + (alt ? " + alt" : ""));
+#endif
+
+            int num = 0;
+            if (shift) num++;
+            if (ctrl) num++;
+            if (alt) num++;
+
+            INPUT[] inputs = new INPUT[num];
+            int idx = 0;
+
+            if (ctrl)
+            {
+                inputs[idx].Type = 1; //INPUT_KEYBOARD
+                inputs[idx].U.ki = getScanInput((ushort)Keys.LControlKey, KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP);
+                idx++;
+            }
+
+            if (shift)
+            {
+                inputs[idx].Type = 1; //INPUT_KEYBOARD
+                inputs[idx].U.ki = getScanInput((ushort)Keys.LShiftKey, KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP);
+                idx++;
+            }
+
+            if (alt)
+            {
+                inputs[idx].Type = 1; //INPUT_KEYBOARD
+                inputs[idx].U.ki = getScanInput((ushort)Keys.LMenu, KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP);
+                idx++;
+            }
+
+            SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(inputs[0]));
         }
 
-        private void ctrlUp()
+        private KEYBDINPUT getScanInput(ushort key, uint flags)
         {
-            scanUp((ushort)Keys.ControlKey);
-        }
-
-        private void altUp()
-        {
-            scanUp((ushort)Keys.Menu);
-        }
-
-        private void scanUp(ushort key)
-        {
-            INPUT[] inputs = new INPUT[1];
-            inputs[0].Type = 1; //INPUT_KEYBOARD
             KEYBDINPUT ki = new KEYBDINPUT();
             ki.Time = 0;
             ki.ExtraInfo = GetMessageExtraInfo();
             ki.Vk = key;
             ki.Scan = (ushort)MapVirtualKey(key, 0);
-            ki.Flags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
-            inputs[0].U.ki = ki;
-
-            SendInput((uint)1, inputs, Marshal.SizeOf(inputs[0]));
+            ki.Flags = flags;
+            return ki;
         }
 
         #endregion

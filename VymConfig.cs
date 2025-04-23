@@ -149,7 +149,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
         //名前でメインメイドを選択
         public VymVoiceInfo[] vymSelectMaidName =
         {
-            new VymVoiceInfo("聖道 まりあ", new string[] { "無垢ちゃん" }),
+            //new VymVoiceInfo("聖道 まりあ", new string[]{"無垢選択"}),
         };
 
         public string[] vymPrevMaid = { "前のメイド" };
@@ -212,7 +212,7 @@ namespace COM3D2.VoiceShortcutManager.Plugin
         //第1引数: -1=表示中の最初の男, 0=ご主人様, 1～モブ男  第2引数:-1変更なし, 0=男の顔の向き, 1=顔, 2=胸, 3=股間
         public VymVoiceInfo[] vymCamManHead =
         {
-            new VymVoiceInfo("-1", "1", new string[] { "男に移動", "男の位置" }), //メイドの顔方向
+            new VymVoiceInfo("-1", "1", new string[] { "男に移動", "男の位置" }), //男の頭位置からメイドの顔方向を向く
             new VymVoiceInfo("-1", "0", new string[] { "男視点" }), //男の顔の方向 1人称モードにはしない
             new VymVoiceInfo("0", "0", new string[] { "ご主人様視点" }),
         };
@@ -249,11 +249,18 @@ namespace COM3D2.VoiceShortcutManager.Plugin
             new VymVoiceInfo("0", new string[] { "地面ゼロ" }),
         };
 
+        //コライダー Slot複数指定はカンマ区切り 髪以外も指定可能
+        public VymVoiceInfo[] vymCollider =
+        {
+            new VymVoiceInfo("hairR,hairT", "true", new string[] { "コライダー有効" }),
+            new VymVoiceInfo("hairR,hairT", "false", new string[] { "コライダー無効" }),
+        };
+
         //興奮値 先頭に"+"や"-"がついていたら相対値で変更
         public VymVoiceInfo[] vymExcite =
         {
-            new VymVoiceInfo("-50", new string[] { "興奮下げる" }),
-            new VymVoiceInfo("+50", new string[] { "興奮上げる" }),
+            new VymVoiceInfo("-100", new string[] { "興奮下げる" }),
+            new VymVoiceInfo("+100", new string[] { "興奮上げる", "興奮して" }),
             new VymVoiceInfo("0", new string[] { "興奮なし" }),
         };
 

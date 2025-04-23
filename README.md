@@ -1,11 +1,17 @@
 # COM3D2.VoiceShortcutManager
 A VoiceShortcutManager fork for personal purposes
 
+This repository is for personal purposes, I added some custom modifications.
+
+
 <br>
 
-This plugin is made by twitter @ankokusamochi, release at [https://x.com/ankokusamochi/status/1857758072518705453](https://x.com/ankokusamochi/status/1857758072518705453), you can find original description there.
+- added more slots support
+- added shape key support
 
-This repository is for personal purposes, I added some custom modifications.
+<br>
+
+This plugin is made by twitter [@ankokusamochi](https://x.com/ankokusamochi), release at [https://x.com/ankokusamochi/status/1857758072518705453](https://x.com/ankokusamochi/status/1857758072518705453), you can find original description there.
 
 <br>
 

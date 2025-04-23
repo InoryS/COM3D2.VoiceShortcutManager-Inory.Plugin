@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - uses: actions/checkout@v4
@@ -26,7 +26,7 @@ jobs:
         with:
           nuget-api-key: ${{ secrets.NuGetAPIKey }}
           nuget-version: '5.x'
-      - run: nuget restore COM3D2.VoiceShortcutManager.Plugin.csproj
+      - run: nuget restore COM3D2.VoiceShortcutManager.Plugin.sln
         
       - name: Build
         run: |

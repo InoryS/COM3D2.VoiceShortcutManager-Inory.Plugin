@@ -1,0 +1,30 @@
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30523.141
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{28631C98-E3A8-48C6-B495-9AA89E2091E3}") = "COM3D2.VoiceShortcutManager.Plugin", "COM3D2.VoiceShortcutManager.Plugin.csproj", "{2E2599B3-A84B-5F1C-9DB5-622170498278}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+		Release_2_5|Any CPU = Release_2_5|Any CPU
+		Debug_2_5|Any CPU = Debug_2_5|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2E2599B3-A84B-5F1C-9DB5-622170498278}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E2599B3-A84B-5F1C-9DB5-622170498278}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E2599B3-A84B-5F1C-9DB5-622170498278}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E2599B3-A84B-5F1C-9DB5-622170498278}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E2599B3-A84B-5F1C-9DB5-622170498278}.Release_2_5|Any CPU.ActiveCfg = Release_2_5|Any CPU
+		{2E2599B3-A84B-5F1C-9DB5-622170498278}.Release_2_5|Any CPU.Build.0 = Release_2_5|Any CPU
+		{2E2599B3-A84B-5F1C-9DB5-622170498278}.Debug_2_5|Any CPU.ActiveCfg = Debug_2_5|Any CPU
+		{2E2599B3-A84B-5F1C-9DB5-622170498278}.Debug_2_5|Any CPU.Build.0 = Debug_2_5|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2E2599B3-A84B-5F1C-9DB5-622170498278}
+	EndGlobalSection
+EndGlobal

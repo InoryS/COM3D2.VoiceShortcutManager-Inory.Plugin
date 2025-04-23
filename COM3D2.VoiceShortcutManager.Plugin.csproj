@@ -13,6 +13,8 @@
     https://nuget.samboy.dev/v3/index.json
   </RestoreAdditionalProjectSources>
   <RootNamespace>COM3D2.VoiceShortcutManager.Plugin</RootNamespace>
+  <Configurations>Debug;Release;Release 2.5 | Any CPU;Debug 2.5 | Any CPU;Release_2_5;Debug_2_5</Configurations>
+  <Platforms>AnyCPU</Platforms>
 </PropertyGroup>
 
 <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -34,8 +36,27 @@
 </PropertyGroup>
 
 
+<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug_2_5|AnyCPU' ">
+  <DebugSymbols>true</DebugSymbols>
+  <DebugType>full</DebugType>
+  <Optimize>false</Optimize>
+  <OutputPath>bin\Debug\</OutputPath>
+  <DefineConstants>DEBUG;TRACE;COM3D2_5</DefineConstants>
+  <ErrorReport>prompt</ErrorReport>
+  <WarningLevel>4</WarningLevel>
+</PropertyGroup>
+<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release_2_5|AnyCPU' ">
+  <DebugType>pdbonly</DebugType>
+  <Optimize>true</Optimize>
+  <OutputPath>bin\Release\</OutputPath>
+  <DefineConstants>TRACE;COM3D2_5</DefineConstants>
+  <ErrorReport>prompt</ErrorReport>
+  <WarningLevel>4</WarningLevel>
+</PropertyGroup>  
+  
+
 <ItemGroup>
-  <PackageReference Include="COM3D2.GameLibs" Version="2.39.0-r.0" />
+  <PackageReference Include="COM3D2.GameLibs" Version="2.43.1-r.0" />
   <Reference Include="UnityEngine">
     <HintPath>..\libs\UnityEngine.dll</HintPath>
   </Reference>
