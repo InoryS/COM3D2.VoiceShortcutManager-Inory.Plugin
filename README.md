@@ -28,3 +28,4 @@ So I suppose free to use, modify, and redistribute the source code.
 
 But, it the author don't want me to do this, please let me know and I will delete this repo.
 
+All rights belong to the original author @ankokusamochi
