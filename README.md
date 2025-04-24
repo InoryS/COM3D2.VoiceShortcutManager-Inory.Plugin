@@ -10,9 +10,11 @@ Only for COM3D2, sorry
 - added more slots support
 - added shape key support
 
+<br>
+
 <details>
 
-<summary>example</summary>
+<summary>Usage Example</summary>
 
 Use voice to control my [facehugger mod](https://mega.nz/folder/U6Jy0a6a#Pv5G9G_J5zoYc46TVmz6iA): 
 
