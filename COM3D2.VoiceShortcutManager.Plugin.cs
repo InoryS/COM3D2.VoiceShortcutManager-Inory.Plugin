@@ -104,14 +104,15 @@ namespace COM3D2.VoiceShortcutManager.Plugin
         Type vymType = null;
 
 
-
         //# inory modified
         // for ShapeKey animation
-        private struct AnimationState
+        public class AnimationState
         {
             public float current;
-            public float target;
+            public float minValue;
+            public float maxValue;
             public float speed;
+            public bool increasing;
         }
 
         private Dictionary<string, AnimationState> shapeKeyAnimations = new Dictionary<string, AnimationState>();
@@ -899,39 +900,39 @@ namespace COM3D2.VoiceShortcutManager.Plugin
 
         private void setShapeKeyAnimationKeywords()
         {
-        		foreach (ShapeKeyAnimationInfo shapeKeyAnimationInfo in voiceCfg.shapeKeyAnimationList)
-        		{
-                    // add shapeKey animation keywords
-                    if (shapeKeyAnimationInfo.animationSpeed > 0)
+            foreach (ShapeKeyAnimationInfo shapeKeyAnimationInfo in voiceCfg.shapeKeyAnimationList)
+            {
+                // add shapeKey animation keywords
+                if (shapeKeyAnimationInfo.speed > 0)
+                {
+                    // animation start keywords
+                    foreach (string animStart in shapeKeyAnimationInfo.startVoice)
                     {
-                        // animation start keywords
-                        foreach (string animStart in shapeKeyAnimationInfo.animationStartVoice)
+                        if (keywords.ContainsKey(animStart)) continue;
+                        string k = animStart;
+                        keywords.Add(animStart, () =>
                         {
-                            if (keywords.ContainsKey(animStart)) continue;
-                            string k = animStart;
-                            keywords.Add(animStart, () =>
-                            {
-                                Debug.Log($"Voice start animation: {k} -> {shapeKeyAnimationInfo.shapeKey}");
-                                StartShapeKeyAnimation(shapeKeyAnimationInfo.shapeKey,
-                                    shapeKeyAnimationInfo.animationStartValue,
-                                    shapeKeyAnimationInfo.animationEndValue,
-                                    shapeKeyAnimationInfo.animationSpeed);
-                            });
-                        }
-
-                        // animation stop keywords
-                        foreach (string animStop in shapeKeyAnimationInfo.animationStopVoice)
-                        {
-                            if (keywords.ContainsKey(animStop)) continue;
-                            string k = animStop;
-                            keywords.Add(animStop, () =>
-                            {
-                                Debug.Log($"Voice stop animation: {k} -> {shapeKeyAnimationInfo.shapeKey}");
-                                StopShapeKeyAnimation(shapeKeyAnimationInfo.shapeKey);
-                            });
-                        }
+                            Debug.Log($"Voice start animation: {k} -> {shapeKeyAnimationInfo.shapeKey}");
+                            StartShapeKeyAnimation(shapeKeyAnimationInfo.shapeKey,
+                                shapeKeyAnimationInfo.min,
+                                shapeKeyAnimationInfo.max,
+                                shapeKeyAnimationInfo.speed);
+                        });
                     }
-        		}
+
+                    // animation stop keywords
+                    foreach (string animStop in shapeKeyAnimationInfo.stopVoice)
+                    {
+                        if (keywords.ContainsKey(animStop)) continue;
+                        string k = animStop;
+                        keywords.Add(animStop, () =>
+                        {
+                            Debug.Log($"Voice stop animation: {k} -> {shapeKeyAnimationInfo.shapeKey}");
+                            StopShapeKeyAnimation(shapeKeyAnimationInfo.shapeKey);
+                        });
+                    }
+                }
+            }
         }
 
 
@@ -4349,18 +4350,26 @@ namespace COM3D2.VoiceShortcutManager.Plugin
         {
             if (!shapeKeyAnimations.ContainsKey(shapeKey))
             {
+                // Make sure startValue is less than endValue
+                float minVal = Mathf.Min(startValue, endValue);
+                float maxVal = Mathf.Max(startValue, endValue);
+
                 shapeKeyAnimations[shapeKey] = new AnimationState
                 {
                     current = startValue,
-                    target = endValue,
-                    speed = animationSpeed
+                    minValue = minVal,
+                    maxValue = maxVal,
+                    speed = animationSpeed,
+                    increasing = true // Initially set to increment
                 };
             }
 
-            if (animationCoroutine == null)
+            if (animationCoroutine != null)
             {
-                animationCoroutine = StartCoroutine(UpdateShapeKeyAnimations());
+                StopCoroutine(animationCoroutine);
             }
+
+            animationCoroutine = StartCoroutine(UpdateShapeKeyAnimations());
         }
 
         public void StopShapeKeyAnimation(string shapeKey)
@@ -4381,29 +4390,71 @@ namespace COM3D2.VoiceShortcutManager.Plugin
         {
             while (true)
             {
-                foreach (var anim in shapeKeyAnimations.ToList())
+                if (GameMain.Instance is null || GameMain.Instance.CharacterMgr is null)
                 {
-                    var state = anim.Value;
-                    // Update current value
-                    float newValue = Mathf.MoveTowards(state.current, state.target, state.speed * Time.deltaTime);
-
-                    // Apply shapekey to all maids
-                    setShapeKey(anim.Key, newValue);
-
-                    // Reverse direction when target is reached
-                    shapeKeyAnimations[anim.Key] = new AnimationState
-                    {
-                        current = newValue,
-                        target = Mathf.Approximately(newValue, state.target) ?
-                            (state.target == anim.Value.target ? anim.Value.current : anim.Value.target) :
-                            state.target,
-                        speed = state.speed
-                    };
+                    yield break;
                 }
+
+                bool anyActive = false;
+
+                foreach (var kvp in shapeKeyAnimations.ToList())
+                {
+                    string key = kvp.Key;
+                    AnimationState state = kvp.Value;
+                    anyActive = true;
+
+                    try
+                    {
+                        // Update the value according to the current direction
+                        if (state.increasing)
+                        {
+                            // Increment direction
+                            state.current += state.speed * Time.deltaTime;
+
+                            // Check if the maximum value is reached
+                            if (state.current >= state.maxValue)
+                            {
+                                state.current = state.maxValue;
+                                state.increasing = false; // Reversal direction
+                            }
+                        }
+                        else
+                        {
+                            // Decreasing direction
+                            state.current -= state.speed * Time.deltaTime;
+
+                            // Check whether the minimum value is reached
+                            if (state.current <= state.minValue)
+                            {
+                                state.current = state.minValue;
+                                state.increasing = true; // Reversal direction
+                            }
+                        }
+
+                        // Apply the current value to the morphological key
+                        setShapeKey(key, state.current);
+
+                        // Update animation status
+                        shapeKeyAnimations[key] = state;
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogError($"Error updating shape key animation for {key}: {ex.Message}");
+                        // Remove the animation when an error occurs to prevent continued crashes
+                        shapeKeyAnimations.Remove(key);
+                    }
+                }
+
+                // If there is no active animation, exit the coroutine
+                if (!anyActive)
+                {
+                    animationCoroutine = null;
+                    yield break;
+                }
+
                 yield return null;
             }
         }
-
 
         #endregion
 

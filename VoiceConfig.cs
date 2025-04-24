@@ -121,24 +121,25 @@ namespace COM3D2.VoiceShortcutManager.Plugin
     public class ShapeKeyAnimationInfo
     {
         public string shapeKey; // shapeKey name
-        public float animationStartValue; // animation Start value
-        public float animationEndValue; // animation End Value
-        public float animationSpeed; // animation Speed
-        public string[] animationStartVoice; // animation Start Keyword
-        public string[] animationStopVoice; // animation Stop Keyword
+        public float min; // animation Start value
+        public float max; // animation End Value
+        public float speed; // animation Speed
+        public string[] startVoice; // animation Start Keyword
+        public string[] stopVoice; // animation Stop Keyword
 
         public ShapeKeyAnimationInfo()
         {
         }
 
-        public ShapeKeyAnimationInfo(string shapeKey, float animationStartValue, float animationEndValue, float animationSpeed, string[] animationStartVoice, string[] animationStopVoice)
+        public ShapeKeyAnimationInfo(string shapeKey, float min, float max, float speed, string[] startVoice,
+            string[] stopVoice)
         {
             this.shapeKey = shapeKey;
-            this.animationStartValue = animationStartValue;
-            this.animationEndValue = animationEndValue;
-            this.animationSpeed = animationSpeed;
-            this.animationStartVoice = animationStartVoice;
-            this.animationStopVoice = animationStopVoice;
+            this.min = min;
+            this.max = max;
+            this.speed = speed;
+            this.startVoice = startVoice;
+            this.stopVoice = stopVoice;
         }
     }
     // # inory modify
@@ -336,11 +337,11 @@ namespace COM3D2.VoiceShortcutManager.Plugin
             shapeKeyAnimationList.Add(new ShapeKeyAnimationInfo
             {
                 shapeKey = "tits_nipple_kupa",
-                animationStartValue =  1,
-                animationEndValue = 0,
-                animationSpeed = 0.5f,
-                animationStartVoice = new string[] { "start nipple kupa animate" },
-                animationStopVoice = new string[] { "stop nipple kupa animate" }
+                min = 0,
+                max = 1,
+                speed = 0.5f,
+                startVoice = new string[] { "start nipple kupa animate" },
+                stopVoice = new string[] { "stop nipple kupa animate" }
             });
             // # inory modify
 
