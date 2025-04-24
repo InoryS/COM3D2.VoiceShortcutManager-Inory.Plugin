@@ -3,6 +3,7 @@ A VoiceShortcutManager fork for personal purposes
 
 This repository is for personal purposes, I added some custom modifications.
 
+Only for COM3D2, sorry
 
 <br>
 
@@ -10,6 +11,7 @@ This repository is for personal purposes, I added some custom modifications.
 - added shape key support
 
 <br>
+
 
 This plugin is made by twitter [@ankokusamochi](https://x.com/ankokusamochi), release at [https://x.com/ankokusamochi/status/1857758072518705453](https://x.com/ankokusamochi/status/1857758072518705453), you can find original description there.
 
